@@ -15,7 +15,7 @@ const GAME_STATE = {
 let gameState = GAME_STATE.START;
 let score = 0;
 let highScore = parseInt(localStorage.getItem('flappyBirdHighScore')) || 0;
-let gravity = 0.5;
+let gravity = 0.4;
 let frameCount = 0;
 let difficulty = 1;
 let soundEnabled = true;
@@ -119,9 +119,9 @@ let pipes = [];
 let powerUps = [];
 
 function createPipe() {
-    const minHeight = 50;
-    const maxHeight = 150;
-    const gap = 90 + difficulty * 5;
+    const minHeight = 60;
+    const maxHeight = 140;
+    const gap = 120;
     
     const topHeight = Math.random() * (maxHeight - minHeight) + minHeight;
     
@@ -147,19 +147,19 @@ function createPipe() {
         },
         
         update() {
-            this.x -= (4 + difficulty * 0.5);
+            this.x -= 3;
         }
     });
 }
 
 function createPowerUp(x, y) {
-    if (Math.random() > 0.7) {
+    if (Math.random() > 0.6) {
         powerUps.push({
             x: x,
             y: y,
             width: 20,
             height: 20,
-            type: Math.random() > 0.5 ? 'shield' : 'points',
+            type: Math.random() > 0.4 ? 'shield' : 'points',
             rotation: 0,
             
             draw() {
@@ -193,7 +193,7 @@ function createPowerUp(x, y) {
             },
             
             update() {
-                this.x -= (4 + difficulty * 0.5);
+                this.x -= 3;
                 this.rotation += 0.05;
             }
         });
@@ -307,7 +307,7 @@ function update() {
     
     bird.update();
     
-    if (frameCount % Math.max(60 - difficulty * 3, 40) === 0) {
+    if (frameCount % 100 === 0) {
         createPipe();
     }
     
@@ -325,7 +325,6 @@ function update() {
         if (!pipe.scored && bird.x > pipe.x + pipe.width) {
             pipe.scored = true;
             score += 10;
-            difficulty = 1 + Math.floor(score / 50);
             playSound('score');
             createPowerUp(pipe.x + pipe.width / 2, canvas.height / 2);
         }
@@ -381,9 +380,6 @@ function draw() {
     ctx.fillStyle = '#000';
     ctx.font = 'bold 24px Arial';
     ctx.fillText('Score: ' + score, 10, 30);
-    
-    ctx.font = '14px Arial';
-    ctx.fillText('Difficulty: ' + difficulty, 10, 50);
     
     if (gameState === GAME_STATE.START) {
         drawStartScreen();
