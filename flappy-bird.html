@@ -3,11 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird</title>
+    <title>Flappy Bird - Enhanced</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="gameCanvas" width="320" height="480"></canvas>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="320" height="480"></canvas>
+        <div class="controls">
+            <button id="soundToggle" class="sound-btn">🔊 Sound ON</button>
+            <button id="restartBtn" class="restart-btn">Restart Game</button>
+        </div>
+        <div class="stats">
+            <div class="high-score">Best: <span id="highScore">0</span></div>
+        </div>
+    </div>
     <script src="game.js"></script>
 </body>
 </html>
