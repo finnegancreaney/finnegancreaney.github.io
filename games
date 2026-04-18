@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games - Finnegan's Interests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            flex: 1;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-left: 5px solid #667eea;
+        }
+
+        .game-card h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .game-card p {
+            font-size: 1.05em;
+            line-height: 1.6;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .game-card ul {
+            margin: 15px 0 20px 30px;
+            font-size: 1.05em;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .game-card li {
+            margin: 8px 0;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-top: 15px;
+        }
+
+        .download-btn:hover {
+            background: #764ba2;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .instructions code {
+            background: #e8eef7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+            border-top: 4px solid #667eea;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .back-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎮 My Games</h1>
+        <a href="index.html" class="back-btn">← Back Home</a>
+    </header>
+
+    <main>
+        <div class="game-card">
+            <h2>📚 History Quiz Game</h2>
+            <p>Test your knowledge of English and Medieval history! This is an interactive quiz game built with Python and Pygame.</p>
+            
+            <h3 style="color: #667eea; margin-top: 15px;">Features:</h3>
+            <ul>
+                <li>✅ 12 challenging history questions</li>
+                <li>✅ Topics: Wessex, Medieval England, Modern History</li>
+                <li>✅ Score tracking and percentage calculation</li>
+                <li>✅ Instant feedback (correct/incorrect)</li>
+                <li>✅ Retake option to play again</li>
+                <li>✅ Beautiful GUI with progress bar</li>
+            </ul>
+
+            <a href="https://github.com/finnegancreaney/finnegancreaney.github.io/blob/main/history_quiz.py" class="download-btn" target="_blank">
+                📥 View on GitHub
+            </a>
+
+            <div class="instructions">
+                <h3>How to Play:</h3>
+                <ol>
+                    <li>Download the <code>history_quiz.py</code> file from GitHub</li>
+                    <li>Make sure you have Python 3 installed on your computer</li>
+                    <li>Open a terminal/command prompt in the folder where you saved the file</li>
+                    <li>Install Pygame: <code>pip install pygame</code></li>
+                    <li>Run the game: <code>python history_quiz.py</code></li>
+                    <li>Answer 12 history questions and get your score!</li>
+                </ol>
+            </div>
+
+            <div class="instructions" style="background: #e8f5e9; border-left-color: #4caf50; margin-top: 15px;">
+                <h3 style="color: #2e7d32;">Requirements:</h3>
+                <ul style="margin-left: 20px;">
+                    <li>Python 3.6+</li>
+                    <li>Pygame library (<code>pip install pygame</code>)</li>
+                    <li>Windows, Mac, or Linux</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="game-card">
+            <h2>🎮 More Games Coming Soon!</h2>
+            <p>I'm working on new games to add to this collection. Stay tuned for strategy games, tactical battles, and more!</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Finnegan Creaney | Personal Interest Hub</p>
+    </footer>
+</body>
+</html>
