@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Quiz Game - Finnegan's Interests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            flex: 1;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 1em;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            background: white;
+            border-radius: 10px;
+            padding: 60px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .start-screen h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            font-size: 1.1em;
+            color: #555;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        .start-btn {
+            background: #667eea;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 30px;
+        }
+
+        .start-btn:hover {
+            background: #764ba2;
+        }
+
+        /* Quiz Screen */
+        .quiz-screen {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-text {
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            transition: width 0.3s;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .question-container {
+            margin: 30px 0;
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #e8e8e8;
+            border-color: #667eea;
+        }
+
+        .option-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option-btn.correct {
+            background: #46a049;
+            color: white;
+            border-color: #46a049;
+        }
+
+        .option-btn.incorrect {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .next-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .next-btn.show {
+            display: block;
+        }
+
+        .next-btn:hover {
+            background: #764ba2;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            background: white;
+            border-radius: 10px;
+            padding: 60px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .result-screen h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 3em;
+            color: #46a049;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        .percentage-display {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .rating-message {
+            font-size: 1.2em;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f0f0f0;
+        }
+
+        .rating-message.perfect {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .rating-message.excellent {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .rating-message.good {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .rating-message.keep-learning {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .retake-btn {
+            background: #667eea;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 30px;
+        }
+
+        .retake-btn:hover {
+            background: #764ba2;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+            border-top: 4px solid #667eea;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .back-btn {
+                width: 100%;
+            }
+
+            .question-text {
+                font-size: 1.2em;
+            }
+
+            .score-display {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📚 History Quiz Game</h1>
+        <button class="back-btn" onclick="goHome()">← Back Home</button>
+    </header>
+
+    <main>
+        <!-- Start Screen -->
+        <div class="screen active" id="startScreen">
+            <div class="start-screen">
+                <h2>📚 Finnegan's History Quiz</h2>
+                <p>Test your knowledge of English and Medieval history!</p>
+                
+                <div class="info-box">
+                    <strong>📖 What's Inside:</strong>
+                    <p>12 challenging questions spanning Wessex, Medieval England, and Modern History</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>🎯 How It Works:</strong>
+                    <p>Answer each question by clicking an option. Get instant feedback and a final score!</p>
+                </div>
+
+                <button class="start-btn" onclick="startQuiz()">Start Quiz 🚀</button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="screen" id="quizScreen">
+            <div class="quiz-screen">
+                <div class="progress-container">
+                    <div class="progress-text">Question <span id="currentQuestion">1</span> / <span id="totalQuestions">12</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <div class="category-badge" id="categoryBadge">Category</div>
+
+                <div class="question-container">
+                    <div class="question-text" id="questionText">Question will appear here</div>
+                    <div class="options-container" id="optionsContainer"></div>
+                </div>
+
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="screen" id="resultScreen">
+            <div class="result-screen">
+                <h2>Quiz Complete! 🎉</h2>
+                <div class="score-display" id="finalScore">12 / 12</div>
+                <div class="percentage-display" id="percentageDisplay">100%</div>
+                <div class="rating-message" id="ratingMessage">Perfect Score! 🏆</div>
+                <button class="retake-btn" onclick="restartQuiz()">Retake Quiz</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Finnegan Creaney | Personal Interest Hub</p>
+    </footer>
+
+    <script>
+        // Quiz Data
+        const QUIZ_QUESTIONS = [
+            {
+                question: "Who was the King of Wessex that defended against Viking invasions?",
+                options: ["Alfred the Great", "William the Conqueror", "Richard the Lionheart", "King John"],
+                correct: 0,
+                category: "Wessex"
+            },
+            {
+                question: "In what year was the Treaty of Wedmore signed?",
+                options: ["878 AD", "1066 AD", "1215 AD", "1348 AD"],
+                correct: 0,
+                category: "Wessex"
+            },
+            {
+                question: "What was the Danelaw?",
+                options: ["Region controlled by Vikings", "A peace treaty", "A Viking weapon", "Alfred's law code"],
+                correct: 0,
+                category: "Wessex"
+            },
+            {
+                question: "What year was the Norman Conquest?",
+                options: ["1066", "1215", "1348", "1453"],
+                correct: 0,
+                category: "Medieval"
+            },
+            {
+                question: "Who created the Magna Carta?",
+                options: ["King John", "Richard the Lionheart", "William the Conqueror", "Henry VIII"],
+                correct: 0,
+                category: "Medieval"
+            },
+            {
+                question: "What conflict was fought between the Houses of York and Lancaster?",
+                options: ["Wars of the Roses", "Hundred Years' War", "Norman Conquest", "English Civil War"],
+                correct: 0,
+                category: "Medieval"
+            },
+            {
+                question: "What devastating event killed roughly half of England's population (1348-1350)?",
+                options: ["The Black Death", "The Spanish Armada", "World War I", "The English Civil War"],
+                correct: 0,
+                category: "Modern"
+            },
+            {
+                question: "Which king broke from Rome and created the Church of England?",
+                options: ["Henry VIII", "Elizabeth I", "Charles I", "James I"],
+                correct: 0,
+                category: "Modern"
+            },
+            {
+                question: "What was England's naval victory against Spain?",
+                options: ["The Spanish Armada", "Battle of Hastings", "Battle of Bosworth", "Battle of Crécy"],
+                correct: 0,
+                category: "Modern"
+            },
+            {
+                question: "Who was the 'Virgin Queen' known for England's Golden Age?",
+                options: ["Elizabeth I", "Mary I", "Anne Boleyn", "Catherine of Aragon"],
+                correct: 0,
+                category: "Modern"
+            },
+            {
+                question: "In which year did World War II begin?",
+                options: ["1939", "1914", "1918", "1945"],
+                correct: 0,
+                category: "Modern"
+            },
+            {
+                question: "What was the Spanish Civil War also known as?",
+                options: ["Spanish Revolution", "Spanish Uprising", "Spanish Conflict", "Spanish Rebellion"],
+                correct: 0,
+                category: "Modern"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let answered = false;
+        let questions = [];
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startQuiz() {
+            questions = shuffleArray(QUIZ_QUESTIONS);
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedAnswer = null;
+            answered = false;
+            document.getElementById('totalQuestions').textContent = questions.length;
+            showScreen('quizScreen');
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('categoryBadge').textContent = '📂 ' + question.category;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+            
+            selectedAnswer = null;
+            answered = false;
+            document.getElementById('nextBtn').classList.remove('show');
+        }
+
+        function selectAnswer(index) {
+            if (answered) return;
+            
+            const question = questions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            answered = true;
+            selectedAnswer = index;
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === question.correct) {
+                    btn.classList.add('correct');
+                } else if (i === index) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            if (index === question.correct) {
+                score++;
+            }
+            
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const percentage = (score / questions.length) * 100;
+            document.getElementById('finalScore').textContent = score + ' / ' + questions.length;
+            document.getElementById('percentageDisplay').textContent = percentage.toFixed(1) + '%';
+            
+            const ratingElement = document.getElementById('ratingMessage');
+            ratingElement.className = 'rating-message';
+            
+            if (percentage === 100) {
+                ratingElement.textContent = '🏆 Perfect Score! You\'re a history expert!';
+                ratingElement.classList.add('perfect');
+            } else if (percentage >= 80) {
+                ratingElement.textContent = '👏 Excellent! Great knowledge of history!';
+                ratingElement.classList.add('excellent');
+            } else if (percentage >= 60) {
+                ratingElement.textContent = '👍 Good! You know your stuff!';
+                ratingElement.classList.add('good');
+            } else {
+                ratingElement.textContent = '📚 Keep learning! History is fascinating!';
+                ratingElement.classList.add('keep-learning');
+            }
+            
+            showScreen('resultScreen');
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
