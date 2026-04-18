@@ -518,6 +518,458 @@ body {
 }
 
 /* ==============================
+   School Bus Tracker
+   ============================== */
+.bus-content {
+    align-items: stretch;
+    gap: 16px;
+    max-width: 680px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.bus-route-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+}
+
+.bus-route-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.5px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    white-space: nowrap;
+}
+
+.bus-route-info {
+    flex: 1;
+}
+
+.bus-route-name {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.bus-route-op {
+    margin: 4px 0 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.bus-status-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 6px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    box-shadow: var(--shadow-sm);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 18px;
+    align-items: center;
+}
+
+.bus-status-card[data-kind="pending"] { border-left-color: var(--success); }
+.bus-status-card[data-kind="passed"]  { border-left-color: var(--warning); }
+.bus-status-card[data-kind="complete"] { border-left-color: var(--muted); }
+.bus-status-card[data-kind="off"]     { border-left-color: var(--primary); background: #f9fafc; }
+
+.bus-status-time {
+    grid-row: 1 / span 2;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+}
+
+.bus-status-main {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.bus-status-sub {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 2px;
+}
+
+.bus-stop-picker {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: var(--bg);
+    padding: 12px 14px;
+    border-radius: 8px;
+}
+
+.bus-stop-picker-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bus-stop-picker-row label {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bus-stop-picker select {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+    font-size: 0.95rem;
+    color: var(--text);
+    cursor: pointer;
+}
+
+@media (max-width: 520px) {
+    .bus-stop-picker {
+        grid-template-columns: 1fr;
+    }
+}
+
+.bus-journey {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+.bus-journey-title {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+    color: var(--text);
+}
+
+.bus-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    position: relative;
+}
+
+.bus-timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 16px;
+    bottom: 16px;
+    width: 3px;
+    background: var(--border);
+    border-radius: 2px;
+}
+
+.bus-stop {
+    display: grid;
+    grid-template-columns: 34px 72px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    position: relative;
+    color: var(--text);
+}
+
+.bus-stop-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 3px solid var(--surface);
+    outline: 2px solid var(--border);
+    margin-left: 4px;
+    z-index: 1;
+    transition: background 0.25s ease, outline-color 0.25s ease, transform 0.2s ease;
+}
+
+.bus-stop.passed .bus-stop-dot {
+    background: var(--muted);
+    outline-color: var(--muted);
+}
+
+.bus-stop.passed {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: rgba(107, 114, 128, 0.35);
+}
+
+.bus-stop.current .bus-stop-dot {
+    background: var(--success);
+    outline-color: var(--success);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.18);
+    animation: bus-pulse 1.6s ease-in-out infinite;
+}
+
+.bus-stop.current .bus-stop-time,
+.bus-stop.current .bus-stop-name {
+    color: var(--success);
+    font-weight: 700;
+}
+
+.bus-stop.upcoming .bus-stop-dot {
+    background: var(--primary);
+    outline-color: var(--primary);
+}
+
+.bus-stop.my-stop {
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
+    border-radius: 6px;
+    padding-left: 6px;
+    margin-left: -6px;
+}
+
+.bus-stop.my-stop .bus-stop-badge::before {
+    content: 'My stop';
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.bus-stop-time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--primary-dark);
+}
+
+.bus-stop.passed .bus-stop-time {
+    color: var(--muted);
+}
+
+.bus-stop-name {
+    font-size: 0.95rem;
+}
+
+@keyframes bus-pulse {
+    0%, 100% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.18); }
+    50%      { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.08); }
+}
+
+.bus-hint {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 4px 0 0;
+    font-style: italic;
+}
+
+/* ----- Train board ----- */
+.trains-section {
+    background: #0b2230;
+    color: #e8eef3;
+    border-radius: var(--radius);
+    padding: 16px 18px 14px;
+    box-shadow: var(--shadow-md);
+    margin-top: 8px;
+}
+
+.trains-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.trains-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #e8eef3;
+    letter-spacing: 0.3px;
+}
+
+.trains-refresh-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e8eef3;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.trains-refresh-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.trains-status {
+    color: #8ea4b5;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.trains-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.train-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 70px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 3px solid #2ecc71;
+    transition: background 0.2s ease;
+}
+
+.train-row:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.train-row.cancelled {
+    border-left-color: #e74c3c;
+    opacity: 0.75;
+}
+
+.train-time-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.train-std {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.train-std.strike {
+    text-decoration: line-through;
+    color: #8ea4b5;
+}
+
+.train-etd {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.train-etd.ontime { color: #2ecc71; }
+.train-etd.delayed { color: #f39c12; }
+.train-etd.cancelled { color: #e74c3c; }
+
+.train-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.train-dest {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.train-operator {
+    font-size: 0.8rem;
+    color: #8ea4b5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.train-plat-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 6px 10px;
+    min-width: 60px;
+}
+
+.train-plat-label {
+    font-size: 0.65rem;
+    color: #8ea4b5;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.train-plat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffd166;
+    line-height: 1.1;
+}
+
+.trains-source {
+    color: #6b8294;
+    font-size: 0.75rem;
+    text-align: center;
+    margin: 10px 0 0;
+    font-style: italic;
+}
+
+@media (max-width: 520px) {
+    .train-row {
+        grid-template-columns: 90px 1fr 54px;
+        gap: 8px;
+        padding: 8px 10px;
+    }
+    .train-std { font-size: 1.15rem; }
+    .train-plat-value { font-size: 1.05rem; }
+}
+
+@media (max-width: 520px) {
+    .bus-stop {
+        grid-template-columns: 30px 60px 1fr;
+    }
+    .bus-stop-badge {
+        grid-column: 1 / -1;
+        padding-left: 40px;
+    }
+    .bus-status-time {
+        font-size: 2rem;
+    }
+    .bus-route-header {
+        flex-wrap: wrap;
+    }
+}
+
+/* ==============================
    Match 3
    ============================== */
 .match3-content {
