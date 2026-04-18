@@ -20,7 +20,9 @@ let frameCount = 0;
 let difficulty = 1;
 let soundEnabled = true;
 
-highScoreDisplay.textContent = highScore;
+if (highScoreDisplay) {
+    highScoreDisplay.textContent = highScore;
+}
 
 // Bird object
 const bird = {
@@ -325,6 +327,7 @@ function update() {
         if (!pipe.scored && bird.x > pipe.x + pipe.width) {
             pipe.scored = true;
             score += 10;
+            difficulty = 1 + Math.floor(score / 50);
             playSound('score');
             createPowerUp(pipe.x + pipe.width / 2, canvas.height / 2);
         }
@@ -381,13 +384,18 @@ function draw() {
     ctx.font = 'bold 24px Arial';
     ctx.fillText('Score: ' + score, 10, 30);
     
+    ctx.font = '14px Arial';
+    ctx.fillText('Difficulty: ' + difficulty, 10, 50);
+    
     if (gameState === GAME_STATE.START) {
         drawStartScreen();
     } else if (gameState === GAME_STATE.GAME_OVER) {
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('flappyBirdHighScore', highScore);
-            highScoreDisplay.textContent = highScore;
+            if (highScoreDisplay) {
+                highScoreDisplay.textContent = highScore;
+            }
         }
         drawGameOverScreen();
     }
@@ -423,15 +431,19 @@ canvas.addEventListener('click', () => {
     }
 });
 
-soundToggle.addEventListener('click', () => {
-    soundEnabled = !soundEnabled;
-    soundToggle.textContent = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
-    soundToggle.classList.toggle('off');
-});
+if (soundToggle) {
+    soundToggle.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundToggle.textContent = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
+        soundToggle.classList.toggle('off');
+    });
+}
 
-restartBtn.addEventListener('click', () => {
-    resetGame();
-});
+if (restartBtn) {
+    restartBtn.addEventListener('click', () => {
+        resetGame();
+    });
+}
 
 function resetGame() {
     gameState = GAME_STATE.PLAYING;
@@ -446,4 +458,5 @@ function resetGame() {
     powerUps = [];
 }
 
+// Start the game loop
 gameLoop();
