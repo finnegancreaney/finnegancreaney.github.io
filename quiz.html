@@ -530,11 +530,21 @@
             const optionsContainer = document.getElementById('optionsContainer');
             optionsContainer.innerHTML = '';
             
-            question.options.forEach((option, index) => {
+            // Create array of options with their original indices
+            const optionsWithIndices = question.options.map((option, index) => ({
+                text: option,
+                originalIndex: index
+            }));
+            
+            // Shuffle the options
+            const shuffledOptions = shuffleArray(optionsWithIndices);
+            
+            // Display shuffled options
+            shuffledOptions.forEach((optionObj) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
-                btn.textContent = option;
-                btn.onclick = () => selectAnswer(index);
+                btn.textContent = optionObj.text;
+                btn.onclick = () => selectAnswer(optionObj.originalIndex);
                 optionsContainer.appendChild(btn);
             });
             
@@ -554,9 +564,14 @@
             
             buttons.forEach((btn, i) => {
                 btn.disabled = true;
-                if (i === question.correct) {
+                const optionObj = {
+                    text: btn.textContent,
+                    originalIndex: parseInt(btn.onclick.toString().match(/\d+/)[0])
+                };
+                
+                if (optionObj.originalIndex === question.correct) {
                     btn.classList.add('correct');
-                } else if (i === index) {
+                } else if (optionObj.originalIndex === index) {
                     btn.classList.add('incorrect');
                 }
             });
