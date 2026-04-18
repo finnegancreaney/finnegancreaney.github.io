@@ -14,9 +14,12 @@
         </header>
 
         <nav class="hub-nav">
-            <button class="nav-btn active" data-game="home">Home</button>
-            <button class="nav-btn" data-game="flappy-bird">Flappy Bird</button>
-            <button class="nav-btn" data-game="battle-simulator">Battle Simulator</button>
+            <button class="nav-btn active" data-tab="home">Home</button>
+            <button class="nav-btn" data-tab="flappy">Flappy Bird</button>
+            <button class="nav-btn" data-tab="battle">Battle Simulator</button>
+            <button class="nav-btn" data-tab="history">History</button>
+            <button class="nav-btn" data-tab="football">Football</button>
+            <button class="nav-btn" data-tab="gaming">Gaming</button>
         </nav>
 
         <div class="games-container">
@@ -27,14 +30,14 @@
                     <p>Choose a game to play from the navigation above</p>
                     
                     <div class="games-showcase">
-                        <div class="game-card" data-game="flappy-bird">
+                        <div class="game-card" onclick="switchTab('flappy')">
                             <div class="game-card-icon">🐦</div>
                             <h3>Flappy Bird</h3>
                             <p>Guide your bird through pipes!</p>
                             <button class="play-btn">Play Now</button>
                         </div>
 
-                        <div class="game-card" data-game="battle-simulator">
+                        <div class="game-card" onclick="switchTab('battle')">
                             <div class="game-card-icon">⚔️</div>
                             <h3>Battle Simulator</h3>
                             <p>Build your base and battle enemies!</p>
@@ -63,10 +66,10 @@
             </div>
 
             <!-- Flappy Bird Game -->
-            <div id="flappy-bird" class="game-page">
+            <div id="flappy" class="game-page">
                 <div class="game-header-inline">
                     <h2>🐦 Flappy Bird</h2>
-                    <button class="back-btn">← Back</button>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
                 </div>
                 <div class="game-content">
                     <canvas id="gameCanvas" width="320" height="480"></canvas>
@@ -75,115 +78,25 @@
                         <button id="restartBtn" class="restart-btn">Restart Game</button>
                     </div>
                 </div>
-                <script src="game.js"></script>
             </div>
 
             <!-- Battle Simulator Game -->
-            <div id="battle-simulator" class="game-page">
+            <div id="battle" class="game-page">
                 <div class="game-header-inline">
                     <h2>⚔️ Battle Simulator</h2>
-                    <button class="back-btn">← Back</button>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
                 </div>
                 
-                <!-- Instructions Modal -->
-                <div id="battleInstructions" class="instructions-modal">
-                    <div class="instructions-content">
-                        <button class="close-instructions">✕</button>
-                        <h2>⚔️ Battle Simulator Tutorial</h2>
-                        
-                        <div class="instructions-section">
-                            <h3>🏗️ Step 1: Build Your Base</h3>
-                            <p><strong>Left Panel:</strong> Click on a building from the "Buildings" tab and click on the canvas to place it.</p>
-                            <ul>
-                                <li>🏰 <strong>Town Hall:</strong> Your command center (1000🪙)</li>
-                                <li>🏹 <strong>Archer Tower:</strong> Shoots enemies from distance (800🪙)</li>
-                                <li>🔫 <strong>Cannon:</strong> Heavy damage defender (1200🪙)</li>
-                                <li>🧱 <strong>Wall:</strong> Blocks enemy paths (100🪙)</li>
-                                <li>📦 <strong>Storage:</strong> Stores resources (600🪙)</li>
-                            </ul>
-                            <p><strong>Tips:</strong> Place towers and cannons to defend. Surround important buildings with walls!</p>
-                        </div>
-
-                        <div class="instructions-section">
-                            <h3>🗡️ Step 2: Train Your Army</h3>
-                            <p><strong>Right Panel - Units Tab:</strong> Select how many units to train and click "Train"</p>
-                            <ul>
-                                <li>🗡️ <strong>Barbarian:</strong> Basic melee unit (50⚡)</li>
-                                <li>🏹 <strong>Archer:</strong> Ranged attacker (75⚡)</li>
-                                <li>🐉 <strong>Dragon:</strong> Flying powerhouse (200⚡)</li>
-                                <li>🧙 <strong>Wizard:</strong> Magic attacks (150⚡)</li>
-                            </ul>
-                            <p><strong>Note:</strong> You spend Elixir (⚡) to train units, not Gold (🪙)</p>
-                        </div>
-
-                        <div class="instructions-section">
-                            <h3>📊 Step 3: Upgrade Your Units</h3>
-                            <p><strong>Right Panel - Upgrades Tab:</strong> Spend Elixir to boost your units</p>
-                            <ul>
-                                <li><strong>Barbarian Strength:</strong> +5 damage per level</li>
-                                <li><strong>Archer Precision:</strong> +2 range per level</li>
-                                <li><strong>Tower Defense:</strong> +20% tower damage</li>
-                                <li><strong>Wall Fortification:</strong> +50 HP per level</li>
-                            </ul>
-                            <p><strong>Max level:</strong> Level 5 for each upgrade</p>
-                        </div>
-
-                        <div class="instructions-section">
-                            <h3>⚔️ Step 4: Attack & Simulate Battle</h3>
-                            <p><strong>Bottom Left:</strong> Click "⚔️ Test Attack" to simulate a battle</p>
-                            <ul>
-                                <li>Your trained army attacks your own base</li>
-                                <li>Your towers and cannons defend</li>
-                                <li>Battle Log shows what happens</li>
-                                <li>If base is destroyed: WIN! (get 1000🪙 + 500⚡)</li>
-                                <li>If base survives: You lose (but learn what to improve)</li>
-                            </ul>
-                        </div>
-
-                        <div class="instructions-section">
-                            <h3>🎮 Game Controls</h3>
-                            <ul>
-                                <li>🗑️ <strong>Clear:</strong> Remove all buildings, get 100🪙 back</li>
-                                <li>🎲 <strong>Random:</strong> Auto-generate a base layout (costs 500🪙)</li>
-                                <li>⚔️ <strong>Test Attack:</strong> Simulate a battle with your army</li>
-                            </ul>
-                        </div>
-
-                        <div class="instructions-section">
-                            <h3>💡 Strategy Tips</h3>
-                            <ul>
-                                <li>Place <strong>Town Hall</strong> in the center - it's important!</li>
-                                <li>Surround towers with <strong>walls</strong> to protect them</li>
-                                <li>Mix different unit types - barbarians tank, archers deal damage</li>
-                                <li>Dragons are expensive but very powerful</li>
-                                <li>Test your base often to see where it's weak</li>
-                                <li>Upgrade units before training more - quality over quantity</li>
-                            </ul>
-                        </div>
-
-                        <div class="instructions-section">
-                            <h3>💰 Resources</h3>
-                            <ul>
-                                <li>🪙 <strong>Gold:</strong> Used to build structures</li>
-                                <li>⚡ <strong>Elixir:</strong> Used to train units and upgrade</li>
-                                <li>❤️ <strong>Base HP:</strong> Health of your base (0 = destroyed)</li>
-                            </ul>
-                        </div>
-
-                        <button class="start-playing-btn">Start Playing!</button>
-                    </div>
-                </div>
-
                 <div class="game-content battle-content">
                     <div class="left-panel">
                         <div class="resources-bar">
                             <div class="resource">
                                 <span class="icon">🪙</span>
-                                <span class="value" id="battle-gold">5000</span>
+                                <span class="value" id="battle-gold">15000</span>
                             </div>
                             <div class="resource">
                                 <span class="icon">⚡</span>
-                                <span class="value" id="battle-elixir">3000</span>
+                                <span class="value" id="battle-elixir">10000</span>
                             </div>
                             <div class="resource">
                                 <span class="icon">❤️</span>
@@ -203,7 +116,7 @@
                             <button class="tab-btn active" data-tab="buildings">Buildings</button>
                             <button class="tab-btn" data-tab="units">Units</button>
                             <button class="tab-btn" data-tab="upgrades">Upgrades</button>
-                            <button class="tab-btn" data-tab="battle">Battle Log</button>
+                            <button class="tab-btn" data-tab="battle-log">Battle Log</button>
                         </div>
 
                         <div id="buildings" class="tab-content active">
@@ -365,7 +278,7 @@
                             </div>
                         </div>
 
-                        <div id="battle" class="tab-content">
+                        <div id="battle-log" class="tab-content">
                             <h3>Battle Log</h3>
                             <div class="battle-log" id="battleLog">
                                 <p class="log-entry">Ready for battle!</p>
@@ -373,7 +286,39 @@
                         </div>
                     </div>
                 </div>
-                <script src="battle-game.js"></script>
+            </div>
+
+            <!-- History Page -->
+            <div id="history" class="game-page">
+                <div class="game-header-inline">
+                    <h2>📚 History</h2>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
+                </div>
+                <div class="game-content content-page">
+                    <p>History page content coming soon...</p>
+                </div>
+            </div>
+
+            <!-- Football Page -->
+            <div id="football" class="game-page">
+                <div class="game-header-inline">
+                    <h2>⚽ Football</h2>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
+                </div>
+                <div class="game-content content-page">
+                    <p>Football page content coming soon...</p>
+                </div>
+            </div>
+
+            <!-- Gaming Page -->
+            <div id="gaming" class="game-page">
+                <div class="game-header-inline">
+                    <h2>🎮 Gaming</h2>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
+                </div>
+                <div class="game-content content-page">
+                    <p>Gaming page content coming soon...</p>
+                </div>
             </div>
         </div>
 
@@ -382,6 +327,45 @@
         </footer>
     </div>
 
-    <script src="index-app.js"></script>
+    <script>
+        function switchTab(tabName) {
+            // Hide all pages
+            document.querySelectorAll('.game-page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(tabName).classList.add('active');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            window.scrollTo(0, 0);
+        }
+
+        // Setup tab switching for inner tabs
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    document.getElementById(tab).classList.add('active');
+                    btn.classList.add('active');
+                });
+            });
+        });
+    </script>
+
+    <!-- Game Scripts - Load AFTER the HTML -->
+    <script src="game.js"></script>
+    <script src="battle-game.js"></script>
 </body>
 </html>
