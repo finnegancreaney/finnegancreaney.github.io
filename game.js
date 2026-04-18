@@ -120,10 +120,24 @@ const bird = {
 let pipes = [];
 let powerUps = [];
 
+function getDifficultySettings() {
+    // Calculate difficulty-based settings
+    const pipeGap = Math.max(90 - difficulty * 3, 60); // Gap gets smaller
+    const pipeSpeed = 3 + difficulty * 0.3; // Speed increases
+    const pipeFrequency = Math.max(100 - difficulty * 5, 50); // Pipes spawn more often
+    
+    return {
+        gap: pipeGap,
+        speed: pipeSpeed,
+        frequency: pipeFrequency
+    };
+}
+
 function createPipe() {
+    const settings = getDifficultySettings();
     const minHeight = 60;
     const maxHeight = 140;
-    const gap = 120;
+    const gap = settings.gap;
     
     const topHeight = Math.random() * (maxHeight - minHeight) + minHeight;
     
@@ -149,7 +163,8 @@ function createPipe() {
         },
         
         update() {
-            this.x -= 3;
+            const settings = getDifficultySettings();
+            this.x -= settings.speed;
         }
     });
 }
@@ -195,7 +210,8 @@ function createPowerUp(x, y) {
             },
             
             update() {
-                this.x -= 3;
+                const settings = getDifficultySettings();
+                this.x -= settings.speed;
                 this.rotation += 0.05;
             }
         });
@@ -309,7 +325,10 @@ function update() {
     
     bird.update();
     
-    if (frameCount % 100 === 0) {
+    // Get difficulty-based pipe frequency
+    const settings = getDifficultySettings();
+    
+    if (frameCount % settings.frequency === 0) {
         createPipe();
     }
     
@@ -386,6 +405,12 @@ function draw() {
     
     ctx.font = '14px Arial';
     ctx.fillText('Difficulty: ' + difficulty, 10, 50);
+    
+    // Draw difficulty indicator
+    ctx.fillStyle = '#e74c3c';
+    ctx.font = 'bold 12px Arial';
+    const settings = getDifficultySettings();
+    ctx.fillText('Speed: ' + settings.speed.toFixed(1) + 'x | Gap: ' + settings.gap.toFixed(0) + 'px', 10, 70);
     
     if (gameState === GAME_STATE.START) {
         drawStartScreen();
