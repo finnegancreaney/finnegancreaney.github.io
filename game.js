@@ -1,4 +1,4 @@
-vaconst canvas = document.getElementById('gameCanvas');
+const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const soundToggle = document.getElementById('soundToggle');
 const restartBtn = document.getElementById('restartBtn');
@@ -8,14 +8,13 @@ const highScoreDisplay = document.getElementById('highScore');
 const GAME_STATE = {
     START: 'start',
     PLAYING: 'playing',
-    PAUSED: 'paused',
     GAME_OVER: 'gameOver'
 };
 
 // Game variables
 let gameState = GAME_STATE.START;
 let score = 0;
-let highScore = localStorage.getItem('flappyBirdHighScore') || 0;
+let highScore = parseInt(localStorage.getItem('flappyBirdHighScore')) || 0;
 let gravity = 0.5;
 let frameCount = 0;
 let difficulty = 1;
@@ -41,13 +40,9 @@ const bird = {
         this.velocity += gravity;
         this.y += this.velocity;
         
-        // Rotation based on velocity
         this.rotation = Math.min(this.velocity * 0.05, 1.5);
-        
-        // Wing flap animation
         this.wingFlap += 0.15;
         
-        // Shield duration
         if (this.hasShield) {
             this.shieldDuration--;
             if (this.shieldDuration <= 0) {
@@ -55,22 +50,21 @@ const bird = {
             }
         }
         
-        // Ground collision
         if (this.y + this.height >= canvas.height - 30) {
             gameState = GAME_STATE.GAME_OVER;
             playSound('collision');
         }
         
-        // Ceiling collision
         if (this.y <= 0) {
             this.y = 0;
-            this.velocity = 0;
         }
     },
     
     flap() {
-        this.velocity = -10;
-        playSound('flap');
+        if (gameState === GAME_STATE.PLAYING) {
+            this.velocity = -10;
+            playSound('flap');
+        }
     },
     
     draw() {
@@ -78,25 +72,21 @@ const bird = {
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.rotation);
         
-        // Draw bird body
         ctx.fillStyle = '#FFD700';
         ctx.beginPath();
         ctx.arc(0, 0, this.width / 2, 0, Math.PI * 2);
         ctx.fill();
         
-        // Draw eye
         ctx.fillStyle = '#000';
         ctx.beginPath();
         ctx.arc(8, -5, 4, 0, Math.PI * 2);
         ctx.fill();
         
-        // Draw eye shine
         ctx.fillStyle = '#FFF';
         ctx.beginPath();
         ctx.arc(9, -4, 2, 0, Math.PI * 2);
         ctx.fill();
         
-        // Draw beak
         ctx.fillStyle = '#FF6347';
         ctx.beginPath();
         ctx.moveTo(10, -2);
@@ -105,7 +95,6 @@ const bird = {
         ctx.closePath();
         ctx.fill();
         
-        // Draw wings with flap animation
         const wingY = Math.sin(this.wingFlap) * 3;
         ctx.strokeStyle = '#FFB347';
         ctx.lineWidth = 3;
@@ -113,7 +102,6 @@ const bird = {
         ctx.arc(-8, wingY, 8, 0, Math.PI * 2);
         ctx.stroke();
         
-        // Draw shield if active
         if (this.hasShield) {
             ctx.strokeStyle = `rgba(100, 150, 255, ${this.shieldDuration / 300})`;
             ctx.lineWidth = 3;
@@ -133,7 +121,7 @@ let powerUps = [];
 function createPipe() {
     const minHeight = 50;
     const maxHeight = 150;
-    const gap = 90 + difficulty * 5; // Gap decreases with difficulty
+    const gap = 90 + difficulty * 5;
     
     const topHeight = Math.random() * (maxHeight - minHeight) + minHeight;
     
@@ -145,31 +133,27 @@ function createPipe() {
         scored: false,
         
         draw() {
-            // Draw pipes with gradient
             const gradient = ctx.createLinearGradient(this.x, 0, this.x + this.width, 0);
             gradient.addColorStop(0, '#2a7f2a');
             gradient.addColorStop(1, '#1a4d1a');
             
             ctx.fillStyle = gradient;
-            // Top pipe
             ctx.fillRect(this.x, 0, this.width, this.topHeight);
-            // Bottom pipe
             ctx.fillRect(this.x, canvas.height - this.bottomHeight, this.width, this.bottomHeight);
             
-            // Draw pipe caps
             ctx.fillStyle = '#1a4d1a';
             ctx.fillRect(this.x - 2, this.topHeight - 8, this.width + 4, 8);
             ctx.fillRect(this.x - 2, canvas.height - this.bottomHeight, this.width + 4, 8);
         },
         
         update() {
-            this.x -= (4 + difficulty * 0.5); // Speed increases with difficulty
+            this.x -= (4 + difficulty * 0.5);
         }
     });
 }
 
 function createPowerUp(x, y) {
-    if (Math.random() > 0.7) { // 30% chance
+    if (Math.random() > 0.7) {
         powerUps.push({
             x: x,
             y: y,
@@ -232,52 +216,27 @@ function checkPowerUpCollision(bird, powerUp) {
            bird.y + bird.height > powerUp.y;
 }
 
-function drawClouds() {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    
-    // Simple cloud shapes
-    const cloudPositions = [
-        { x: 50, y: 50 },
-        { x: 200, y: 100 },
-        { x: 280, y: 30 }
-    ];
-    
-    cloudPositions.forEach(pos => {
-        ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
-        ctx.arc(pos.x + 20, pos.y, 25, 0, Math.PI * 2);
-        ctx.arc(pos.x + 40, pos.y, 20, 0, Math.PI * 2);
-        ctx.fill();
-    });
-}
-
 function drawStartScreen() {
-    // Semi-transparent overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     ctx.fillStyle = '#000';
     ctx.textAlign = 'center';
     
-    // Title
-    ctx.font = 'bold 40px Arial';
+    ctx.font = 'bold 36px Arial';
     ctx.fillText('Flappy Bird', canvas.width / 2, 80);
     
-    // Instructions
     ctx.font = '18px Arial';
-    ctx.fillText('Click or Press SPACE to Start', canvas.width / 2, 200);
-    ctx.fillText('Avoid the pipes!', canvas.width / 2, 240);
+    ctx.fillText('Click to Start', canvas.width / 2, 180);
     
-    ctx.font = '16px Arial';
-    ctx.fillText('Shield: Protects once', canvas.width / 2, 310);
-    ctx.fillText('Plus: +10 points', canvas.width / 2, 340);
-    ctx.fillText('Difficulty increases over time', canvas.width / 2, 370);
+    ctx.font = '14px Arial';
+    ctx.fillText('Avoid the pipes!', canvas.width / 2, 220);
+    ctx.fillText('S = Shield | + = Points', canvas.width / 2, 280);
     
     ctx.textAlign = 'left';
 }
 
 function drawGameOverScreen() {
-    // Semi-transparent overlay
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
@@ -292,7 +251,7 @@ function drawGameOverScreen() {
     ctx.fillText('Best: ' + highScore, canvas.width / 2, 240);
     
     ctx.font = '18px Arial';
-    ctx.fillText('Click or Press SPACE to Restart', canvas.width / 2, 320);
+    ctx.fillText('Click to Restart', canvas.width / 2, 320);
     
     ctx.textAlign = 'left';
 }
@@ -300,42 +259,46 @@ function drawGameOverScreen() {
 function playSound(type) {
     if (!soundEnabled) return;
     
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    switch(type) {
-        case 'flap':
-            oscillator.frequency.value = 400;
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.1);
-            break;
-        case 'score':
-            oscillator.frequency.value = 800;
-            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.2);
-            break;
-        case 'collision':
-            oscillator.frequency.value = 200;
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.3);
-            break;
-        case 'powerup':
-            oscillator.frequency.value = 600;
-            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.15);
-            break;
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        switch(type) {
+            case 'flap':
+                oscillator.frequency.value = 400;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+                break;
+            case 'score':
+                oscillator.frequency.value = 800;
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+                break;
+            case 'collision':
+                oscillator.frequency.value = 200;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                break;
+            case 'powerup':
+                oscillator.frequency.value = 600;
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.15);
+                break;
+        }
+    } catch(e) {
+        // Audio context not available
     }
 }
 
@@ -344,16 +307,13 @@ function update() {
     
     bird.update();
     
-    // Generate pipes with difficulty scaling
     if (frameCount % Math.max(60 - difficulty * 3, 40) === 0) {
         createPipe();
     }
     
-    // Update pipes
     pipes.forEach((pipe, index) => {
         pipe.update();
         
-        // Check collision
         if (!bird.hasShield && checkCollision(bird, pipe)) {
             gameState = GAME_STATE.GAME_OVER;
             playSound('collision');
@@ -362,28 +322,22 @@ function update() {
             playSound('powerup');
         }
         
-        // Check if bird passed the pipe
         if (!pipe.scored && bird.x > pipe.x + pipe.width) {
             pipe.scored = true;
             score += 10;
             difficulty = 1 + Math.floor(score / 50);
             playSound('score');
-            
-            // Create power-up at pipe location
             createPowerUp(pipe.x + pipe.width / 2, canvas.height / 2);
         }
         
-        // Remove pipes that are off screen
         if (pipe.x + pipe.width < 0) {
             pipes.splice(index, 1);
         }
     });
     
-    // Update power-ups
     powerUps.forEach((powerUp, index) => {
         powerUp.update();
         
-        // Check collision with bird
         if (checkPowerUpCollision(bird, powerUp)) {
             if (powerUp.type === 'shield') {
                 bird.hasShield = true;
@@ -395,7 +349,6 @@ function update() {
             powerUps.splice(index, 1);
         }
         
-        // Remove power-ups that are off screen
         if (powerUp.x < -30) {
             powerUps.splice(index, 1);
         }
@@ -403,37 +356,28 @@ function update() {
 }
 
 function draw() {
-    // Draw background gradient
     const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     bgGradient.addColorStop(0, '#87CEEB');
     bgGradient.addColorStop(1, '#E0F6FF');
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Draw clouds
-    drawClouds();
-    
-    // Draw pipes
     pipes.forEach(pipe => {
         pipe.draw();
     });
     
-    // Draw power-ups
     powerUps.forEach(powerUp => {
         powerUp.draw();
     });
     
-    // Draw bird
     bird.draw();
     
-    // Draw ground
     ctx.fillStyle = '#228B22';
     ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
     
     ctx.fillStyle = '#1a6b1a';
     ctx.fillRect(0, canvas.height - 30, canvas.width, 5);
     
-    // Draw UI
     ctx.fillStyle = '#000';
     ctx.font = 'bold 24px Arial';
     ctx.fillText('Score: ' + score, 10, 30);
@@ -441,7 +385,6 @@ function draw() {
     ctx.font = '14px Arial';
     ctx.fillText('Difficulty: ' + difficulty, 10, 50);
     
-    // Draw game state screens
     if (gameState === GAME_STATE.START) {
         drawStartScreen();
     } else if (gameState === GAME_STATE.GAME_OVER) {
@@ -461,7 +404,6 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Event listeners
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         e.preventDefault();
@@ -492,9 +434,7 @@ soundToggle.addEventListener('click', () => {
 });
 
 restartBtn.addEventListener('click', () => {
-    if (gameState === GAME_STATE.GAME_OVER) {
-        resetGame();
-    }
+    resetGame();
 });
 
 function resetGame() {
@@ -510,5 +450,4 @@ function resetGame() {
     powerUps = [];
 }
 
-// Start the game loop
 gameLoop();
