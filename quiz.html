@@ -489,6 +489,7 @@
         let selectedAnswer = null;
         let answered = false;
         let questions = [];
+        let currentShuffledOptions = []; // Track shuffled options
 
         function shuffleArray(array) {
             const shuffled = [...array];
@@ -536,14 +537,15 @@
                 originalIndex: index
             }));
             
-            // Shuffle the options
-            const shuffledOptions = shuffleArray(optionsWithIndices);
+            // Shuffle the options and store them
+            currentShuffledOptions = shuffleArray(optionsWithIndices);
             
             // Display shuffled options
-            shuffledOptions.forEach((optionObj) => {
+            currentShuffledOptions.forEach((optionObj, displayIndex) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
                 btn.textContent = optionObj.text;
+                btn.dataset.originalIndex = optionObj.originalIndex;
                 btn.onclick = () => selectAnswer(optionObj.originalIndex);
                 optionsContainer.appendChild(btn);
             });
@@ -553,30 +555,27 @@
             document.getElementById('nextBtn').classList.remove('show');
         }
 
-        function selectAnswer(index) {
+        function selectAnswer(originalIndex) {
             if (answered) return;
             
             const question = questions[currentQuestionIndex];
             const buttons = document.querySelectorAll('.option-btn');
             
             answered = true;
-            selectedAnswer = index;
+            selectedAnswer = originalIndex;
             
-            buttons.forEach((btn, i) => {
+            buttons.forEach((btn) => {
                 btn.disabled = true;
-                const optionObj = {
-                    text: btn.textContent,
-                    originalIndex: parseInt(btn.onclick.toString().match(/\d+/)[0])
-                };
+                const btnOriginalIndex = parseInt(btn.dataset.originalIndex);
                 
-                if (optionObj.originalIndex === question.correct) {
+                if (btnOriginalIndex === question.correct) {
                     btn.classList.add('correct');
-                } else if (optionObj.originalIndex === index) {
+                } else if (btnOriginalIndex === originalIndex) {
                     btn.classList.add('incorrect');
                 }
             });
             
-            if (index === question.correct) {
+            if (originalIndex === question.correct) {
                 score++;
             }
             
