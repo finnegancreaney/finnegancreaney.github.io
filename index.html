@@ -19,6 +19,7 @@
             <button class="nav-btn" data-tab="battle">Battle Simulator</button>
             <button class="nav-btn" data-tab="match3">Match 3</button>
             <button class="nav-btn" data-tab="bus">School Bus</button>
+            <button class="nav-btn" data-tab="worldcup">World Cup</button>
             <button class="nav-btn" data-tab="history">History</button>
             <button class="nav-btn" data-tab="football">Football</button>
             <button class="nav-btn" data-tab="gaming">Gaming</button>
@@ -58,6 +59,13 @@
                             <h3>School Bus</h3>
                             <p>Track Route 44275 to Westgate School</p>
                             <button class="play-btn">Open</button>
+                        </div>
+
+                        <div class="game-card" onclick="switchTab('worldcup')">
+                            <div class="game-card-icon">🏆</div>
+                            <h3>World Cup 2026</h3>
+                            <p>Predict every result. Who will lift the trophy?</p>
+                            <button class="play-btn">Predict</button>
                         </div>
                     </div>
 
@@ -416,6 +424,50 @@
                 </div>
             </div>
 
+            <!-- World Cup Predictor -->
+            <div id="worldcup" class="game-page">
+                <div class="game-header-inline">
+                    <h2>🏆 World Cup 2026 Predictor</h2>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
+                </div>
+                <div class="game-content wc-content">
+                    <div class="wc-champion-banner" id="wc-champion">
+                        <span class="wc-champion-label">Your predicted champion</span>
+                        <span class="wc-champion-flag" id="wc-champion-flag">—</span>
+                        <span class="wc-champion-name" id="wc-champion-name">Complete the bracket</span>
+                    </div>
+
+                    <div class="wc-controls">
+                        <button class="wc-btn wc-btn-primary" id="wc-autofill-all">🎲 Auto-fill everything</button>
+                        <button class="wc-btn" id="wc-autofill-remaining">🎲 Auto-fill blanks only</button>
+                        <button class="wc-btn" id="wc-share">📤 Share link</button>
+                        <button class="wc-btn wc-btn-ghost" id="wc-clear-all">🧹 Clear all</button>
+                    </div>
+
+                    <div class="wc-shared-banner" id="wc-shared-banner" hidden>
+                        <span class="wc-shared-icon">📬</span>
+                        <span class="wc-shared-text">You're viewing predictions shared by a friend. Any edits will become your own.</span>
+                        <button class="wc-btn wc-btn-small wc-btn-ghost" id="wc-shared-dismiss">Dismiss</button>
+                    </div>
+
+                    <div class="wc-toast" id="wc-toast" hidden></div>
+
+                    <div class="wc-section">
+                        <h3 class="wc-section-title">Group Stage</h3>
+                        <p class="wc-section-hint">Enter the score for each match, or hit "Auto-fill group" to pick using FIFA rankings.</p>
+                        <div class="wc-groups" id="wc-groups"></div>
+                    </div>
+
+                    <div class="wc-section">
+                        <h3 class="wc-section-title">Knockout Stage</h3>
+                        <p class="wc-section-hint">Click a team to send them through. 8 best third-placed teams join the group winners and runners-up.</p>
+                        <div class="wc-knockouts" id="wc-knockouts"></div>
+                    </div>
+
+                    <p class="wc-source">Groups and rankings as of April 2026. Bracket pairings use the 2026 tournament seeding.</p>
+                </div>
+            </div>
+
             <!-- History Page -->
             <div id="history" class="game-page">
                 <div class="game-header-inline">
@@ -654,5 +706,6 @@
     <script src="match3.js"></script>
     <script src="tracker.js"></script>
     <script src="trains.js"></script>
+    <script src="worldcup.js"></script>
 </body>
 </html>
