@@ -31,85 +31,67 @@
             margin-bottom: 20px;
         }
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.1em;
-            transition: color 0.3s;
-            padding: 8px 16px;
-            border-radius: 5px;
-        }
-
-        nav a:hover {
-            color: #667eea;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
         main {
             max-width: 1200px;
-            margin: 40px auto;
+            margin: 60px auto;
             padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
         }
 
-        section {
+        .card {
             background: white;
             border-radius: 10px;
             padding: 40px;
-            margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
         }
 
-        section:hover {
-            transform: translateY(-5px);
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
 
-        section h2 {
-            color: #667eea;
+        .card h2 {
             font-size: 2em;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #667eea;
         }
 
-        section p {
+        .card p {
             font-size: 1.1em;
             line-height: 1.6;
             color: #555;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
         }
 
-        .gaming-section {
-            border-left: 5px solid #9b59b6;
-        }
-
-        .history-section {
-            border-left: 5px solid #3498db;
-        }
-
-        .football-section {
-            border-left: 5px solid #e74c3c;
-        }
-
-        .games-list, .history-list {
-            list-style: none;
-            margin-top: 20px;
-        }
-
-        .games-list li, .history-list li {
-            padding: 12px;
-            margin: 10px 0;
-            background: #f8f9fa;
+        .card a {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
             border-radius: 5px;
-            border-left: 4px solid #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .card a:hover {
+            background: #764ba2;
+        }
+
+        .gaming-card {
+            border-top: 4px solid #9b59b6;
+        }
+
+        .history-card {
+            border-top: 4px solid #3498db;
+        }
+
+        .football-card {
+            border-top: 4px solid #e74c3c;
         }
 
         footer {
@@ -117,7 +99,7 @@
             color: white;
             text-align: center;
             padding: 20px;
-            margin-top: 50px;
+            margin-top: 60px;
             border-top: 4px solid #667eea;
         }
 
@@ -126,17 +108,8 @@
                 font-size: 1.8em;
             }
 
-            nav ul {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            section {
-                padding: 20px;
-            }
-
-            section h2 {
-                font-size: 1.5em;
+            main {
+                margin: 30px auto;
             }
         }
     </style>
@@ -144,44 +117,27 @@
 <body>
     <header>
         <h1>🎮 Finnegan's Interests 📚⚽</h1>
-        <nav>
-            <ul>
-                <li><a href="#gaming">Gaming Reviews</a></li>
-                <li><a href="#history">History Topics</a></li>
-                <li><a href="#football">Football</a></li>
-            </ul>
-        </nav>
+        <p style="color: #ccc; font-size: 1.1em;">Explore my passions and interests</p>
     </header>
 
     <main>
-        <!-- Gaming Section -->
-        <section id="gaming" class="gaming-section">
+        <div class="card gaming-card">
             <h2>🎮 Gaming Reviews</h2>
-            <p>Exploring and reviewing strategy games, indie titles, and everything in between. Here are some games I'm currently into:</p>
-            <ul class="games-list">
-                <li><strong>Victoria 3</strong> - A grand strategy game about building empires through diplomacy and economy</li>
-                <li><strong>Crusader Kings 3</strong> - Medieval dynasty simulator with intricate political systems</li>
-                <li><strong>War of Dots</strong> - Tactical strategy game with unique gameplay mechanics</li>
-            </ul>
-        </section>
+            <p>Exploring and reviewing strategy games like Victoria 3, Crusader Kings 3, and War of Dots.</p>
+            <a href="gaming.html">Explore Gaming →</a>
+        </div>
 
-        <!-- History Section -->
-        <section id="history" class="history-section">
+        <div class="card history-card">
             <h2>📚 History Topics</h2>
-            <p>Diving deep into historical events and learning about pivotal moments that shaped our world:</p>
-            <ul class="history-list">
-                <li><strong>World War I</strong> - The Great War and its impact on modern Europe</li>
-                <li><strong>World War II</strong> - Understanding the second global conflict and its consequences</li>
-               
-            </ul>
-        </section>
+            <p>Diving deep into fascinating historical events from Wessex to World War II and beyond.</p>
+            <a href="history.html">Explore History →</a>
+        </div>
 
-        <!-- Football Section -->
-        <section id="football" class="football-section">
-            <h2>⚽ Tottenham Hotspur</h2>
-            <p>Following one of England's most historic football clubs. Spurs are my passion! I love tracking team performance, player development, and the journey through the Premier League.</p>
-            <p>Stay tuned for match reviews, player analysis, and all the latest Tottenham news!</p>
-        </section>
+        <div class="card football-card">
+            <h2>⚽ Football</h2>
+            <p>Following Tottenham Hotspur, match reviews, player analysis, and all things Spurs.</p>
+            <a href="football.html">Explore Football →</a>
+        </div>
     </main>
 
     <footer>
