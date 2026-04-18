@@ -84,8 +84,112 @@
                     <h2>⚔️ Battle Simulator</h2>
                     <button class="back-btn">← Back</button>
                 </div>
+                
+                <!-- Instructions Modal -->
+                <div id="battleInstructions" class="instructions-modal">
+                    <div class="instructions-content">
+                        <button class="close-instructions">✕</button>
+                        <h2>⚔️ Battle Simulator Tutorial</h2>
+                        
+                        <div class="instructions-section">
+                            <h3>🏗️ Step 1: Build Your Base</h3>
+                            <p><strong>Left Panel:</strong> Click on a building from the "Buildings" tab and click on the canvas to place it.</p>
+                            <ul>
+                                <li>🏰 <strong>Town Hall:</strong> Your command center (1000🪙)</li>
+                                <li>🏹 <strong>Archer Tower:</strong> Shoots enemies from distance (800🪙)</li>
+                                <li>🔫 <strong>Cannon:</strong> Heavy damage defender (1200🪙)</li>
+                                <li>🧱 <strong>Wall:</strong> Blocks enemy paths (100🪙)</li>
+                                <li>📦 <strong>Storage:</strong> Stores resources (600🪙)</li>
+                            </ul>
+                            <p><strong>Tips:</strong> Place towers and cannons to defend. Surround important buildings with walls!</p>
+                        </div>
+
+                        <div class="instructions-section">
+                            <h3>🗡️ Step 2: Train Your Army</h3>
+                            <p><strong>Right Panel - Units Tab:</strong> Select how many units to train and click "Train"</p>
+                            <ul>
+                                <li>🗡️ <strong>Barbarian:</strong> Basic melee unit (50⚡)</li>
+                                <li>🏹 <strong>Archer:</strong> Ranged attacker (75⚡)</li>
+                                <li>🐉 <strong>Dragon:</strong> Flying powerhouse (200⚡)</li>
+                                <li>🧙 <strong>Wizard:</strong> Magic attacks (150⚡)</li>
+                            </ul>
+                            <p><strong>Note:</strong> You spend Elixir (⚡) to train units, not Gold (🪙)</p>
+                        </div>
+
+                        <div class="instructions-section">
+                            <h3>📊 Step 3: Upgrade Your Units</h3>
+                            <p><strong>Right Panel - Upgrades Tab:</strong> Spend Elixir to boost your units</p>
+                            <ul>
+                                <li><strong>Barbarian Strength:</strong> +5 damage per level</li>
+                                <li><strong>Archer Precision:</strong> +2 range per level</li>
+                                <li><strong>Tower Defense:</strong> +20% tower damage</li>
+                                <li><strong>Wall Fortification:</strong> +50 HP per level</li>
+                            </ul>
+                            <p><strong>Max level:</strong> Level 5 for each upgrade</p>
+                        </div>
+
+                        <div class="instructions-section">
+                            <h3>⚔️ Step 4: Attack & Simulate Battle</h3>
+                            <p><strong>Bottom Left:</strong> Click "⚔️ Test Attack" to simulate a battle</p>
+                            <ul>
+                                <li>Your trained army attacks your own base</li>
+                                <li>Your towers and cannons defend</li>
+                                <li>Battle Log shows what happens</li>
+                                <li>If base is destroyed: WIN! (get 1000🪙 + 500⚡)</li>
+                                <li>If base survives: You lose (but learn what to improve)</li>
+                            </ul>
+                        </div>
+
+                        <div class="instructions-section">
+                            <h3>🎮 Game Controls</h3>
+                            <ul>
+                                <li>🗑️ <strong>Clear:</strong> Remove all buildings, get 100🪙 back</li>
+                                <li>🎲 <strong>Random:</strong> Auto-generate a base layout (costs 500🪙)</li>
+                                <li>⚔️ <strong>Test Attack:</strong> Simulate a battle with your army</li>
+                            </ul>
+                        </div>
+
+                        <div class="instructions-section">
+                            <h3>💡 Strategy Tips</h3>
+                            <ul>
+                                <li>Place <strong>Town Hall</strong> in the center - it's important!</li>
+                                <li>Surround towers with <strong>walls</strong> to protect them</li>
+                                <li>Mix different unit types - barbarians tank, archers deal damage</li>
+                                <li>Dragons are expensive but very powerful</li>
+                                <li>Test your base often to see where it's weak</li>
+                                <li>Upgrade units before training more - quality over quantity</li>
+                            </ul>
+                        </div>
+
+                        <div class="instructions-section">
+                            <h3>💰 Resources</h3>
+                            <ul>
+                                <li>🪙 <strong>Gold:</strong> Used to build structures</li>
+                                <li>⚡ <strong>Elixir:</strong> Used to train units and upgrade</li>
+                                <li>❤️ <strong>Base HP:</strong> Health of your base (0 = destroyed)</li>
+                            </ul>
+                        </div>
+
+                        <button class="start-playing-btn">Start Playing!</button>
+                    </div>
+                </div>
+
                 <div class="game-content battle-content">
                     <div class="left-panel">
+                        <div class="resources-bar">
+                            <div class="resource">
+                                <span class="icon">🪙</span>
+                                <span class="value" id="battle-gold">5000</span>
+                            </div>
+                            <div class="resource">
+                                <span class="icon">⚡</span>
+                                <span class="value" id="battle-elixir">3000</span>
+                            </div>
+                            <div class="resource">
+                                <span class="icon">❤️</span>
+                                <span class="value" id="battle-hp">100</span>
+                            </div>
+                        </div>
                         <canvas id="gameCanvas" width="500" height="600"></canvas>
                         <div class="canvas-controls">
                             <button id="clearBase">🗑️ Clear</button>
