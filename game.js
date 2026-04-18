@@ -62,7 +62,7 @@ const bird = {
     
     flap() {
         if (gameState === GAME_STATE.PLAYING) {
-            this.velocity = -10;
+            this.velocity = -6;
             playSound('flap');
         }
     },
