@@ -1,6 +1,13 @@
 class BattleSimulator {
     constructor() {
-        this.canvas = document.getElementById('gameCanvas');
+        // Find the canvas in the battle simulator section
+        this.canvas = document.querySelectorAll('canvas')[1]; // Get second canvas (battle simulator)
+        
+        if (!this.canvas) {
+            console.error('Battle canvas not found!');
+            return;
+        }
+        
         this.ctx = this.canvas.getContext('2d');
         
         // Resources - INCREASED STARTING AMOUNTS
@@ -46,6 +53,7 @@ class BattleSimulator {
         
         this.setupEventListeners();
         this.addLog('🎮 Welcome! You have 15000🪙 and 10000⚡ to start!', 'defense');
+        this.updateUI();
         this.render();
     }
     
@@ -59,6 +67,7 @@ class BattleSimulator {
             item.querySelector('.select-btn').addEventListener('click', () => {
                 const building = item.dataset.building;
                 this.selectBuilding(building);
+                console.log('Selected building:', building);
             });
         });
         
@@ -101,15 +110,20 @@ class BattleSimulator {
         document.querySelectorAll('.building-item').forEach(item => {
             item.style.opacity = item.dataset.building === type ? '1' : '0.5';
         });
+        console.log('Building selected:', type);
     }
     
     handleCanvasClick(e) {
-        if (!this.selectedBuilding) return;
+        if (!this.selectedBuilding) {
+            console.log('No building selected');
+            return;
+        }
         
         const rect = this.canvas.getBoundingClientRect();
         const x = Math.floor((e.clientX - rect.left) / this.gridSize);
         const y = Math.floor((e.clientY - rect.top) / this.gridSize);
         
+        console.log('Canvas clicked at:', x, y);
         this.placeBuilding(this.selectedBuilding, x, y);
     }
     
@@ -126,7 +140,10 @@ class BattleSimulator {
     
     placeBuilding(type, x, y) {
         const buildingData = this.buildingTypes[type];
-        if (!buildingData) return;
+        if (!buildingData) {
+            console.error('Building type not found:', type);
+            return;
+        }
         
         // Check if affordable
         if (this.gold < buildingData.cost) {
@@ -153,6 +170,7 @@ class BattleSimulator {
         
         this.updateUI();
         this.addLog(`Placed ${type}!`, 'defense');
+        console.log('Building placed:', type, 'at', x, y);
     }
     
     canPlaceBuilding(x, y, size) {
@@ -347,23 +365,23 @@ class BattleSimulator {
     }
     
     updateUI() {
-        document.getElementById('gold').textContent = Math.floor(this.gold);
-        document.getElementById('elixir').textContent = Math.floor(this.elixir);
-        document.getElementById('hp').textContent = Math.floor(this.baseHP);
+        // Update all resource displays
+        const goldElements = document.querySelectorAll('[id$="-gold"]');
+        const elixirElements = document.querySelectorAll('[id$="-elixir"]');
+        const hpElements = document.querySelectorAll('[id$="-hp"]');
         
-        // Update battle panel resources too
-        const battleGold = document.getElementById('battle-gold');
-        const battleElixir = document.getElementById('battle-elixir');
-        const battleHp = document.getElementById('battle-hp');
-        
-        if (battleGold) battleGold.textContent = Math.floor(this.gold);
-        if (battleElixir) battleElixir.textContent = Math.floor(this.elixir);
-        if (battleHp) battleHp.textContent = Math.floor(this.baseHP);
+        goldElements.forEach(el => el.textContent = Math.floor(this.gold));
+        elixirElements.forEach(el => el.textContent = Math.floor(this.elixir));
+        hpElements.forEach(el => el.textContent = Math.floor(this.baseHP));
         
         const totalUnits = this.units.length;
         const armyPower = this.units.reduce((sum, u) => sum + u.dmg, 0);
-        document.getElementById('total-units').textContent = totalUnits;
-        document.getElementById('army-power').textContent = armyPower;
+        
+        const totalUnitsEl = document.getElementById('total-units');
+        const armyPowerEl = document.getElementById('army-power');
+        
+        if (totalUnitsEl) totalUnitsEl.textContent = totalUnits;
+        if (armyPowerEl) armyPowerEl.textContent = armyPower;
         
         Object.keys(this.upgrades).forEach(key => {
             const element = document.getElementById(`${key}-level`);
@@ -473,7 +491,16 @@ class BattleSimulator {
     }
 }
 
-// Initialize game
-window.addEventListener('DOMContentLoaded', () => {
-    new BattleSimulator();
-});
+// Initialize game when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Wait a bit to make sure the page is ready
+        setTimeout(() => {
+            new BattleSimulator();
+        }, 100);
+    });
+} else {
+    setTimeout(() => {
+        new BattleSimulator();
+    }, 100);
+}
