@@ -437,6 +437,11 @@
                         <span class="wc-champion-name" id="wc-champion-name">Complete the bracket</span>
                     </div>
 
+                    <div class="wc-name-row">
+                        <label for="wc-name">Your name (shown when you share):</label>
+                        <input type="text" id="wc-name" maxlength="24" placeholder="e.g. Billy">
+                    </div>
+
                     <div class="wc-controls">
                         <button class="wc-btn wc-btn-primary" id="wc-autofill-all">🎲 Auto-fill everything</button>
                         <button class="wc-btn" id="wc-autofill-remaining">🎲 Auto-fill blanks only</button>
@@ -446,7 +451,7 @@
 
                     <div class="wc-shared-banner" id="wc-shared-banner" hidden>
                         <span class="wc-shared-icon">📬</span>
-                        <span class="wc-shared-text">You're viewing predictions shared by a friend. Any edits will become your own.</span>
+                        <span class="wc-shared-text" id="wc-shared-text">You're viewing predictions shared by a friend. Any edits will become your own.</span>
                         <button class="wc-btn wc-btn-small wc-btn-ghost" id="wc-shared-dismiss">Dismiss</button>
                     </div>
 

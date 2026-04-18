@@ -568,6 +568,39 @@ body {
     padding: 4px;
 }
 
+.wc-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+    padding: 10px 14px;
+    border-radius: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.wc-name-row label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.wc-name-row input {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    min-width: 160px;
+    background: #fff;
+    color: var(--text);
+}
+
+.wc-name-row input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
 .wc-shared-banner {
     display: flex;
     align-items: center;

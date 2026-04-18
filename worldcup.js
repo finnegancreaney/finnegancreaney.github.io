@@ -139,7 +139,7 @@ function displayName(team) {
 // Knockouts: store all picks as team names in a single array.
 // URL-safe base64 wraps a minimal JSON payload.
 
-function encodeState(groupStage, knockouts) {
+function encodeState(groupStage, knockouts, name) {
     const gs = [];
     for (const g of Object.keys(WC_GROUPS)) {
         for (const m of groupStage[g]) {
@@ -152,6 +152,7 @@ function encodeState(groupStage, knockouts) {
         ...knockouts.sf, knockouts.final
     ].map(t => t || '');
     const payload = { v: 1, gs, ko };
+    if (name && name.trim()) payload.n = name.trim().slice(0, 24);
     const json = JSON.stringify(payload);
     const b64 = btoa(unescape(encodeURIComponent(json)));
     return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -184,11 +185,14 @@ function decodeState(hash) {
             final: ko[30] || null,
             champion: ko[30] || null
         };
-        return { groupStage, knockouts };
+        const name = typeof data.n === 'string' ? data.n.slice(0, 24) : '';
+        return { groupStage, knockouts, name };
     } catch (e) {
         return null;
     }
 }
+
+const WC_NAME_KEY = 'worldcup2026_name';
 
 class WorldCupPredictor {
     constructor() {
@@ -201,6 +205,16 @@ class WorldCupPredictor {
         this.groupStage = this.emptyGroupStage();
         this.knockouts = this.emptyKnockouts();
         this.bracketSignature = null;
+        this.name = localStorage.getItem(WC_NAME_KEY) || '';
+
+        this.nameInput = document.getElementById('wc-name');
+        if (this.nameInput) {
+            this.nameInput.value = this.name;
+            this.nameInput.addEventListener('input', () => {
+                this.name = this.nameInput.value;
+                localStorage.setItem(WC_NAME_KEY, this.name);
+            });
+        }
 
         this.load();
 
@@ -231,6 +245,14 @@ class WorldCupPredictor {
         this.knockouts = decoded.knockouts;
         this.bracketSignature = null; // let computeKnockoutsIfStale accept loaded picks
         this.save();
+
+        const bannerText = document.getElementById('wc-shared-text');
+        if (bannerText) {
+            const who = decoded.name
+                ? `${decoded.name}'s`
+                : "a friend's";
+            bannerText.textContent = `You're viewing ${who} predictions. Any edits will become your own.`;
+        }
         // Compute + trust the signature so we don't immediately wipe the loaded picks
         const q = this.buildQualifiers();
         if (q) {
@@ -247,7 +269,7 @@ class WorldCupPredictor {
     }
 
     async share() {
-        const encoded = encodeState(this.groupStage, this.knockouts);
+        const encoded = encodeState(this.groupStage, this.knockouts, this.name);
         const url = `${window.location.origin}${window.location.pathname}#wc=${encoded}`;
         try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
