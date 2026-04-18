@@ -3,9 +3,9 @@ class BattleSimulator {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
         
-        // Resources
-        this.gold = 5000;
-        this.elixir = 3000;
+        // Resources - INCREASED STARTING AMOUNTS
+        this.gold = 15000;
+        this.elixir = 10000;
         this.baseHP = 100;
         this.maxBaseHP = 100;
         
@@ -45,6 +45,7 @@ class BattleSimulator {
         };
         
         this.setupEventListeners();
+        this.addLog('🎮 Welcome! You have 15000🪙 and 10000⚡ to start!', 'defense');
         this.render();
     }
     
@@ -275,8 +276,9 @@ class BattleSimulator {
         
         if (this.baseHP <= 0) {
             this.addLog('🔴 BASE DESTROYED! Attack Success!', 'attack');
-            this.gold += 1000;
-            this.elixir += 500;
+            this.gold += 2000;
+            this.elixir += 1000;
+            this.addLog('Earned 2000🪙 + 1000⚡ for winning!', 'defense');
         } else {
             this.addLog('🟢 BASE DEFENDED! Attack Failed!', 'defense');
         }
@@ -287,8 +289,8 @@ class BattleSimulator {
     
     clearBase() {
         this.buildings = [];
-        this.gold += 100; // Refund
-        this.addLog('Base cleared!', 'defense');
+        this.gold += 500;
+        this.addLog('Base cleared! Refunded 500🪙', 'defense');
         this.updateUI();
     }
     
@@ -348,6 +350,15 @@ class BattleSimulator {
         document.getElementById('gold').textContent = Math.floor(this.gold);
         document.getElementById('elixir').textContent = Math.floor(this.elixir);
         document.getElementById('hp').textContent = Math.floor(this.baseHP);
+        
+        // Update battle panel resources too
+        const battleGold = document.getElementById('battle-gold');
+        const battleElixir = document.getElementById('battle-elixir');
+        const battleHp = document.getElementById('battle-hp');
+        
+        if (battleGold) battleGold.textContent = Math.floor(this.gold);
+        if (battleElixir) battleElixir.textContent = Math.floor(this.elixir);
+        if (battleHp) battleHp.textContent = Math.floor(this.baseHP);
         
         const totalUnits = this.units.length;
         const armyPower = this.units.reduce((sum, u) => sum + u.dmg, 0);
