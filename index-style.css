@@ -614,6 +614,11 @@ body {
     font-size: 0.9rem;
 }
 
+.wc-shared-banner[hidden],
+.wc-toast[hidden] {
+    display: none !important;
+}
+
 .wc-shared-icon {
     font-size: 1.2rem;
 }
