@@ -240,6 +240,8 @@ class WorldCupPredictor {
         }
         const banner = document.getElementById('wc-shared-banner');
         if (banner) banner.hidden = false;
+        // Jump to the World Cup tab so the shared bracket is visible immediately
+        if (typeof switchTab === 'function') switchTab('worldcup');
         // Clean the URL so refreshes don't re-apply the shared state
         if (history.replaceState) history.replaceState(null, '', window.location.pathname + window.location.search);
     }
