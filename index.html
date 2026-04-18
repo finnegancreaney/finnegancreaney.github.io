@@ -17,6 +17,7 @@
             <button class="nav-btn active" data-tab="home">Home</button>
             <button class="nav-btn" data-tab="flappy">Flappy Bird</button>
             <button class="nav-btn" data-tab="battle">Battle Simulator</button>
+            <button class="nav-btn" data-tab="match3">Match 3</button>
             <button class="nav-btn" data-tab="history">History</button>
             <button class="nav-btn" data-tab="football">Football</button>
             <button class="nav-btn" data-tab="gaming">Gaming</button>
@@ -41,6 +42,13 @@
                             <div class="game-card-icon">⚔️</div>
                             <h3>Battle Simulator</h3>
                             <p>Build your base and battle enemies!</p>
+                            <button class="play-btn">Play Now</button>
+                        </div>
+
+                        <div class="game-card" onclick="switchTab('match3')">
+                            <div class="game-card-icon">💎</div>
+                            <h3>Match 3</h3>
+                            <p>Swap gems to clear the board!</p>
                             <button class="play-btn">Play Now</button>
                         </div>
                     </div>
@@ -103,7 +111,7 @@
                                 <span class="value" id="battle-hp">100</span>
                             </div>
                         </div>
-                        <canvas id="gameCanvas" width="500" height="600"></canvas>
+                        <canvas id="battleCanvas" width="500" height="600"></canvas>
                         <div class="canvas-controls">
                             <button id="clearBase">🗑️ Clear</button>
                             <button id="randomLayout">🎲 Random</button>
@@ -243,7 +251,7 @@
                                 <div class="upgrade-item">
                                     <div class="upgrade-info">
                                         <p class="name">Barbarian Strength</p>
-                                        <p class="level">Level: <span id="barb-level">0</span>/5</p>
+                                        <p class="level">Level: <span id="barbarian-level">0</span>/5</p>
                                         <p class="effect">+5 damage per level</p>
                                     </div>
                                     <button class="upgrade-btn" data-upgrade="barbarian">Upgrade (300⚡)</button>
@@ -275,6 +283,24 @@
                                     </div>
                                     <button class="upgrade-btn" data-upgrade="wall">Upgrade (200⚡)</button>
                                 </div>
+
+                                <div class="upgrade-item">
+                                    <div class="upgrade-info">
+                                        <p class="name">Dragon Fury</p>
+                                        <p class="level">Level: <span id="dragon-level">0</span>/5</p>
+                                        <p class="effect">+5 damage per level</p>
+                                    </div>
+                                    <button class="upgrade-btn" data-upgrade="dragon">Upgrade (600⚡)</button>
+                                </div>
+
+                                <div class="upgrade-item">
+                                    <div class="upgrade-info">
+                                        <p class="name">Wizard Mastery</p>
+                                        <p class="level">Level: <span id="wizard-level">0</span>/5</p>
+                                        <p class="effect">+5 damage per level</p>
+                                    </div>
+                                    <button class="upgrade-btn" data-upgrade="wizard">Upgrade (450⚡)</button>
+                                </div>
                             </div>
                         </div>
 
@@ -285,6 +311,44 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Match 3 Game -->
+            <div id="match3" class="game-page">
+                <div class="game-header-inline">
+                    <h2>💎 Match 3</h2>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
+                </div>
+                <div class="game-content match3-content">
+                    <div class="match3-hud">
+                        <div class="match3-stat">
+                            <span class="match3-stat-label">Score</span>
+                            <span class="match3-stat-value" id="match3-score">0</span>
+                        </div>
+                        <div class="match3-stat">
+                            <span class="match3-stat-label">Moves Left</span>
+                            <span class="match3-stat-value" id="match3-moves">30</span>
+                        </div>
+                        <div class="match3-stat">
+                            <span class="match3-stat-label">Best</span>
+                            <span class="match3-stat-value" id="match3-best">0</span>
+                        </div>
+                        <button class="match3-restart" id="match3-restart">🔄 Restart</button>
+                    </div>
+
+                    <div class="match3-board-wrap">
+                        <div class="match3-board" id="match3-board"></div>
+                        <div class="match3-overlay" id="match3-overlay">
+                            <div class="match3-overlay-inner">
+                                <h3 id="match3-overlay-title">Game Over</h3>
+                                <p id="match3-overlay-body">Final score: 0</p>
+                                <button class="match3-restart" id="match3-overlay-btn">Play Again</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="match3-hint">Tap a gem, then tap an adjacent gem to swap. Match 3+ in a row or column to score. Cascades multiply!</p>
                 </div>
             </div>
 
@@ -496,8 +560,14 @@
             window.scrollTo(0, 0);
         }
 
-        // Setup tab switching for inner tabs
+        // Setup tab switching for main nav and inner tabs
         document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchTab(btn.dataset.tab);
+                });
+            });
+
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const tab = btn.dataset.tab;
@@ -517,5 +587,6 @@
     <!-- Game Scripts - Load AFTER the HTML -->
     <script src="game.js"></script>
     <script src="battle-game.js"></script>
+    <script src="match3.js"></script>
 </body>
 </html>
