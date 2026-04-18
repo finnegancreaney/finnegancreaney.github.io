@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Reviews - Finnegan's Interests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 4px solid #9b59b6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            flex: 1;
+        }
+
+        .back-btn {
+            background: #9b59b6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #8e44ad;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-left: 5px solid #9b59b6;
+        }
+
+        .game-card h2 {
+            color: #9b59b6;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .game-card p {
+            font-size: 1.05em;
+            line-height: 1.6;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+            border-top: 4px solid #9b59b6;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .back-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎮 Gaming Reviews</h1>
+        <a href="index.html" class="back-btn">← Back Home</a>
+    </header>
+
+    <main>
+        <div class="game-card">
+            <h2>Victoria 3</h2>
+            <p><strong>Genre:</strong> Grand Strategy</p>
+            <p>Victoria 3 is an ambitious grand strategy game that puts you in control of a nation from 1836 to 1936. You must navigate complex economics, diplomacy, and politics to build your empire.</p>
+            <p><strong>What I Love:</strong> The depth of the economic system and the realistic portrayal of 19th-century politics. Every decision matters.</p>
+            <p><strong>Rating:</strong> ⭐⭐⭐⭐⭐</p>
+        </div>
+
+        <div class="game-card">
+            <h2>Crusader Kings 3</h2>
+            <p><strong>Genre:</strong> Medieval Dynasty Simulator</p>
+            <p>CK3 lets you rule a medieval dynasty from 867 AD onwards. You manage family relationships, claim titles, wage wars, and create your own story through centuries of history.</p>
+            <p><strong>What I Love:</strong> The intricate character system and the emergent storytelling. Every playthrough is unique and unpredictable.</p>
+            <p><strong>Rating:</strong> ⭐⭐⭐⭐⭐</p>
+        </div>
+
+        <div class="game-card">
+            <h2>War of Dots</h2>
+            <p><strong>Genre:</strong> Tactical Strategy</p>
+            <p>War of Dots is a unique tactical strategy game with minimalist art style but deep gameplay mechanics. Control your dots and outmaneuver your opponents in battles.</p>
+            <p><strong>What I Love:</strong> The clean aesthetic and challenging tactical puzzles. It's simple to learn but hard to master.</p>
+            <p><strong>Rating:</strong> ⭐⭐⭐⭐</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Finnegan Creaney | Personal Interest Hub</p>
+    </footer>
+</body>
+</html>
