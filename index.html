@@ -83,6 +83,12 @@
                         <p>Test your knowledge on History, Geography, Science and Football!</p>
                         <button class="play-btn">Play Now</button>
                     </div>
+                    <div class="game-card" onclick="switchTab('cannon')">
+                        <div class="game-card-icon">💣</div>
+                        <h3>Cannon Siege</h3>
+                        <p>Aim your cannon, fire cannonballs and destroy targets with chain explosions!</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
                 </div>
                 <div class="stats-section" style="margin-top:28px">
                     <h3>Your Stats</h3>
@@ -553,6 +559,18 @@
                 </div>
             </div>
 
+            <!-- Cannon Siege Game -->
+            <div id="cannon" class="game-page">
+                <div class="game-header-inline">
+                    <h2>💣 Cannon Siege</h2>
+                    <button class="back-btn" onclick="switchTab('games')">← Back</button>
+                </div>
+                <div class="game-content" style="align-items:center;">
+                    <canvas id="cannonCanvas" width="640" height="380" style="max-width:100%;cursor:crosshair;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,0.35);"></canvas>
+                    <p style="margin-top:10px;color:#888;font-size:13px;">Move mouse to aim · Click to fire · Destroy all targets to clear the level!</p>
+                </div>
+            </div>
+
             <!-- History Page -->
             <div id="history" class="game-page">
                 <div class="game-header-inline">
@@ -804,5 +822,6 @@
     <script src="tracker.js"></script>
     <script src="trains.js"></script>
     <script src="worldcup.js"></script>
+    <script src="cannon.js"></script>
 </body>
 </html>
