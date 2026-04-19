@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub - Flappy Bird & Battle Simulator</title>
+    <title>Finnegan's Interests</title>
     <link rel="stylesheet" href="index-style.css">
 </head>
 <body>
     <div class="hub-wrapper">
         <header class="hub-header">
-            <h1>🎮 Game Hub</h1>
-            <p>Play awesome games online!</p>
+            <h1>Finnegan's Interests</h1>
         </header>
 
         <nav class="hub-nav">
@@ -23,67 +22,88 @@
             <button class="nav-btn" data-tab="history">History</button>
             <button class="nav-btn" data-tab="football">Football</button>
             <button class="nav-btn" data-tab="gaming">Gaming</button>
+            <button class="nav-btn" data-tab="games">Games</button>
         </nav>
 
         <div class="games-container">
             <!-- Home Page -->
             <div id="home" class="game-page active">
-                <div class="home-content">
-                    <h2>Welcome to Game Hub! 🎯</h2>
-                    <p>Choose a game to play from the navigation above</p>
-                    
-                    <div class="games-showcase">
-                        <div class="game-card" onclick="switchTab('flappy')">
-                            <div class="game-card-icon">🐦</div>
-                            <h3>Flappy Bird</h3>
-                            <p>Guide your bird through pipes!</p>
-                            <button class="play-btn">Play Now</button>
-                        </div>
-
-                        <div class="game-card" onclick="switchTab('battle')">
-                            <div class="game-card-icon">⚔️</div>
-                            <h3>Battle Simulator</h3>
-                            <p>Build your base and battle enemies!</p>
-                            <button class="play-btn">Play Now</button>
-                        </div>
-
-                        <div class="game-card" onclick="switchTab('match3')">
-                            <div class="game-card-icon">💎</div>
-                            <h3>Match 3</h3>
-                            <p>Swap gems to clear the board!</p>
-                            <button class="play-btn">Play Now</button>
-                        </div>
-
-                        <div class="game-card" onclick="switchTab('bus')">
-                            <div class="game-card-icon">🚌</div>
-                            <h3>School Bus</h3>
-                            <p>Track Route 44275 to Westgate School</p>
-                            <button class="play-btn">Open</button>
-                        </div>
-
-                        <div class="game-card" onclick="switchTab('worldcup')">
-                            <div class="game-card-icon">🏆</div>
-                            <h3>World Cup 2026</h3>
-                            <p>Predict every result. Who will lift the trophy?</p>
-                            <button class="play-btn">Predict</button>
-                        </div>
+                <p class="interests-subtitle">What would you like to explore?</p>
+                <div class="interests-grid">
+                    <div class="interest-card" onclick="switchTab('history')">
+                        <span class="interest-icon">📚</span>
+                        <h3>History</h3>
+                        <p>Explore historical timelines and events</p>
                     </div>
+                    <div class="interest-card" onclick="switchTab('football')">
+                        <span class="interest-icon">⚽</span>
+                        <h3>Football</h3>
+                        <p>Leagues, players and the World Cup</p>
+                    </div>
+                    <div class="interest-card" onclick="switchTab('gaming')">
+                        <span class="interest-icon">🎮</span>
+                        <h3>Gaming & Reviews</h3>
+                        <p>Gaming categories, platforms and reviews</p>
+                    </div>
+                    <div class="interest-card" onclick="switchTab('games')">
+                        <span class="interest-icon">🕹️</span>
+                        <h3>Games</h3>
+                        <p>Play Flappy Bird, Battle Simulator and more</p>
+                    </div>
+                    <div class="interest-card" onclick="switchTab('bus')">
+                        <span class="interest-icon">🏫</span>
+                        <h3>School</h3>
+                        <p>Bus tracker and live train times</p>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="stats-section">
-                        <h3>Your Stats</h3>
-                        <div class="stats-grid">
-                            <div class="stat">
-                                <span class="stat-label">Flappy Bird Best Score</span>
-                                <span class="stat-value" id="flappy-best">0</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Total Games Played</span>
-                                <span class="stat-value" id="total-games">0</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Play Time</span>
-                                <span class="stat-value" id="play-time">0h</span>
-                            </div>
+            <!-- Games Hub -->
+            <div id="games" class="game-page">
+                <div class="game-header-inline">
+                    <h2>🕹️ Games</h2>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
+                </div>
+                <div class="games-showcase">
+                    <div class="game-card" onclick="switchTab('flappy')">
+                        <div class="game-card-icon">🐦</div>
+                        <h3>Flappy Bird</h3>
+                        <p>Guide your bird through pipes!</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
+                    <div class="game-card" onclick="switchTab('battle')">
+                        <div class="game-card-icon">⚔️</div>
+                        <h3>Battle Simulator</h3>
+                        <p>Build your base and battle enemies!</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
+                    <div class="game-card" onclick="switchTab('match3')">
+                        <div class="game-card-icon">💎</div>
+                        <h3>Match 3</h3>
+                        <p>Swap gems to clear the board!</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
+                    <div class="game-card" onclick="switchTab('worldcup')">
+                        <div class="game-card-icon">🏆</div>
+                        <h3>World Cup 2026</h3>
+                        <p>Predict every result. Who will lift the trophy?</p>
+                        <button class="play-btn">Predict</button>
+                    </div>
+                </div>
+                <div class="stats-section" style="margin-top:28px">
+                    <h3>Your Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat">
+                            <span class="stat-label">Flappy Bird Best Score</span>
+                            <span class="stat-value" id="flappy-best">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Total Games Played</span>
+                            <span class="stat-value" id="total-games">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Play Time</span>
+                            <span class="stat-value" id="play-time">0h</span>
                         </div>
                     </div>
                 </div>
@@ -658,7 +678,7 @@
         </div>
 
         <footer class="hub-footer">
-            <p>&copy; 2026 Game Hub - Built with ❤️</p>
+            <p>&copy; 2026 Finnegan Creaney</p>
         </footer>
     </div>
 

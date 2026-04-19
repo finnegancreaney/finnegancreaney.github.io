@@ -144,18 +144,55 @@ body {
 }
 
 /* ==============================
-   Home page
+   Home page — Interests
    ============================== */
-.home-content h2 {
-    margin: 0 0 6px;
-    font-size: 2rem;
-    text-align: center;
-}
-
-.home-content > p {
+.interests-subtitle {
     text-align: center;
     color: var(--muted);
+    font-size: 1.05rem;
     margin: 0 0 28px;
+}
+
+.interests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.interest-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.interest-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 32px rgba(102, 126, 234, 0.2);
+    border-color: var(--primary);
+    background: var(--surface);
+}
+
+.interest-icon {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 14px;
+}
+
+.interest-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+    color: var(--text);
+}
+
+.interest-card p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 .games-showcase {
