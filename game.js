@@ -121,11 +121,10 @@ let pipes = [];
 let powerUps = [];
 
 function getDifficultySettings() {
-    // Calculate difficulty-based settings
-    const pipeGap = Math.max(90 - difficulty * 3, 60); // Gap gets smaller
-    const pipeSpeed = 3 + difficulty * 0.3; // Speed increases
-    const pipeFrequency = Math.max(100 - difficulty * 5, 50); // Pipes spawn more often
-    
+    const pipeGap = Math.max(160 - difficulty * 3, 120); // wider gap, stays generous
+    const pipeSpeed = 2 + difficulty * 0.2;              // slower start, slower ramp
+    const pipeFrequency = Math.max(140 - difficulty * 4, 90); // more space between pipes
+
     return {
         gap: pipeGap,
         speed: pipeSpeed,
@@ -345,8 +344,8 @@ function update() {
         
         if (!pipe.scored && bird.x > pipe.x + pipe.width) {
             pipe.scored = true;
-            score += 10;
-            difficulty = 1 + Math.floor(score / 50);
+            score += 1;
+            difficulty = 1 + Math.floor(score / 10);
             playSound('score');
             createPowerUp(pipe.x + pipe.width / 2, canvas.height / 2);
         }
@@ -364,7 +363,7 @@ function update() {
                 bird.hasShield = true;
                 bird.shieldDuration = 300;
             } else {
-                score += 10;
+                score += 1;
             }
             playSound('powerup');
             powerUps.splice(index, 1);
