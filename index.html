@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finnegan's Interests</title>
-    <link rel="stylesheet" href="index-style.css">
+    <link rel="stylesheet" href="index-style.css?v=2">
 </head>
 <body>
     <div class="hub-wrapper">
@@ -12,18 +12,6 @@
             <h1>Finnegan's Interests</h1>
         </header>
 
-        <nav class="hub-nav">
-            <button class="nav-btn active" data-tab="home">Home</button>
-            <button class="nav-btn" data-tab="flappy">Flappy Bird</button>
-            <button class="nav-btn" data-tab="battle">Battle Simulator</button>
-            <button class="nav-btn" data-tab="match3">Match 3</button>
-            <button class="nav-btn" data-tab="bus">School Bus</button>
-            <button class="nav-btn" data-tab="worldcup">World Cup</button>
-            <button class="nav-btn" data-tab="history">History</button>
-            <button class="nav-btn" data-tab="football">Football</button>
-            <button class="nav-btn" data-tab="gaming">Gaming</button>
-            <button class="nav-btn" data-tab="games">Games</button>
-        </nav>
 
         <div class="games-container">
             <!-- Home Page -->
@@ -684,31 +672,14 @@
 
     <script>
         function switchTab(tabName) {
-            // Hide all pages
             document.querySelectorAll('.game-page').forEach(page => {
                 page.classList.remove('active');
             });
-            
-            // Show selected page
             document.getElementById(tabName).classList.add('active');
-            
-            // Update nav buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            
             window.scrollTo(0, 0);
         }
 
-        // Setup tab switching for main nav and inner tabs
         document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    switchTab(btn.dataset.tab);
-                });
-            });
-
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const tab = btn.dataset.tab;
