@@ -1604,6 +1604,7 @@ body {
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     aspect-ratio: 1 / 1;
+    position: relative;
 }
 
 .gem {
@@ -1632,7 +1633,8 @@ body {
 }
 
 .gem.clearing {
-    animation: gem-clear 0.22s ease-out forwards;
+    animation: gem-explode 0.22s ease-out forwards;
+    z-index: 2;
 }
 
 .gem.bounce {
@@ -1644,10 +1646,39 @@ body {
     pointer-events: none;
 }
 
-@keyframes gem-clear {
-    0%   { transform: scale(1);   opacity: 1; }
-    50%  { transform: scale(1.3); opacity: 0.6; }
-    100% { transform: scale(0);   opacity: 0; }
+@keyframes gem-explode {
+    0%   { transform: scale(1);   opacity: 1;   filter: brightness(1); }
+    15%  { transform: scale(1.8); opacity: 1;   filter: brightness(3) saturate(2); }
+    50%  { transform: scale(1.4); opacity: 0.7; filter: brightness(2); }
+    100% { transform: scale(0);   opacity: 0;   filter: brightness(1); }
+}
+
+.gem-particle {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    animation: particle-fly linear forwards;
+    z-index: 20;
+}
+
+@keyframes particle-fly {
+    0%   { transform: translate(0, 0) scale(1);   opacity: 1; }
+    70%  { opacity: 0.8; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+
+.gem-shockwave {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 3px solid;
+    animation: shockwave 0.42s ease-out forwards;
+    z-index: 15;
+}
+
+@keyframes shockwave {
+    0%   { transform: scale(0.4); opacity: 0.9; }
+    100% { transform: scale(2.6); opacity: 0; }
 }
 
 @keyframes gem-bounce {

@@ -188,6 +188,45 @@ class Match3 {
         this.grid[r2][c2] = tmp;
     }
 
+    // ----- Explosion particles -----
+    spawnParticles(r, c, colorIndex) {
+        const cell = this.cellAt(r, c);
+        if (!cell) return;
+        const boardRect = this.board.getBoundingClientRect();
+        const cellRect  = cell.getBoundingClientRect();
+        const cx = cellRect.left - boardRect.left + cellRect.width  / 2;
+        const cy = cellRect.top  - boardRect.top  + cellRect.height / 2;
+
+        const gemColors = ['#ef4444','#22c55e','#3b82f6','#eab308','#a855f7','#f97316'];
+        const base = gemColors[colorIndex] ?? '#ffffff';
+
+        // particles
+        const count = 10;
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('div');
+            p.className = 'gem-particle';
+            const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+            const dist  = 18 + Math.random() * 38;
+            const size  = 5 + Math.random() * 7;
+            const color = Math.random() < 0.6 ? base : '#ffffff';
+            const dur   = 380 + Math.random() * 180;
+            p.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;` +
+                `background:${color};--dx:${Math.cos(angle)*dist}px;--dy:${Math.sin(angle)*dist}px;` +
+                `margin-left:${-size/2}px;margin-top:${-size/2}px;animation-duration:${dur}ms;`;
+            this.board.appendChild(p);
+            setTimeout(() => p.remove(), dur + 50);
+        }
+
+        // shockwave ring
+        const ring = document.createElement('div');
+        ring.className = 'gem-shockwave';
+        const rSize = Math.max(cellRect.width, cellRect.height);
+        ring.style.cssText = `left:${cx}px;top:${cy}px;width:${rSize}px;height:${rSize}px;` +
+            `margin-left:${-rSize/2}px;margin-top:${-rSize/2}px;border-color:${base};`;
+        this.board.appendChild(ring);
+        setTimeout(() => ring.remove(), 450);
+    }
+
     // ----- Cascades -----
     async resolveCascades() {
         let multiplier = 1;
@@ -201,7 +240,9 @@ class Match3 {
 
             for (const key of matches) {
                 const [r, c] = key.split(',').map(Number);
+                const colorIndex = this.grid[r][c];
                 this.cellAt(r, c).classList.add('clearing');
+                this.spawnParticles(r, c, colorIndex);
             }
             await this.sleep(M3_ANIM_MS);
 
