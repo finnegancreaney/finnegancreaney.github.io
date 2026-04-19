@@ -182,16 +182,8 @@ class CannonSiege {
     }
 
     computeAimDots() {
-        const tip = this.cannonTip();
-        const a = this.angleDeg * Math.PI / 180;
-        let vx = Math.cos(a) * BALL_SPEED, vy = Math.sin(a) * BALL_SPEED;
-        let px = tip.x, py = tip.y;
+        // trajectory preview removed — aim by eye!
         this.aimDots = [];
-        for (let i = 0; i < 80; i++) {
-            vy += GRAVITY; px += vx; py += vy;
-            if (py > GY || px > CW + 20) break;
-            if (i % 4 === 0) this.aimDots.push({ x: px, y: py, a: 1 - i / 80 });
-        }
     }
 
     // ---- FIRE ----
