@@ -77,6 +77,12 @@
                         <p>Predict every result. Who will lift the trophy?</p>
                         <button class="play-btn">Predict</button>
                     </div>
+                    <div class="game-card" onclick="switchTab('quiz')">
+                        <div class="game-card-icon">🧠</div>
+                        <h3>Quizzes</h3>
+                        <p>Test your knowledge on History, Geography, Science and Football!</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
                 </div>
                 <div class="stats-section" style="margin-top:28px">
                     <h3>Your Stats</h3>
@@ -481,6 +487,72 @@
                 </div>
             </div>
 
+            <!-- Quiz Page -->
+            <div id="quiz" class="game-page">
+                <div class="game-header-inline">
+                    <h2>🧠 Quizzes</h2>
+                    <button class="back-btn" onclick="switchTab('games')">← Back</button>
+                </div>
+
+                <!-- Quiz Menu -->
+                <div id="quiz-menu">
+                    <p class="quiz-intro">Pick a topic and difficulty, then start!</p>
+                    <div class="quiz-topics">
+                        <div class="quiz-topic-card" data-topic="history">
+                            <span class="quiz-topic-icon">📚</span>
+                            <span>History</span>
+                        </div>
+                        <div class="quiz-topic-card" data-topic="geography">
+                            <span class="quiz-topic-icon">🌍</span>
+                            <span>Geography</span>
+                        </div>
+                        <div class="quiz-topic-card" data-topic="science">
+                            <span class="quiz-topic-icon">🔬</span>
+                            <span>Science</span>
+                        </div>
+                        <div class="quiz-topic-card" data-topic="football">
+                            <span class="quiz-topic-icon">⚽</span>
+                            <span>Football</span>
+                        </div>
+                    </div>
+                    <div class="quiz-difficulty-row">
+                        <button class="diff-btn active" data-diff="normal">Normal</button>
+                        <button class="diff-btn" data-diff="hard">Difficult</button>
+                    </div>
+                    <button id="quiz-start-btn" class="quiz-start-btn">Start Quiz →</button>
+                </div>
+
+                <!-- Active Quiz -->
+                <div id="quiz-active" hidden>
+                    <div class="quiz-progress">
+                        <span id="quiz-progress-text">Question 1 of 10</span>
+                        <div class="quiz-progress-track">
+                            <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
+                        </div>
+                        <span id="quiz-score-live">0 ✓</span>
+                    </div>
+                    <div class="quiz-question-box">
+                        <p id="quiz-q-text"></p>
+                    </div>
+                    <div class="quiz-options" id="quiz-options"></div>
+                    <button id="quiz-next-btn" class="quiz-next-btn" hidden>Next Question</button>
+                </div>
+
+                <!-- Results -->
+                <div id="quiz-results" hidden>
+                    <div class="quiz-results-box">
+                        <div class="quiz-result-emoji" id="quiz-result-emoji">🏆</div>
+                        <div class="quiz-result-score" id="quiz-result-score">0 / 10</div>
+                        <div class="quiz-result-msg" id="quiz-result-msg"></div>
+                        <div class="quiz-result-meta" id="quiz-result-meta"></div>
+                        <div class="quiz-result-btns">
+                            <button class="quiz-start-btn" id="quiz-again-btn">Play Again</button>
+                            <button class="quiz-back-btn" id="quiz-topics-btn">Choose Another Quiz</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- History Page -->
             <div id="history" class="game-page">
                 <div class="game-header-inline">
@@ -725,6 +797,7 @@
     </script>
 
     <!-- Game Scripts - Load AFTER the HTML -->
+    <script src="quiz.js"></script>
     <script src="game.js"></script>
     <script src="battle-game.js"></script>
     <script src="match3.js"></script>
