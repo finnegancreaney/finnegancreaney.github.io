@@ -92,7 +92,12 @@ class TrainBoard {
 
     renderError(err) {
         this.listEl.innerHTML = '';
-        this.setStatus(`⚠️ Could not load live trains (${err.message}). Will retry in a minute.`);
+        const networkFail = err && (err.name === 'TypeError' || /failed to fetch|networkerror/i.test(err.message));
+        if (networkFail) {
+            this.setStatus('⚠️ Live trains temporarily unavailable (National Rail feed is down). Retrying…');
+        } else {
+            this.setStatus(`⚠️ Could not load live trains (${err.message}). Retrying…`);
+        }
     }
 
     setStatus(msg) {
