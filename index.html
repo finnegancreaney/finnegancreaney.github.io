@@ -59,10 +59,10 @@
                         <p>Guide your bird through pipes!</p>
                         <button class="play-btn">Play Now</button>
                     </div>
-                    <div class="game-card" onclick="switchTab('battle')">
-                        <div class="game-card-icon">⚔️</div>
-                        <h3>Battle Simulator</h3>
-                        <p>Build your base and battle enemies!</p>
+                    <div class="game-card" onclick="switchTab('ww2')">
+                        <div class="game-card-icon">🌍</div>
+                        <h3>Europe 1939</h3>
+                        <p>Turn-based WW2 grand strategy. Command a nation, conquer Europe.</p>
                         <button class="play-btn">Play Now</button>
                     </div>
                     <div class="game-card" onclick="switchTab('match3')">
@@ -154,228 +154,36 @@
                 </div>
             </div>
 
-            <!-- Battle Simulator Game -->
-            <div id="battle" class="game-page">
+            <!-- Europe 1939 — turn-based WW2 strategy -->
+            <div id="ww2" class="game-page">
                 <div class="game-header-inline">
-                    <h2>⚔️ Battle Simulator</h2>
-                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
+                    <h2>🌍 Europe 1939</h2>
+                    <button class="back-btn" onclick="switchTab('games')">← Back</button>
                 </div>
-                
-                <div class="game-content battle-content">
-                    <div class="left-panel">
-                        <div class="resources-bar">
-                            <div class="resource">
-                                <span class="icon">🪙</span>
-                                <span class="value" id="battle-gold">15000</span>
-                            </div>
-                            <div class="resource">
-                                <span class="icon">⚡</span>
-                                <span class="value" id="battle-elixir">10000</span>
-                            </div>
-                            <div class="resource">
-                                <span class="icon">❤️</span>
-                                <span class="value" id="battle-hp">100</span>
-                            </div>
+                <div class="game-content ww2-content">
+                    <div class="ww2-hud">
+                        <div class="ww2-turn-info">
+                            <span class="ww2-label">Turn</span>
+                            <span class="ww2-value" id="ww2-turn">1</span>
+                            <span class="ww2-label">·</span>
+                            <span class="ww2-value" id="ww2-phase">Your move</span>
                         </div>
-                        <canvas id="battleCanvas" width="500" height="600"></canvas>
-                        <div class="canvas-controls">
-                            <button id="clearBase">🗑️ Clear</button>
-                            <button id="randomLayout">🎲 Random</button>
-                            <button id="testAttack">⚔️ Test Attack</button>
+                        <div class="ww2-nation-info">
+                            <span class="ww2-label">You control</span>
+                            <span class="ww2-value" id="ww2-nation">—</span>
                         </div>
+                        <button class="ww2-btn ww2-end-turn" id="ww2-end-turn">End Turn ▶</button>
+                        <button class="ww2-btn ww2-new-game" id="ww2-new-game">🔄 New Game</button>
                     </div>
-
-                    <div class="right-panel">
-                        <div class="tabs">
-                            <button class="tab-btn active" data-tab="buildings">Buildings</button>
-                            <button class="tab-btn" data-tab="units">Units</button>
-                            <button class="tab-btn" data-tab="upgrades">Upgrades</button>
-                            <button class="tab-btn" data-tab="battle-log">Battle Log</button>
-                        </div>
-
-                        <div id="buildings" class="tab-content active">
-                            <h3>Place Buildings</h3>
-                            <div class="building-grid">
-                                <div class="building-item" data-building="townhall">
-                                    <div class="building-preview">🏰</div>
-                                    <div class="building-info">
-                                        <p class="name">Town Hall</p>
-                                        <p class="cost">Cost: 1000🪙</p>
-                                        <p class="desc">Command center. Protects resources.</p>
-                                    </div>
-                                    <button class="select-btn">Select</button>
-                                </div>
-
-                                <div class="building-item" data-building="barracks">
-                                    <div class="building-preview">🛡️</div>
-                                    <div class="building-info">
-                                        <p class="name">Barracks</p>
-                                        <p class="cost">Cost: 500🪙</p>
-                                        <p class="desc">Train troops. 3x3 size.</p>
-                                    </div>
-                                    <button class="select-btn">Select</button>
-                                </div>
-
-                                <div class="building-item" data-building="archer-tower">
-                                    <div class="building-preview">🏹</div>
-                                    <div class="building-info">
-                                        <p class="name">Archer Tower</p>
-                                        <p class="cost">Cost: 800🪙</p>
-                                        <p class="desc">Defensive tower. Range: 5 tiles.</p>
-                                    </div>
-                                    <button class="select-btn">Select</button>
-                                </div>
-
-                                <div class="building-item" data-building="cannon">
-                                    <div class="building-preview">🔫</div>
-                                    <div class="building-info">
-                                        <p class="name">Cannon</p>
-                                        <p class="cost">Cost: 1200🪙</p>
-                                        <p class="desc">Heavy defense. 3x3 damage.</p>
-                                    </div>
-                                    <button class="select-btn">Select</button>
-                                </div>
-
-                                <div class="building-item" data-building="wall">
-                                    <div class="building-preview">🧱</div>
-                                    <div class="building-info">
-                                        <p class="name">Wall</p>
-                                        <p class="cost">Cost: 100🪙</p>
-                                        <p class="desc">Blocks enemy path.</p>
-                                    </div>
-                                    <button class="select-btn">Select</button>
-                                </div>
-
-                                <div class="building-item" data-building="storage">
-                                    <div class="building-preview">📦</div>
-                                    <div class="building-info">
-                                        <p class="name">Storage</p>
-                                        <p class="cost">Cost: 600🪙</p>
-                                        <p class="desc">Stores resources.</p>
-                                    </div>
-                                    <button class="select-btn">Select</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="units" class="tab-content">
-                            <h3>Train Units</h3>
-                            <div class="units-grid">
-                                <div class="unit-item">
-                                    <div class="unit-preview">🗡️</div>
-                                    <div class="unit-info">
-                                        <p class="name">Barbarian</p>
-                                        <p class="cost">Cost: 50⚡</p>
-                                        <p class="stats">HP: 50 | DMG: 8</p>
-                                    </div>
-                                    <input type="number" id="barbarian-count" min="0" max="20" value="0">
-                                    <button class="train-btn" data-unit="barbarian">Train</button>
-                                </div>
-
-                                <div class="unit-item">
-                                    <div class="unit-preview">🏹</div>
-                                    <div class="unit-info">
-                                        <p class="name">Archer</p>
-                                        <p class="cost">Cost: 75⚡</p>
-                                        <p class="stats">HP: 30 | DMG: 12 | Range: 3</p>
-                                    </div>
-                                    <input type="number" id="archer-count" min="0" max="20" value="0">
-                                    <button class="train-btn" data-unit="archer">Train</button>
-                                </div>
-
-                                <div class="unit-item">
-                                    <div class="unit-preview">🐉</div>
-                                    <div class="unit-info">
-                                        <p class="name">Dragon</p>
-                                        <p class="cost">Cost: 200⚡</p>
-                                        <p class="stats">HP: 150 | DMG: 25 | Range: 5</p>
-                                    </div>
-                                    <input type="number" id="dragon-count" min="0" max="10" value="0">
-                                    <button class="train-btn" data-unit="dragon">Train</button>
-                                </div>
-
-                                <div class="unit-item">
-                                    <div class="unit-preview">🧙</div>
-                                    <div class="unit-info">
-                                        <p class="name">Wizard</p>
-                                        <p class="cost">Cost: 150⚡</p>
-                                        <p class="stats">HP: 60 | DMG: 30 | Range: 4</p>
-                                    </div>
-                                    <input type="number" id="wizard-count" min="0" max="15" value="0">
-                                    <button class="train-btn" data-unit="wizard">Train</button>
-                                </div>
-                            </div>
-                            <div class="army-status">
-                                <p>Total Units: <span id="total-units">0</span></p>
-                                <p>Army Power: <span id="army-power">0</span></p>
-                            </div>
-                        </div>
-
-                        <div id="upgrades" class="tab-content">
-                            <h3>Upgrades</h3>
-                            <div class="upgrades-list">
-                                <div class="upgrade-item">
-                                    <div class="upgrade-info">
-                                        <p class="name">Barbarian Strength</p>
-                                        <p class="level">Level: <span id="barbarian-level">0</span>/5</p>
-                                        <p class="effect">+5 damage per level</p>
-                                    </div>
-                                    <button class="upgrade-btn" data-upgrade="barbarian">Upgrade (300⚡)</button>
-                                </div>
-
-                                <div class="upgrade-item">
-                                    <div class="upgrade-info">
-                                        <p class="name">Archer Precision</p>
-                                        <p class="level">Level: <span id="archer-level">0</span>/5</p>
-                                        <p class="effect">+2 range per level</p>
-                                    </div>
-                                    <button class="upgrade-btn" data-upgrade="archer">Upgrade (400⚡)</button>
-                                </div>
-
-                                <div class="upgrade-item">
-                                    <div class="upgrade-info">
-                                        <p class="name">Tower Defense</p>
-                                        <p class="level">Level: <span id="tower-level">0</span>/5</p>
-                                        <p class="effect">+20% tower damage</p>
-                                    </div>
-                                    <button class="upgrade-btn" data-upgrade="tower">Upgrade (500⚡)</button>
-                                </div>
-
-                                <div class="upgrade-item">
-                                    <div class="upgrade-info">
-                                        <p class="name">Wall Fortification</p>
-                                        <p class="level">Level: <span id="wall-level">0</span>/5</p>
-                                        <p class="effect">+50 wall HP per level</p>
-                                    </div>
-                                    <button class="upgrade-btn" data-upgrade="wall">Upgrade (200⚡)</button>
-                                </div>
-
-                                <div class="upgrade-item">
-                                    <div class="upgrade-info">
-                                        <p class="name">Dragon Fury</p>
-                                        <p class="level">Level: <span id="dragon-level">0</span>/5</p>
-                                        <p class="effect">+5 damage per level</p>
-                                    </div>
-                                    <button class="upgrade-btn" data-upgrade="dragon">Upgrade (600⚡)</button>
-                                </div>
-
-                                <div class="upgrade-item">
-                                    <div class="upgrade-info">
-                                        <p class="name">Wizard Mastery</p>
-                                        <p class="level">Level: <span id="wizard-level">0</span>/5</p>
-                                        <p class="effect">+5 damage per level</p>
-                                    </div>
-                                    <button class="upgrade-btn" data-upgrade="wizard">Upgrade (450⚡)</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="battle-log" class="tab-content">
-                            <h3>Battle Log</h3>
-                            <div class="battle-log" id="battleLog">
-                                <p class="log-entry">Ready for battle!</p>
-                            </div>
-                        </div>
+                    <div class="ww2-map-wrap">
+                        <svg id="ww2-map" viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg"></svg>
+                    </div>
+                    <div class="ww2-sidebar" id="ww2-sidebar">
+                        <p class="ww2-hint">Click a territory to see details.</p>
+                    </div>
+                    <div class="ww2-log-wrap">
+                        <h3>Battle Log</h3>
+                        <ol class="ww2-log" id="ww2-log"></ol>
                     </div>
                 </div>
             </div>
@@ -952,7 +760,7 @@
     <!-- Game Scripts - Load AFTER the HTML -->
     <script src="quiz.js"></script>
     <script src="game.js"></script>
-    <script src="battle-game.js"></script>
+    <script src="ww2.js"></script>
     <script src="match3.js"></script>
     <script src="tracker.js"></script>
     <script src="trains.js"></script>

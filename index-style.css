@@ -1,7 +1,7 @@
 :root {
-    --primary: #667eea;
-    --primary-dark: #4f63c9;
-    --accent: #764ba2;
+    --primary: #059669;
+    --primary-dark: #047857;
+    --accent: #065f46;
     --bg: #f4f6fb;
     --surface: #ffffff;
     --text: #2c3e50;
@@ -25,7 +25,7 @@ body {
     padding: 0;
     font-family: var(--font-family);
     color: var(--text);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #059669 0%, #065f46 100%);
     min-height: 100vh;
     line-height: 1.5;
 }
@@ -178,7 +178,7 @@ body {
 
 .interest-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 36px rgba(102, 126, 234, 0.22);
+    box-shadow: 0 16px 36px rgba(5, 150, 105, 0.22);
     border-color: var(--primary);
 }
 
@@ -643,7 +643,7 @@ body {
 .wc-name-row input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
 }
 
 .wc-shared-banner {
@@ -763,7 +763,7 @@ body {
     border-top: 5px solid var(--primary);
     border-radius: var(--radius);
     padding: 14px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(102, 126, 234, 0.08);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(5, 150, 105, 0.08);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -771,7 +771,7 @@ body {
 }
 
 .wc-group-card:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(5, 150, 105, 0.15);
     transform: translateY(-1px);
 }
 
@@ -896,7 +896,7 @@ body {
 .wc-score-input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
 }
 
 .wc-standings {
@@ -1016,7 +1016,7 @@ body {
 .wc-ko-team:last-child { border-bottom: none; }
 
 .wc-ko-team:not(:disabled):hover {
-    background: rgba(102, 126, 234, 0.08);
+    background: rgba(5, 150, 105, 0.08);
 }
 
 .wc-ko-team:disabled {
@@ -1093,7 +1093,7 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #059669 0%, #065f46 100%);
     color: #fff;
     padding: 18px 20px;
     border-radius: var(--radius);
@@ -1291,7 +1291,7 @@ body {
 }
 
 .bus-stop.my-stop {
-    background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
+    background: linear-gradient(90deg, rgba(5, 150, 105, 0.1), transparent);
     border-radius: 6px;
     padding-left: 6px;
     margin-left: -6px;
@@ -1626,7 +1626,7 @@ body {
 }
 
 .gem.selected {
-    background: rgba(102, 126, 234, 0.55);
+    background: rgba(5, 150, 105, 0.55);
     transform: scale(1.12);
     box-shadow: 0 0 0 3px #fff, 0 4px 10px rgba(0, 0, 0, 0.3);
     z-index: 2;
@@ -1935,7 +1935,7 @@ body {
 
 .quiz-topic-card.selected {
     border-color: var(--primary);
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(5, 150, 105, 0.1);
 }
 
 .quiz-topic-icon { font-size: 2.2rem; line-height: 1; }
@@ -2049,7 +2049,7 @@ body {
 
 .quiz-option-btn:not(:disabled):hover {
     border-color: var(--primary);
-    background: rgba(102, 126, 234, 0.06);
+    background: rgba(5, 150, 105, 0.06);
     transform: translateY(-1px);
 }
 
@@ -2394,4 +2394,114 @@ body {
     .sol-card, .sol-empty { width: 48px; height: 72px; }
     .sol-rank { font-size: 0.85rem; }
     .sol-suit { font-size: 1.2rem; }
+}
+
+/* ==============================
+   Europe 1939 (WW2 grand strategy)
+   ============================== */
+.ww2-content {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    grid-template-rows: auto 1fr auto;
+    gap: 12px;
+    align-items: stretch;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.ww2-hud {
+    grid-column: 1 / -1;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    background: var(--bg); padding: 10px 14px; border-radius: var(--radius);
+}
+.ww2-hud .ww2-label {
+    font-size: 0.75rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.6px; margin-right: 4px;
+}
+.ww2-hud .ww2-value {
+    font-weight: 700; color: var(--primary-dark); margin-right: 12px;
+}
+.ww2-turn-info, .ww2-nation-info { display: flex; align-items: center; }
+.ww2-btn {
+    padding: 8px 14px; border: none; border-radius: 6px;
+    background: var(--primary); color: #fff;
+    font-weight: 700; cursor: pointer; font-size: 0.9rem;
+    transition: background 0.2s;
+}
+.ww2-btn:hover { background: var(--primary-dark); }
+.ww2-new-game { background: var(--muted); }
+.ww2-new-game:hover { background: #4b5563; }
+
+.ww2-map-wrap {
+    background: #0e2540; border-radius: var(--radius);
+    padding: 8px; overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+}
+#ww2-map {
+    width: 100%; height: auto; display: block;
+    font-family: var(--font-family);
+}
+.ww2-terr {
+    cursor: pointer;
+    transition: fill 0.15s, stroke-width 0.15s;
+}
+.ww2-terr:hover { filter: brightness(1.2); }
+.ww2-terr.selected {
+    stroke: #fbbf24 !important; stroke-width: 3 !important;
+    filter: brightness(1.15);
+}
+.ww2-label-text {
+    font-size: 11px; font-weight: 700;
+    fill: #f5f5f5;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+    paint-order: stroke; stroke: rgba(0,0,0,0.8); stroke-width: 2.5px;
+}
+.ww2-unit-count {
+    font-size: 10px; font-weight: 700;
+    fill: #fde68a;
+    paint-order: stroke; stroke: rgba(0,0,0,0.9); stroke-width: 2.5px;
+}
+
+.ww2-sidebar {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 14px; box-shadow: var(--shadow-sm);
+    min-height: 200px;
+    font-size: 0.9rem;
+}
+.ww2-sb-title { margin: 0 0 10px; color: var(--primary-dark); font-size: 1.2rem; }
+.ww2-sb-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0; border-bottom: 1px dashed var(--border);
+}
+.ww2-sb-label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.ww2-sb-value { font-weight: 700; color: var(--text); }
+.ww2-sb-section {
+    margin-top: 12px; font-size: 0.75rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700;
+}
+.ww2-sb-units { list-style: none; margin: 6px 0; padding: 0; }
+.ww2-sb-units li { padding: 3px 0; }
+.ww2-sb-units .ww2-none { color: var(--muted); font-style: italic; }
+.ww2-sb-adj { margin: 6px 0 0; font-size: 0.85rem; color: var(--text); line-height: 1.4; }
+.ww2-hint { margin: 0; color: var(--muted); font-style: italic; }
+
+.ww2-log-wrap {
+    grid-column: 1 / -1;
+    background: var(--surface); border-radius: var(--radius);
+    padding: 10px 14px; box-shadow: var(--shadow-sm);
+    max-height: 140px; overflow-y: auto;
+}
+.ww2-log-wrap h3 {
+    margin: 0 0 6px; color: var(--primary-dark);
+    font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.6px;
+}
+.ww2-log { list-style: none; margin: 0; padding: 0; font-size: 0.85rem; }
+.ww2-log li {
+    padding: 3px 0; border-bottom: 1px dashed var(--border);
+    color: var(--text);
+}
+.ww2-log li:last-child { border-bottom: none; }
+
+@media (max-width: 900px) {
+    .ww2-content { grid-template-columns: 1fr; }
+    .ww2-sidebar { min-height: auto; }
 }
