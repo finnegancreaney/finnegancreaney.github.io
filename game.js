@@ -2,7 +2,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const soundToggle = document.getElementById('soundToggle');
 const restartBtn = document.getElementById('restartBtn');
-const highScoreDisplay = document.getElementById('highScore');
+const flappyPage = document.getElementById('flappy');
 
 // Game states
 const GAME_STATE = {
@@ -20,9 +20,15 @@ let frameCount = 0;
 let difficulty = 1;
 let soundEnabled = true;
 
-if (highScoreDisplay) {
-    highScoreDisplay.textContent = highScore;
+function isFlappyActive() {
+    return flappyPage && flappyPage.classList.contains('active');
 }
+
+function updateFlappyBestDisplay() {
+    const el = document.getElementById('flappy-best');
+    if (el) el.textContent = highScore;
+}
+updateFlappyBestDisplay();
 
 // Bird object
 const bird = {
@@ -417,31 +423,33 @@ function draw() {
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('flappyBirdHighScore', highScore);
-            if (highScoreDisplay) {
-                highScoreDisplay.textContent = highScore;
-            }
+            updateFlappyBestDisplay();
         }
         drawGameOverScreen();
     }
 }
 
 function gameLoop() {
-    update();
-    draw();
-    frameCount++;
+    // Only run when the Flappy tab is visible — otherwise we burn CPU every
+    // frame (and advance gameplay) while the user is on another game.
+    if (isFlappyActive()) {
+        update();
+        draw();
+        frameCount++;
+    }
     requestAnimationFrame(gameLoop);
 }
 
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
-        e.preventDefault();
-        if (gameState === GAME_STATE.START) {
-            gameState = GAME_STATE.PLAYING;
-        } else if (gameState === GAME_STATE.GAME_OVER) {
-            resetGame();
-        } else if (gameState === GAME_STATE.PLAYING) {
-            bird.flap();
-        }
+    if (e.code !== 'Space') return;
+    if (!isFlappyActive()) return; // don't hijack Space on other tabs
+    e.preventDefault();
+    if (gameState === GAME_STATE.START) {
+        gameState = GAME_STATE.PLAYING;
+    } else if (gameState === GAME_STATE.GAME_OVER) {
+        resetGame();
+    } else if (gameState === GAME_STATE.PLAYING) {
+        bird.flap();
     }
 });
 
