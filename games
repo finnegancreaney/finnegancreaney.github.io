@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #059669 0%, #065f46 100%);
             min-height: 100vh;
             color: #333;
         }
@@ -23,7 +23,7 @@
             color: white;
             padding: 30px 20px;
             text-align: center;
-            border-bottom: 4px solid #667eea;
+            border-bottom: 4px solid #059669;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -35,7 +35,7 @@
         }
 
         .back-btn {
-            background: #667eea;
+            background: #059669;
             color: white;
             padding: 10px 20px;
             border-radius: 5px;
@@ -45,7 +45,7 @@
         }
 
         .back-btn:hover {
-            background: #764ba2;
+            background: #065f46;
         }
 
         main {
@@ -60,11 +60,11 @@
             padding: 30px;
             margin-bottom: 25px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border-left: 5px solid #667eea;
+            border-left: 5px solid #059669;
         }
 
         .game-card h2 {
-            color: #667eea;
+            color: #059669;
             font-size: 1.8em;
             margin-bottom: 15px;
         }
@@ -89,7 +89,7 @@
 
         .download-btn {
             display: inline-block;
-            background: #667eea;
+            background: #059669;
             color: white;
             padding: 12px 30px;
             border-radius: 5px;
@@ -100,19 +100,19 @@
         }
 
         .download-btn:hover {
-            background: #764ba2;
+            background: #065f46;
         }
 
         .instructions {
             background: #f8f9fa;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #059669;
             padding: 20px;
             margin-top: 20px;
             border-radius: 5px;
         }
 
         .instructions h3 {
-            color: #667eea;
+            color: #059669;
             margin-bottom: 10px;
         }
 
@@ -135,7 +135,7 @@
             text-align: center;
             padding: 20px;
             margin-top: 60px;
-            border-top: 4px solid #667eea;
+            border-top: 4px solid #059669;
         }
 
         @media (max-width: 768px) {
@@ -166,7 +166,7 @@
             <h2>📚 History Quiz Game</h2>
             <p>Test your knowledge of English and Medieval history! This is an interactive quiz game built with Python and Pygame.</p>
             
-            <h3 style="color: #667eea; margin-top: 15px;">Features:</h3>
+            <h3 style="color: #059669; margin-top: 15px;">Features:</h3>
             <ul>
                 <li>✅ 12 challenging history questions</li>
                 <li>✅ Topics: Wessex, Medieval England, Modern History</li>
