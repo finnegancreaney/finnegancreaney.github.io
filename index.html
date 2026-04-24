@@ -59,12 +59,6 @@
                         <p>Guide your bird through pipes!</p>
                         <button class="play-btn">Play Now</button>
                     </div>
-                    <div class="game-card" onclick="switchTab('ww2')">
-                        <div class="game-card-icon">🌍</div>
-                        <h3>Europe 1939</h3>
-                        <p>Turn-based WW2 grand strategy. Command a nation, conquer Europe.</p>
-                        <button class="play-btn">Play Now</button>
-                    </div>
                     <div class="game-card" onclick="switchTab('match3')">
                         <div class="game-card-icon">💎</div>
                         <h3>Match 3</h3>
@@ -160,39 +154,7 @@
                 </div>
             </div>
 
-            <!-- Europe 1939 — turn-based WW2 strategy -->
-            <div id="ww2" class="game-page">
-                <div class="game-header-inline">
-                    <h2>🌍 Europe 1939</h2>
-                    <button class="back-btn" onclick="switchTab('games')">← Back</button>
-                </div>
-                <div class="game-content ww2-content">
-                    <div class="ww2-hud">
-                        <div class="ww2-turn-info">
-                            <span class="ww2-label">Turn</span>
-                            <span class="ww2-value" id="ww2-turn">1</span>
-                            <span class="ww2-label">·</span>
-                            <span class="ww2-value" id="ww2-phase">Your move</span>
-                        </div>
-                        <div class="ww2-nation-info">
-                            <span class="ww2-label">You control</span>
-                            <span class="ww2-value" id="ww2-nation">—</span>
-                        </div>
-                        <button class="ww2-btn ww2-end-turn" id="ww2-end-turn">End Turn ▶</button>
-                        <button class="ww2-btn ww2-new-game" id="ww2-new-game">🔄 New Game</button>
-                    </div>
-                    <div class="ww2-map-wrap">
-                        <svg id="ww2-map" viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg"></svg>
-                    </div>
-                    <div class="ww2-sidebar" id="ww2-sidebar">
-                        <p class="ww2-hint">Click a territory to see details.</p>
-                    </div>
-                    <div class="ww2-log-wrap">
-                        <h3>Battle Log</h3>
-                        <ol class="ww2-log" id="ww2-log"></ol>
-                    </div>
-                </div>
-            </div>
+<!-- Europe 1939 tab hidden for now; ww2.js file kept for later revisit. -->
 
             <!-- Match 3 Game -->
             <div id="match3" class="game-page">
@@ -777,7 +739,6 @@
     <!-- Game Scripts - Load AFTER the HTML -->
     <script src="quiz.js"></script>
     <script src="game.js"></script>
-    <script src="ww2.js"></script>
     <script src="plmanager-data.js"></script>
     <script src="plmanager.js"></script>
     <script src="match3.js"></script>
