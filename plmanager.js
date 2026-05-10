@@ -1495,9 +1495,19 @@ class PLManager {
         else if (promoted)                     verdict = `🎉 Promoted to ${PLM_DIVISIONS[newDivId].name}! Finished ${ordinal(yourPos)}.`;
         else if (relegated)                    verdict = `💀 Relegated to ${PLM_DIVISIONS[newDivId].name}. Finished ${ordinal(yourPos)}.`;
         else if (yourPos === 1)                verdict = `🏆 CHAMPIONS of ${divName}!`;
-        else if (this.state.divisionId === 'premier-league' && yourPos <= 4)  verdict = `✨ Champions League qualification — ${ordinal(yourPos)}!`;
-        else if (this.state.divisionId === 'premier-league' && yourPos <= 7)  verdict = `🥈 European qualification — ${ordinal(yourPos)}.`;
-        else                                   verdict = `Finished ${ordinal(yourPos)} in ${divName}.`;
+        else if (this.state.divisionId === 'premier-league' && yourPos <= 5)  verdict = `⭐ Champions League qualification — ${ordinal(yourPos)} place!`;
+        else if (this.state.divisionId === 'premier-league' && yourPos === 6) verdict = `🟠 Europa League qualification — 6th place.`;
+        else if (this.state.divisionId === 'premier-league' && yourPos === 7) verdict = `🟡 Conference League qualification — 7th place.`;
+        else {
+            const pt = this.state.playerTeam;
+            const wonUEL    = this.state.uel?.winner === pt;
+            const wonFACup  = this.state.facup?.winner === pt;
+            const wonCarabo = this.state.carabaocup?.winner === pt;
+            if (wonUEL)    verdict = `⭐ Europa League WINNERS — into the Champions League next season!`;
+            else if (wonFACup)  verdict = `🟠 FA Cup Winners — Europa League qualification!`;
+            else if (wonCarabo) verdict = `🟡 Carabao Cup Winners — Conference League qualification!`;
+            else               verdict = `Finished ${ordinal(yourPos)} in ${divName}.`;
+        }
 
         // Promotion/relegation summary for player's division
         let moveLines = '';
@@ -1567,8 +1577,15 @@ class PLManager {
             // Save player squad across seasons
             const savedSquad       = (this.squads[teamId] || []).map(p => ({ ...p }));
             const savedFormation   = this.state.formation;
-            // Determine next season European qual
-            const nextEurQual      = this._nextEurQual(yourPos, this.state.divisionId);
+            // Determine next season European qual (real UEFA rules)
+            const pt = teamId;
+            const eurBonuses = {
+                wonUCL:    this.state.ucl?.winner  === pt,
+                wonUEL:    this.state.uel?.winner  === pt,
+                wonFACup:  this.state.facup?.winner === pt,
+                wonCarabao:this.state.carabaocup?.winner === pt,
+            };
+            const nextEurQual = this._nextEurQual(yourPos, this.state.divisionId, eurBonuses);
             this.newGame(teamId, savedBudgets, newDivs, newDivId);
             // Restore squad with reset seasonal stats
             this.squads[teamId]    = savedSquad.map(p => ({
@@ -1604,8 +1621,8 @@ class PLManager {
             const pos  = i + 1;
             let cls = '';
             if (divId === 'premier-league') {
-                if (pos <= 4) cls = 'pos-cl';
-                else if (pos <= 7) cls = 'pos-eur';
+                if (pos <= 5) cls = 'pos-cl';       // 5 UCL spots (England coefficient)
+                else if (pos <= 7) cls = 'pos-eur'; // 6th UEL, 7th UECL
                 else if (pos >= divSize - 2) cls = 'pos-rel';
             } else if (divId === 'championship') {
                 if (pos <= 2) cls = 'pos-cl';
@@ -2190,12 +2207,23 @@ class PLManager {
         }).join('');
     }
 
-    // Determine European qual for next season from season end table
-    _nextEurQual(finishPos, divisionId) {
+    // Determine European qual for next season — real UEFA rules
+    // England gets 5 UCL spots. FA Cup → UEL. Carabao → UECL. UEL winner → UCL.
+    _nextEurQual(finishPos, divisionId, bonuses) {
         if (divisionId !== 'premier-league') return null;
-        if (finishPos <= 4) return 'ucl';
-        if (finishPos === 5) return 'uel';
-        if (finishPos <= 7) return 'uecl';
+        const { wonUCL, wonUEL, wonFACup, wonCarabao } = bonuses || {};
+        // Cup/European winner routes (highest priority)
+        if (wonUCL || wonUEL) return 'ucl';
+        // League finish routes (England's coefficient = 5 UCL spots)
+        if (finishPos <= 5) return 'ucl';
+        if (finishPos === 6) {
+            if (wonFACup) return 'ucl'; // FA Cup winner already gets UEL but if 6th they'd get UEL anyway; UCL if cup winner somehow
+            return 'uel';
+        }
+        if (finishPos === 7) return 'uecl';
+        // Outside top 7 — only cup routes
+        if (wonFACup)   return 'uel';
+        if (wonCarabao) return 'uecl';
         return null;
     }
 }
