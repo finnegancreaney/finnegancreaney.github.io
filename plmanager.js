@@ -1,7 +1,8 @@
 // ==================================================================
-// Premier League Manager v3
-// All 92 English professional clubs across 4 divisions.
-// Promotion, relegation, division prize money, per-club budgets.
+// The Gaffer v4
+// All 92 English professional clubs + UEFA European competitions.
+// Champions League, Europa League, Conference League.
+// Multi-season: squad persists across seasons.
 // ==================================================================
 
 // ---------- All 92 teams ----------
@@ -161,6 +162,90 @@ const PLM_DIVISION_PRIZE_MONEY = {
     'league-one':     [2,1.7,1.5,1.3,1.1,1,0.9,0.8,0.8,0.7,0.7,0.6,0.6,0.5,0.5,0.5,0.4,0.4,0.4,0.3,0.3,0.3,0.2,0.2],
     'league-two':     [0.5,0.4,0.35,0.3,0.25,0.25,0.2,0.2,0.18,0.18,0.15,0.15,0.15,0.15,0.12,0.12,0.1,0.1,0.1,0.08,0.08,0.08,0.05,0.05],
 };
+
+// ---------- European club teams ----------
+const PLM_EUR_TEAMS = [
+    // La Liga
+    { id: 'realmadrid',   name: 'Real Madrid',           short: 'RMA', color: '#FEBE10', text: '#fff', rating: 92, country: 'Spain'       },
+    { id: 'barcelona',    name: 'Barcelona',              short: 'BAR', color: '#A50044', text: '#fff', rating: 88, country: 'Spain'       },
+    { id: 'atletico',     name: 'Atletico Madrid',        short: 'ATM', color: '#CE3524', text: '#fff', rating: 85, country: 'Spain'       },
+    { id: 'girona',       name: 'Girona',                 short: 'GIR', color: '#CD1515', text: '#fff', rating: 75, country: 'Spain'       },
+    { id: 'realsociedad', name: 'Real Sociedad',          short: 'RSO', color: '#0033A0', text: '#fff', rating: 74, country: 'Spain'       },
+    // Bundesliga
+    { id: 'bayernmunich', name: 'Bayern Munich',          short: 'BAY', color: '#DC052D', text: '#fff', rating: 90, country: 'Germany'     },
+    { id: 'leverkusen',   name: 'Bayer Leverkusen',       short: 'LEV', color: '#E32221', text: '#fff', rating: 86, country: 'Germany'     },
+    { id: 'dortmund',     name: 'Borussia Dortmund',      short: 'BVB', color: '#FDE100', text: '#000', rating: 84, country: 'Germany'     },
+    { id: 'rbleipzig',    name: 'RB Leipzig',             short: 'RBL', color: '#DD0741', text: '#fff', rating: 83, country: 'Germany'     },
+    { id: 'vfbstuttgart', name: 'VfB Stuttgart',          short: 'STU', color: '#E32221', text: '#fff', rating: 80, country: 'Germany'     },
+    { id: 'frankfurt',    name: 'Eintracht Frankfurt',    short: 'EFR', color: '#E2001A', text: '#fff', rating: 79, country: 'Germany'     },
+    { id: 'hoffenheim',   name: 'TSG Hoffenheim',         short: 'HOF', color: '#1261AD', text: '#fff', rating: 74, country: 'Germany'     },
+    // Serie A
+    { id: 'inter',        name: 'Inter Milan',            short: 'INT', color: '#010E80', text: '#fff', rating: 87, country: 'Italy'       },
+    { id: 'acmilan',      name: 'AC Milan',               short: 'MIL', color: '#FB090B', text: '#fff', rating: 84, country: 'Italy'       },
+    { id: 'juventus',     name: 'Juventus',               short: 'JUV', color: '#000000', text: '#fff', rating: 83, country: 'Italy'       },
+    { id: 'atalanta',     name: 'Atalanta',               short: 'ATA', color: '#1E90FF', text: '#fff', rating: 82, country: 'Italy'       },
+    { id: 'bologna',      name: 'Bologna',                short: 'BOL', color: '#CE1E29', text: '#fff', rating: 75, country: 'Italy'       },
+    { id: 'roma',         name: 'AS Roma',                short: 'ROM', color: '#8B1A1A', text: '#FFD700', rating: 80, country: 'Italy'   },
+    { id: 'lazio',        name: 'Lazio',                  short: 'LAZ', color: '#87CEEB', text: '#003', rating: 79,  country: 'Italy'      },
+    { id: 'fiorentina',   name: 'Fiorentina',             short: 'FIO', color: '#6600CC', text: '#fff', rating: 77, country: 'Italy'       },
+    // Ligue 1
+    { id: 'psg',          name: 'Paris Saint-Germain',    short: 'PSG', color: '#004170', text: '#fff', rating: 89, country: 'France'      },
+    { id: 'monaco',       name: 'Monaco',                 short: 'MON', color: '#CE1126', text: '#fff', rating: 78, country: 'France'      },
+    { id: 'brest',        name: 'Stade Brestois',         short: 'BRE', color: '#DA0202', text: '#fff', rating: 72, country: 'France'      },
+    { id: 'lille',        name: 'Lille',                  short: 'LIL', color: '#C61C23', text: '#fff', rating: 76, country: 'France'      },
+    { id: 'lyon',         name: 'Olympique Lyonnais',     short: 'LYO', color: '#0032A0', text: '#fff', rating: 75, country: 'France'      },
+    // Portugal
+    { id: 'benfica',      name: 'Benfica',                short: 'BEN', color: '#E11D28', text: '#fff', rating: 80, country: 'Portugal'    },
+    { id: 'sporting',     name: 'Sporting CP',            short: 'SPO', color: '#006600', text: '#fff', rating: 78, country: 'Portugal'    },
+    { id: 'porto',        name: 'FC Porto',               short: 'POR', color: '#0046AE', text: '#fff', rating: 79, country: 'Portugal'    },
+    { id: 'braga',        name: 'Sporting Braga',         short: 'BRA', color: '#CC0000', text: '#fff', rating: 74, country: 'Portugal'    },
+    // Netherlands
+    { id: 'psv',          name: 'PSV Eindhoven',          short: 'PSV', color: '#E31E24', text: '#fff', rating: 80, country: 'Netherlands' },
+    { id: 'feyenoord',    name: 'Feyenoord',              short: 'FEY', color: '#C8102E', text: '#fff', rating: 78, country: 'Netherlands' },
+    { id: 'ajax',         name: 'Ajax',                   short: 'AJX', color: '#D2001A', text: '#fff', rating: 77, country: 'Netherlands' },
+    // Belgium
+    { id: 'clubbrugge',   name: 'Club Brugge',            short: 'BRU', color: '#1A73B8', text: '#fff', rating: 75, country: 'Belgium'     },
+    { id: 'anderlecht',   name: 'Anderlecht',             short: 'AND', color: '#6C0E6D', text: '#fff', rating: 71, country: 'Belgium'     },
+    // Turkey
+    { id: 'galatasaray',  name: 'Galatasaray',            short: 'GAL', color: '#F5A623', text: '#000', rating: 77, country: 'Turkey'      },
+    { id: 'fenerbahce',   name: 'Fenerbahce',             short: 'FEN', color: '#FFD700', text: '#003', rating: 75, country: 'Turkey'      },
+    // Scotland
+    { id: 'celtic',       name: 'Celtic',                 short: 'CEL', color: '#16A950', text: '#fff', rating: 74, country: 'Scotland'    },
+    { id: 'rangers',      name: 'Rangers',                short: 'RAN', color: '#1B458F', text: '#fff', rating: 72, country: 'Scotland'    },
+    // Other UCL/UEL
+    { id: 'shakhtar',     name: 'Shakhtar Donetsk',       short: 'SHA', color: '#FF6B00', text: '#000', rating: 74, country: 'Ukraine'     },
+    { id: 'redstar',      name: 'Red Star Belgrade',      short: 'RSB', color: '#CC0000', text: '#fff', rating: 73, country: 'Serbia'      },
+    { id: 'youngboys',    name: 'Young Boys',             short: 'YBY', color: '#FDD800', text: '#000', rating: 70, country: 'Switzerland' },
+    { id: 'sturmgraz',    name: 'Sturm Graz',             short: 'STG', color: '#000000', text: '#fff', rating: 70, country: 'Austria'     },
+    { id: 'dinamozagreb', name: 'Dinamo Zagreb',          short: 'DZG', color: '#0000CD', text: '#fff', rating: 71, country: 'Croatia'     },
+    { id: 'slovan',       name: 'Slovan Bratislava',      short: 'SLV', color: '#0044AA', text: '#fff', rating: 68, country: 'Slovakia'    },
+    { id: 'sparta',       name: 'Sparta Prague',          short: 'SPA', color: '#AA0000', text: '#fff', rating: 72, country: 'Czech Rep'   },
+    { id: 'olympiakos',   name: 'Olympiacos',             short: 'OLY', color: '#CC0000', text: '#fff', rating: 72, country: 'Greece'      },
+    { id: 'basel',        name: 'FC Basel',               short: 'BAS', color: '#BB2222', text: '#fff', rating: 71, country: 'Switzerland' },
+    { id: 'ferencvaros',  name: 'Ferencvaros',            short: 'FER', color: '#006633', text: '#fff', rating: 70, country: 'Hungary'     },
+    { id: 'villarreal',   name: 'Villarreal',             short: 'VIL', color: '#FFD700', text: '#000', rating: 78, country: 'Spain'       },
+];
+const PLM_EUR_TEAMS_BY_ID = Object.fromEntries(PLM_EUR_TEAMS.map(t => [t.id, t]));
+
+// Helper — find any team (English or European)
+function plmGetTeam(id) {
+    return PLM_ALL_TEAMS_BY_ID[id] || PLM_EUR_TEAMS_BY_ID[id] || null;
+}
+
+// 2024/25 UCL teams (actual participants)
+const PLM_UCL_ENGLISH_S1  = ['mancity','arsenal','liverpool','astonvilla'];
+const PLM_UCL_EUR_S1      = ['realmadrid','barcelona','atletico','girona','bayernmunich','leverkusen','dortmund','rbleipzig','vfbstuttgart','inter','acmilan','juventus','atalanta','bologna','psg','monaco','brest','lille','celtic','benfica','psv','clubbrugge','feyenoord','sporting','galatasaray','shakhtar','redstar','youngboys','sturmgraz','dinamozagreb','slovan','sparta'];
+
+// UEL & UECL initial English participants (approx 2024/25)
+const PLM_UEL_ENGLISH_S1  = ['tottenham','manunited','chelsea'];
+const PLM_UEL_EUR_S1      = ['roma','lazio','porto','ajax','rangers','fenerbahce','lyon','olympiakos','anderlecht','villarreal','frankfurt','braga'];
+
+const PLM_UECL_ENGLISH_S1 = ['newcastle','westham'];
+const PLM_UECL_EUR_S1     = ['fiorentina','realsociedad','hoffenheim','youngboys','sturmgraz','ferencvaros'];
+
+// European prize money (£M)
+const PLM_EUR_PRIZES = { ucl: 80, uel: 40, uecl: 25 };
+const PLM_EUR_LABELS = { ucl: '⭐ Champions League', uel: '🟠 Europa League', uecl: '🟡 Conference League' };
 
 // ---------- Player market value (£M) ----------
 function plmPlayerValue(rating) {
@@ -489,7 +574,7 @@ function plmStatusBadge(p) {
 }
 
 // ---------- Save key ----------
-const PLM_SAVE_KEY = 'plm_save_v3';
+const PLM_SAVE_KEY = 'plm_save_v4';
 
 // ---------- Game class ----------
 class PLManager {
@@ -498,6 +583,7 @@ class PLManager {
         if (!this.rootEl) return;
         this.squads = {};
         for (const team of PLM_ALL_TEAMS) this.squads[team.id] = plmGenerateSquad(team);
+        for (const team of PLM_EUR_TEAMS)  this.squads[team.id] = plmFallbackSquad(team);
         this._tFilter = 'all';
         this._pFilter = 'all';
         this.load();
@@ -580,6 +666,11 @@ class PLManager {
         this.state.facup      = this._initFACup();
         this.state.carabaocup = this._initCarabaoCup();
         this.state.cupContext  = null;
+        // Init European competitions
+        this.state.ucl  = this._initEuropean('ucl',  carryoverBudgets);
+        this.state.uel  = this._initEuropean('uel',  carryoverBudgets);
+        this.state.uecl = this._initEuropean('uecl', carryoverBudgets);
+        this.state.eurContext = null;
         this.doAITransfers('summer');
         this.save();
     }
@@ -699,6 +790,7 @@ class PLManager {
     }
 
     playMatchDay() {
+        if (this.state.eurContext) return this.playEurMatch();
         if (this.state.cupContext) return this.playCupMatch();
         const md = this.state.matchDay;
         let playerResult = null;
@@ -855,9 +947,12 @@ class PLManager {
             const cards = teams.map(t => {
                 const budget = PLM_TEAM_BUDGETS[t.id] || 1;
                 const budgetStr = budget < 1 ? `£${(budget * 1000).toFixed(0)}k` : `£${budget}m`;
+                const eurBadge = PLM_UCL_ENGLISH_S1.includes(t.id) ? '⭐'
+                               : PLM_UEL_ENGLISH_S1.includes(t.id) ? '🟠'
+                               : PLM_UECL_ENGLISH_S1.includes(t.id) ? '🟡' : '';
                 return `<button class="plm-team-card" data-team="${t.id}"
                     style="background:${t.color};color:${t.text}">
-                    <span class="plm-team-name">${t.name}</span>
+                    <span class="plm-team-name">${t.name} ${eurBadge}</span>
                     <span class="plm-team-meta">OVR <b>${t.rating}</b> · <b>${budgetStr}</b></span>
                 </button>`;
             }).join('');
@@ -869,8 +964,9 @@ class PLManager {
 
         this.rootEl.innerHTML = `
             <div class="plm-select">
-                <h2 class="plm-select-h">Pick your club</h2>
-                <p class="plm-select-sub">Choose from all 92 English professional clubs across 4 divisions. Win promotion, avoid relegation!</p>
+                <h2 class="plm-select-h">⚽ The Gaffer</h2>
+                <p class="plm-select-sub">Pick your club from all 92 English professional clubs. Win promotion, compete in Europe, and build a dynasty across multiple seasons!</p>
+                <p class="plm-select-sub" style="font-size:.8em;color:#888">⭐ = UCL · 🟠 = UEL · 🟡 = UECL (based on 2024/25 finish)</p>
                 ${sections}
             </div>`;
         this.rootEl.querySelectorAll('.plm-team-card').forEach(el =>
@@ -1062,6 +1158,7 @@ class PLManager {
                 </section>` : ''}
 
                 ${this._cupStatusHtml()}
+                ${this._eurStatusHtml()}
 
                 <section class="plm-grid">
                     <div class="plm-col">
@@ -1193,12 +1290,19 @@ class PLManager {
         };
         const squadRows = ['GK','DEF','MID','FWD'].flatMap(pos => squadByPos[pos].map(renderSquadRow)).join('');
 
-        const cup = this.state.cupContext ? this.state[this.state.cupContext.cupName] : null;
+        const cup = this.state.cupContext ? this.state[this.state.cupContext.cupName]
+                  : this.state.eurContext  ? this.state[this.state.eurContext.comp] : null;
         let fx, opp, vsText, matchLabel;
-        if (this.state.cupContext) {
+        if (this.state.eurContext) {
+            const cf = this.state.eurContext.fixture;
+            const isHome = cf.home === this.state.playerTeam;
+            opp = plmGetTeam(isHome ? cf.away : cf.home);
+            vsText = opp ? `${isHome ? 'vs' : '@'} ${opp.name} (${opp.country || ''})` : '';
+            matchLabel = `${cup?.name || 'UEFA'} · ${this.state.eurContext.roundName}`;
+        } else if (this.state.cupContext) {
             const cf = this.state.cupContext.fixture;
             const isHome = cf.home === this.state.playerTeam;
-            opp = PLM_ALL_TEAMS_BY_ID[isHome ? cf.away : cf.home];
+            opp = plmGetTeam(isHome ? cf.away : cf.home);
             vsText = opp ? `${isHome ? 'vs' : '@'} ${opp.name}` : '';
             matchLabel = `${cup?.name || 'Cup'} · ${this.state.cupContext.roundName}`;
         } else {
@@ -1245,7 +1349,10 @@ class PLManager {
         this.rootEl.querySelector('#plm-formation').addEventListener('change', e => this.changeFormation(e.target.value));
         this.rootEl.querySelector('#plm-autopick').addEventListener('click', () => this.autoPickXI());
         const kickoff = this.rootEl.querySelector('#plm-kickoff');
-        if (kickoff && !kickoff.disabled) kickoff.addEventListener('click', () => this.playMatchDay());
+        if (kickoff && !kickoff.disabled) kickoff.addEventListener('click', () => {
+            if (this.state.eurContext) this.playEurMatch();
+            else this.playMatchDay();
+        });
         this.rootEl.querySelectorAll('.plm-xi-btn').forEach(btn => btn.addEventListener('click', () => {
             const p = this.squads[this.state.playerTeam].find(x => x.id === btn.getAttribute('data-pid'));
             if (p) this.togglePlayerInXI(p);
@@ -1305,7 +1412,7 @@ class PLManager {
                 this.state.screen = 'transferWindow';
                 this.save(); this.render(); return;
             }
-            // Cup triggers (Carabao first — earlier in the season)
+            // Cup triggers (Carabao first)
             for (const cupName of ['carabaocup', 'facup']) {
                 if (this._shouldTriggerCup(cupName)) {
                     const hasPlayerMatch = this.setupCupRound(cupName);
@@ -1313,7 +1420,16 @@ class PLManager {
                         this.state.screen = 'pickxi';
                         this.save(); this.render(); return;
                     }
-                    // Round auto-simulated (player not involved), loop to check next
+                }
+            }
+            // European triggers
+            for (const comp of ['ucl','uel','uecl']) {
+                if (this._shouldTriggerEur(comp)) {
+                    const hasPlayerMatch = this.setupEurRound(comp);
+                    if (hasPlayerMatch) {
+                        this.state.screen = 'pickxi';
+                        this.save(); this.render(); return;
+                    }
                 }
             }
             this.state.screen = 'dashboard';
@@ -1424,6 +1540,7 @@ class PLManager {
                 ${moveLines}
 
                 ${this._cupSeasonEndHtml()}
+                ${this._eurSeasonEndHtml()}
 
                 <details class="plm-prize-details">
                     <summary>Prize money breakdown</summary>
@@ -1443,12 +1560,33 @@ class PLManager {
             </div>`;
 
         this.rootEl.querySelector('#plm-next-season').addEventListener('click', () => {
-            const teamId       = this.state.playerTeam;
-            const season       = this.state.season + 1;
-            const savedBudgets = { ...this.state.allBudgets };
-            const newDivs      = this.state.newDivisions || null;
+            const teamId           = this.state.playerTeam;
+            const season           = this.state.season + 1;
+            const savedBudgets     = { ...this.state.allBudgets };
+            const newDivs          = this.state.newDivisions || null;
+            // Save player squad across seasons
+            const savedSquad       = (this.squads[teamId] || []).map(p => ({ ...p }));
+            const savedFormation   = this.state.formation;
+            // Determine next season European qual
+            const nextEurQual      = this._nextEurQual(yourPos, this.state.divisionId);
             this.newGame(teamId, savedBudgets, newDivs, newDivId);
-            this.state.season = season;
+            // Restore squad with reset seasonal stats
+            this.squads[teamId]    = savedSquad.map(p => ({
+                ...p, goals: 0, assists: 0, yellows: 0, reds: 0, suspended: 0, injured: 0,
+            }));
+            this.state.formation   = savedFormation || PLM_DEFAULT_FORMATION;
+            this.state.xi          = plmAutoPickXI(this.squads[teamId], this.state.formation).map(p => p.id);
+            this.state.season      = season;
+            // Override European competitions for next season based on PL finish
+            if (newDivId === 'premier-league') {
+                const plTeams = newDivs ? [...(newDivs['premier-league'] || [])] : [...PLM_INITIAL_DIVISIONS['premier-league']];
+                this.state.ucl.survivors  = nextEurQual === 'ucl'  ? [...plTeams.slice(0,4), ...PLM_UCL_EUR_S1]  : [...PLM_UCL_EUR_S1];
+                this.state.ucl.playerIn   = nextEurQual === 'ucl';
+                this.state.uel.survivors  = nextEurQual === 'uel'  ? [teamId, ...PLM_UEL_EUR_S1]  : [...PLM_UEL_EUR_S1];
+                this.state.uel.playerIn   = nextEurQual === 'uel';
+                this.state.uecl.survivors = nextEurQual === 'uecl' ? [teamId, ...PLM_UECL_EUR_S1] : [...PLM_UECL_EUR_S1];
+                this.state.uecl.playerIn  = nextEurQual === 'uecl';
+            }
             this.save();
             this.render();
         });
@@ -1582,17 +1720,19 @@ class PLManager {
     }
 
     _simulateSingleCupMatch(homeId, awayId) {
-        const home = PLM_ALL_TEAMS_BY_ID[homeId];
-        const away = PLM_ALL_TEAMS_BY_ID[awayId];
-        if (!home || !away) return { winner: homeId, hs: 0, as: 0, pens: false, home: homeId, away: awayId };
-        const homeXI = plmAutoPickXI(this.squads[homeId] || [], PLM_DEFAULT_FORMATION);
-        const awayXI = plmAutoPickXI(this.squads[awayId] || [], PLM_DEFAULT_FORMATION);
+        const home = plmGetTeam(homeId);
+        const away = plmGetTeam(awayId);
+        if (!home || !away) return { winner: homeId, hs: 0, as: 0, pens: false };
+        if (!this.squads[homeId]) this.squads[homeId] = plmFallbackSquad(home);
+        if (!this.squads[awayId]) this.squads[awayId] = plmFallbackSquad(away);
+        const homeXI = plmAutoPickXI(this.squads[homeId], PLM_DEFAULT_FORMATION);
+        const awayXI = plmAutoPickXI(this.squads[awayId], PLM_DEFAULT_FORMATION);
         const sim = plmSimulateMatch(home, homeXI, away, awayXI, PLM_DEFAULT_FORMATION, PLM_DEFAULT_FORMATION);
         let winner, pens = false;
         if (sim.homeScore > sim.awayScore) winner = homeId;
         else if (sim.awayScore > sim.homeScore) winner = awayId;
         else { winner = Math.random() < 0.5 ? homeId : awayId; pens = true; }
-        return { winner, hs: sim.homeScore, as: sim.awayScore, pens, home: homeId, away: awayId };
+        return { winner, hs: sim.homeScore, as: sim.awayScore, pens };
     }
 
     setupCupRound(cupName) {
@@ -1632,7 +1772,7 @@ class PLManager {
             for (let i = 0; i < pool.length; i += 2) {
                 const r = this._simulateSingleCupMatch(pool[i], pool[i + 1]);
                 newSurvivors.push(r.winner);
-                const h = PLM_ALL_TEAMS_BY_ID[pool[i]], a = PLM_ALL_TEAMS_BY_ID[pool[i + 1]];
+                const h = plmGetTeam(pool[i]), a = plmGetTeam(pool[i + 1]);
                 cup.log.push(`${roundName}: ${h?.short || pool[i]} ${r.hs}–${r.as}${r.pens ? '(p)' : ''} ${a?.short || pool[i + 1]}`);
             }
             cup.survivors = newSurvivors;
@@ -1693,9 +1833,11 @@ class PLManager {
         if (!this.state.cupContext) return;
         const { cupName, roundName, fixture } = this.state.cupContext;
         const cup  = this.state[cupName];
-        const home = PLM_ALL_TEAMS_BY_ID[fixture.home];
-        const away = PLM_ALL_TEAMS_BY_ID[fixture.away];
+        const home = plmGetTeam(fixture.home);
+        const away = plmGetTeam(fixture.away);
         if (!home || !away) { this.state.cupContext = null; this.render(); return; }
+        if (!this.squads[fixture.home]) this.squads[fixture.home] = plmFallbackSquad(home);
+        if (!this.squads[fixture.away]) this.squads[fixture.away] = plmFallbackSquad(away);
 
         const homeXI = this.getXIFor(home.id);
         const awayXI = this.getXIFor(away.id);
@@ -1756,7 +1898,7 @@ class PLManager {
         const prize = cupName === 'facup' ? 75 : 50;
         this.state.allBudgets[winnerId] = (this.state.allBudgets[winnerId] || 0) + prize;
         const cup = this.state[cupName];
-        const t   = PLM_ALL_TEAMS_BY_ID[winnerId];
+        const t   = plmGetTeam(winnerId);
         cup.log.push(`🏆 ${t?.name || winnerId} win the ${cup.name}! (+£${prize}m)`);
     }
 
@@ -1788,7 +1930,7 @@ class PLManager {
         return cups.map(({ key, label, prize }) => {
             const cup = this.state[key];
             if (!cup) return '';
-            const w = PLM_ALL_TEAMS_BY_ID[cup.winner];
+            const w = plmGetTeam(cup.winner);
             const youWon = cup.winner === this.state.playerTeam;
             if (youWon) {
                 return `<div class="plm-cup-won-box">🏆 <b>${label} WINNER!</b> +£${prize}m prize money</div>`;
@@ -1798,6 +1940,263 @@ class PLManager {
             }
             return `<div class="plm-cup-result-line">🏆 ${label}: Season ongoing</div>`;
         }).join('');
+    }
+
+    // ================================================================
+    // EUROPEAN COMPETITION METHODS
+    // ================================================================
+
+    _getPlayerEurQual(prevSeason) {
+        // Determine which European competition player qualifies for.
+        // prevSeason: object with { divisionId, finishPos } or null (season 1 = use initial lists)
+        const pt = this.state.playerTeam;
+        if (!prevSeason) {
+            if (PLM_UCL_ENGLISH_S1.includes(pt))  return 'ucl';
+            if (PLM_UEL_ENGLISH_S1.includes(pt))  return 'uel';
+            if (PLM_UECL_ENGLISH_S1.includes(pt)) return 'uecl';
+            return null;
+        }
+        const { divisionId, finishPos } = prevSeason;
+        if (divisionId !== 'premier-league') return null;
+        if (finishPos <= 4) return 'ucl';
+        if (finishPos === 5) return 'uel';
+        if (finishPos <= 7) return 'uecl';
+        return null;
+    }
+
+    _initEuropean(comp, carryoverBudgets) {
+        // Season 1: use pre-set lists. Later seasons: determined by renderSeasonEnd override.
+        const pt      = this.state.playerTeam;
+        const season  = this.state.season || 1;
+        const isS1    = !carryoverBudgets;
+
+        let englishTeams, eurTeams;
+        if (comp === 'ucl') {
+            englishTeams = isS1 ? [...PLM_UCL_ENGLISH_S1] : [];
+            eurTeams     = isS1 ? [...PLM_UCL_EUR_S1]     : [...PLM_UCL_EUR_S1];
+        } else if (comp === 'uel') {
+            englishTeams = isS1 ? [...PLM_UEL_ENGLISH_S1] : [];
+            eurTeams     = isS1 ? [...PLM_UEL_EUR_S1]     : [...PLM_UEL_EUR_S1.slice(0, 12)];
+        } else {
+            englishTeams = isS1 ? [...PLM_UECL_ENGLISH_S1] : [];
+            eurTeams     = isS1 ? [...PLM_UECL_EUR_S1]      : [...PLM_UECL_EUR_S1];
+        }
+
+        const playerIn   = englishTeams.includes(pt);
+        const survivors  = [...englishTeams, ...eurTeams];
+        const totalMD    = this.divConfig().matchdays;
+        const triggers   = this._eurTriggers(totalMD, comp);
+
+        const roundNames = {
+            ucl:  ['Round of 32','Round of 16','Quarter-Final','Semi-Final','Final'],
+            uel:  ['Round of 16','Quarter-Final','Semi-Final','Final'],
+            uecl: ['Quarter-Final','Semi-Final','Final'],
+        }[comp];
+
+        return {
+            comp, name: PLM_EUR_LABELS[comp],
+            survivors, roundIdx: 0, roundNames, triggers,
+            playerIn, roundInProgress: false,
+            winner: null, done: false, log: [],
+            pendingAISurvivors: null, pendingByeTeam: null, pendingRoundName: '',
+        };
+    }
+
+    _eurTriggers(totalMD, comp) {
+        const fracs = {
+            ucl:  [0.21, 0.37, 0.55, 0.74, 0.94],
+            uel:  [0.26, 0.47, 0.68, 0.89],
+            uecl: [0.32, 0.53, 0.84],
+        }[comp] || [0.5];
+        return fracs.map(f => Math.max(1, Math.round(totalMD * f)));
+    }
+
+    _shouldTriggerEur(comp) {
+        const c = this.state[comp];
+        if (!c || c.done || c.roundInProgress || !c.survivors || !c.survivors.length) return false;
+        if (c.roundIdx >= c.triggers.length) return false;
+        return (this.state.matchDay - 1) >= c.triggers[c.roundIdx];
+    }
+
+    setupEurRound(comp) {
+        const cup = this.state[comp];
+        if (!cup) return false;
+        const roundIdx  = cup.roundIdx;
+        const roundName = cup.roundNames[roundIdx] || `Round ${roundIdx + 1}`;
+        cup.roundInProgress = true;
+
+        if (!cup.playerIn) {
+            // Auto-simulate whole round
+            const pool = [...cup.survivors];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            const bye = pool.length % 2 !== 0 ? pool.shift() : null;
+            const newSurv = bye ? [bye] : [];
+            for (let i = 0; i < pool.length; i += 2) {
+                const r = this._simulateSingleCupMatch(pool[i], pool[i + 1]);
+                newSurv.push(r.winner);
+                const h = plmGetTeam(pool[i]), a = plmGetTeam(pool[i + 1]);
+                cup.log.push(`${roundName}: ${h?.short || pool[i]} ${r.hs}–${r.as}${r.pens ? '(p)' : ''} ${a?.short || pool[i + 1]}`);
+            }
+            cup.survivors       = newSurv;
+            cup.roundInProgress = false;
+            cup.roundIdx++;
+            if (cup.survivors.length <= 1) {
+                cup.winner = cup.survivors[0] || null;
+                cup.done   = true;
+                if (cup.winner) this._awardEurPrize(comp, cup.winner);
+            }
+            this.save();
+            return false;
+        }
+
+        // Player involved
+        const pool = [...cup.survivors];
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        let byeTeam = null;
+        if (pool.length % 2 !== 0) {
+            const nonP = pool.filter(id => id !== this.state.playerTeam);
+            byeTeam    = nonP[Math.floor(Math.random() * nonP.length)];
+            pool.splice(pool.indexOf(byeTeam), 1);
+        }
+        let pIdx = -1;
+        for (let i = 0; i < pool.length; i += 2) {
+            if (pool[i] === this.state.playerTeam || pool[i + 1] === this.state.playerTeam) { pIdx = i; break; }
+        }
+        if (pIdx < 0) { cup.roundInProgress = false; return false; }
+
+        const oppId   = pool[pIdx] === this.state.playerTeam ? pool[pIdx + 1] : pool[pIdx];
+        const isHome  = Math.random() < 0.5;
+        const fixture = isHome
+            ? { home: this.state.playerTeam, away: oppId }
+            : { home: oppId, away: this.state.playerTeam };
+
+        const aiSurvivors = [];
+        for (let i = 0; i < pool.length; i += 2) {
+            if (i === pIdx) continue;
+            const r = this._simulateSingleCupMatch(pool[i], pool[i + 1]);
+            aiSurvivors.push(r.winner);
+            const h = plmGetTeam(pool[i]), a = plmGetTeam(pool[i + 1]);
+            cup.log.push(`${roundName}: ${h?.short || pool[i]} ${r.hs}–${r.as}${r.pens ? '(p)' : ''} ${a?.short || pool[i + 1]}`);
+        }
+
+        cup.pendingAISurvivors = aiSurvivors;
+        cup.pendingByeTeam     = byeTeam;
+        cup.pendingRoundName   = roundName;
+        this.state.eurContext  = { comp, roundName, fixture };
+        this.save();
+        return true;
+    }
+
+    playEurMatch() {
+        if (!this.state.eurContext) return;
+        const { comp, roundName, fixture } = this.state.eurContext;
+        const cup  = this.state[comp];
+        const home = plmGetTeam(fixture.home);
+        const away = plmGetTeam(fixture.away);
+        if (!home || !away) { this.state.eurContext = null; this.render(); return; }
+        if (!this.squads[fixture.home]) this.squads[fixture.home] = plmFallbackSquad(home);
+        if (!this.squads[fixture.away]) this.squads[fixture.away] = plmFallbackSquad(away);
+
+        const homeXI = this.getXIFor(fixture.home);
+        const awayXI = this.getXIFor(fixture.away);
+        const sim    = plmSimulateMatch(home, homeXI, away, awayXI,
+            this.getFormationFor(fixture.home), this.getFormationFor(fixture.away));
+
+        let playerWon, pens = false;
+        if (sim.homeScore !== sim.awayScore) {
+            playerWon = sim.homeScore > sim.awayScore
+                ? fixture.home === this.state.playerTeam
+                : fixture.away === this.state.playerTeam;
+        } else {
+            const prob = (plmAvgRating(homeXI) + 2) / (plmAvgRating(homeXI) + plmAvgRating(awayXI) + 2);
+            const homeWins = Math.random() < prob;
+            playerWon = homeWins ? fixture.home === this.state.playerTeam : fixture.away === this.state.playerTeam;
+            pens = true;
+            sim.timeline.push({ min: 121, type: 'ft',
+                text: `⚽ Goes to penalties! ${(homeWins ? home : away).name} win the shootout!` });
+        }
+
+        for (const tid of [fixture.home, fixture.away])
+            for (const p of (this.squads[tid] || []))
+                { if (p.suspended > 0) p.suspended--; if (p.injured > 0) p.injured--; }
+
+        const winner      = playerWon ? this.state.playerTeam : (fixture.home === this.state.playerTeam ? fixture.away : fixture.home);
+        const aiSurvivors = cup.pendingAISurvivors || [];
+        const byeTeam     = cup.pendingByeTeam     || null;
+        cup.survivors     = [...aiSurvivors, winner, ...(byeTeam ? [byeTeam] : [])];
+
+        cup.log.push(`${roundName}: ${home.short} ${sim.homeScore}–${sim.awayScore}${pens ? '(p)' : ''} ${away.short}${playerWon ? ' ← YOU ✓' : ''}`);
+        if (!playerWon) cup.playerIn = false;
+        cup.roundIdx++;
+        cup.roundInProgress    = false;
+        cup.pendingAISurvivors = null;
+        cup.pendingByeTeam     = null;
+
+        if (cup.survivors.length <= 1) {
+            cup.winner = cup.survivors[0] || null;
+            cup.done   = true;
+            if (cup.winner) this._awardEurPrize(comp, cup.winner);
+        }
+
+        this.state.lastMatch  = { fixture, ...sim, home, away,
+            isCupMatch: true, cupName: comp, roundName, cupDisplayName: cup.name, playerWon, pens };
+        this.state.screen     = 'matchResult';
+        this.state.eurContext = null;
+        this.save();
+        this.render();
+    }
+
+    _awardEurPrize(comp, winnerId) {
+        const prize = PLM_EUR_PRIZES[comp] || 0;
+        this.state.allBudgets[winnerId] = (this.state.allBudgets[winnerId] || 0) + prize;
+        const cup = this.state[comp];
+        const t   = plmGetTeam(winnerId);
+        cup.log.push(`🏆 ${t?.name || winnerId} win the ${cup.name}! (+£${prize}m)`);
+    }
+
+    _eurStatusHtml() {
+        const comps = ['ucl','uel','uecl'];
+        const parts = comps.map(comp => {
+            const cup = this.state[comp];
+            if (!cup || (!cup.playerIn && !cup.done)) return '';
+            if (!cup.survivors || !cup.survivors.length) return '';
+            if (cup.done) {
+                const w      = plmGetTeam(cup.winner);
+                const youWon = cup.winner === this.state.playerTeam;
+                return `<span class="${youWon ? 'plm-cup-you' : ''}">${cup.name}: ${youWon ? '🏆 YOU! 🎉' : (w?.name || '?')}</span>`;
+            }
+            if (!cup.playerIn) return `<span style="opacity:.6">${cup.name}: Eliminated</span>`;
+            const next = cup.roundNames[cup.roundIdx] || 'Final';
+            return `<span>${cup.name}: Still in — <b>${next}</b> next</span>`;
+        }).filter(Boolean).join(' &nbsp;|&nbsp; ');
+        return parts ? `<div class="plm-cup-status">${parts}</div>` : '';
+    }
+
+    _eurSeasonEndHtml() {
+        return ['ucl','uel','uecl'].map(comp => {
+            const cup = this.state[comp];
+            if (!cup) return '';
+            const w      = plmGetTeam(cup.winner);
+            const youWon = cup.winner === this.state.playerTeam;
+            if (youWon) return `<div class="plm-cup-won-box">🏆 <b>${cup.name} WINNER!</b> +£${PLM_EUR_PRIZES[comp]}m prize money</div>`;
+            if (cup.done && cup.playerIn !== undefined) {
+                return `<div class="plm-cup-result-line">${cup.name}: Won by ${w?.name || cup.winner || 'N/A'}</div>`;
+            }
+            return '';
+        }).join('');
+    }
+
+    // Determine European qual for next season from season end table
+    _nextEurQual(finishPos, divisionId) {
+        if (divisionId !== 'premier-league') return null;
+        if (finishPos <= 4) return 'ucl';
+        if (finishPos === 5) return 'uel';
+        if (finishPos <= 7) return 'uecl';
+        return null;
     }
 }
 
