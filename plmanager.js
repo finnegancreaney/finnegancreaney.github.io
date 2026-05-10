@@ -1,49 +1,166 @@
 // ==================================================================
-// Premier League Manager v2
-// New: realistic team budgets, summer + January transfer windows,
-//      player buy/sell UI, AI transfers, end-of-season prize money.
+// Premier League Manager v3
+// All 92 English professional clubs across 4 divisions.
+// Promotion, relegation, division prize money, per-club budgets.
 // ==================================================================
 
-const PLM_TEAMS = [
-    { id: 'arsenal',        name: 'Arsenal',               short: 'ARS', color: '#EF0107', text: '#ffffff', rating: 85 },
-    { id: 'astonvilla',     name: 'Aston Villa',           short: 'AVL', color: '#670E36', text: '#ffffff', rating: 80 },
-    { id: 'bournemouth',    name: 'Bournemouth',           short: 'BOU', color: '#DA291C', text: '#ffffff', rating: 72 },
-    { id: 'brentford',      name: 'Brentford',             short: 'BRE', color: '#E30613', text: '#ffffff', rating: 73 },
-    { id: 'brighton',       name: 'Brighton & Hove Albion',short: 'BHA', color: '#0057B8', text: '#ffffff', rating: 76 },
-    { id: 'burnley',        name: 'Burnley',               short: 'BUR', color: '#6C1D45', text: '#ffffff', rating: 68 },
-    { id: 'chelsea',        name: 'Chelsea',               short: 'CHE', color: '#034694', text: '#ffffff', rating: 78 },
-    { id: 'crystalpalace',  name: 'Crystal Palace',        short: 'CRY', color: '#1B458F', text: '#ffffff', rating: 74 },
-    { id: 'everton',        name: 'Everton',               short: 'EVE', color: '#003399', text: '#ffffff', rating: 72 },
-    { id: 'fulham',         name: 'Fulham',                short: 'FUL', color: '#000000', text: '#ffffff', rating: 73 },
-    { id: 'leeds',          name: 'Leeds United',          short: 'LEE', color: '#FFCD00', text: '#1D428A', rating: 72 },
-    { id: 'liverpool',      name: 'Liverpool',             short: 'LIV', color: '#C8102E', text: '#ffffff', rating: 85 },
-    { id: 'mancity',        name: 'Manchester City',       short: 'MCI', color: '#6CABDD', text: '#1c2c5b', rating: 87 },
-    { id: 'manunited',      name: 'Manchester United',     short: 'MUN', color: '#DA291C', text: '#ffffff', rating: 78 },
-    { id: 'newcastle',      name: 'Newcastle United',      short: 'NEW', color: '#241F20', text: '#ffffff', rating: 80 },
-    { id: 'nforest',        name: 'Nottingham Forest',     short: 'NFO', color: '#DD0000', text: '#ffffff', rating: 72 },
-    { id: 'sunderland',     name: 'Sunderland',            short: 'SUN', color: '#EB172B', text: '#ffffff', rating: 68 },
-    { id: 'tottenham',      name: 'Tottenham Hotspur',     short: 'TOT', color: '#132257', text: '#ffffff', rating: 78 },
-    { id: 'westham',        name: 'West Ham United',       short: 'WHU', color: '#7A263A', text: '#ffffff', rating: 74 },
-    { id: 'wolves',         name: 'Wolverhampton',         short: 'WOL', color: '#FDB913', text: '#231F20', rating: 70 },
+// ---------- All 92 teams ----------
+const PLM_ALL_TEAMS = [
+    // ---- Premier League ----
+    { id: 'arsenal',       name: 'Arsenal',                short: 'ARS', color: '#EF0107', text: '#fff', rating: 85, division: 'premier-league' },
+    { id: 'astonvilla',    name: 'Aston Villa',            short: 'AVL', color: '#670E36', text: '#fff', rating: 80, division: 'premier-league' },
+    { id: 'bournemouth',   name: 'Bournemouth',            short: 'BOU', color: '#DA291C', text: '#fff', rating: 72, division: 'premier-league' },
+    { id: 'brentford',     name: 'Brentford',              short: 'BRE', color: '#E30613', text: '#fff', rating: 73, division: 'premier-league' },
+    { id: 'brighton',      name: 'Brighton',               short: 'BHA', color: '#0057B8', text: '#fff', rating: 76, division: 'premier-league' },
+    { id: 'burnley',       name: 'Burnley',                short: 'BUR', color: '#6C1D45', text: '#fff', rating: 68, division: 'premier-league' },
+    { id: 'chelsea',       name: 'Chelsea',                short: 'CHE', color: '#034694', text: '#fff', rating: 78, division: 'premier-league' },
+    { id: 'crystalpalace', name: 'Crystal Palace',         short: 'CRY', color: '#1B458F', text: '#fff', rating: 74, division: 'premier-league' },
+    { id: 'everton',       name: 'Everton',                short: 'EVE', color: '#003399', text: '#fff', rating: 72, division: 'premier-league' },
+    { id: 'fulham',        name: 'Fulham',                 short: 'FUL', color: '#000000', text: '#fff', rating: 73, division: 'premier-league' },
+    { id: 'leeds',         name: 'Leeds United',           short: 'LEE', color: '#FFCD00', text: '#1D428A', rating: 72, division: 'premier-league' },
+    { id: 'liverpool',     name: 'Liverpool',              short: 'LIV', color: '#C8102E', text: '#fff', rating: 85, division: 'premier-league' },
+    { id: 'mancity',       name: 'Manchester City',        short: 'MCI', color: '#6CABDD', text: '#1c2c5b', rating: 87, division: 'premier-league' },
+    { id: 'manunited',     name: 'Manchester United',      short: 'MUN', color: '#DA291C', text: '#fff', rating: 78, division: 'premier-league' },
+    { id: 'newcastle',     name: 'Newcastle United',       short: 'NEW', color: '#241F20', text: '#fff', rating: 80, division: 'premier-league' },
+    { id: 'nforest',       name: 'Nottingham Forest',      short: 'NFO', color: '#DD0000', text: '#fff', rating: 72, division: 'premier-league' },
+    { id: 'sunderland',    name: 'Sunderland',             short: 'SUN', color: '#EB172B', text: '#fff', rating: 68, division: 'premier-league' },
+    { id: 'tottenham',     name: 'Tottenham Hotspur',      short: 'TOT', color: '#132257', text: '#fff', rating: 78, division: 'premier-league' },
+    { id: 'westham',       name: 'West Ham United',        short: 'WHU', color: '#7A263A', text: '#fff', rating: 74, division: 'premier-league' },
+    { id: 'wolves',        name: 'Wolverhampton',          short: 'WOL', color: '#FDB913', text: '#231F20', rating: 70, division: 'premier-league' },
+    // ---- Championship ----
+    { id: 'birmingham',    name: 'Birmingham City',        short: 'BIR', color: '#0000CD', text: '#fff', rating: 64, division: 'championship' },
+    { id: 'blackburn',     name: 'Blackburn Rovers',       short: 'BBR', color: '#009EE0', text: '#fff', rating: 66, division: 'championship' },
+    { id: 'bristolcity',   name: 'Bristol City',           short: 'BRC', color: '#C8102E', text: '#fff', rating: 65, division: 'championship' },
+    { id: 'charlton',      name: 'Charlton Athletic',      short: 'CHA', color: '#C8102E', text: '#fff', rating: 63, division: 'championship' },
+    { id: 'coventry',      name: 'Coventry City',          short: 'COV', color: '#59CBFF', text: '#003087', rating: 68, division: 'championship' },
+    { id: 'derby',         name: 'Derby County',           short: 'DER', color: '#0E0E0E', text: '#fff', rating: 65, division: 'championship' },
+    { id: 'hull',          name: 'Hull City',              short: 'HUL', color: '#F5A12D', text: '#000', rating: 67, division: 'championship' },
+    { id: 'ipswich',       name: 'Ipswich Town',           short: 'IPS', color: '#003087', text: '#fff', rating: 70, division: 'championship' },
+    { id: 'leicester',     name: 'Leicester City',         short: 'LEI', color: '#003090', text: '#fff', rating: 76, division: 'championship' },
+    { id: 'middlesbrough', name: 'Middlesbrough',          short: 'MBR', color: '#C8102E', text: '#fff', rating: 70, division: 'championship' },
+    { id: 'millwall',      name: 'Millwall',               short: 'MIL', color: '#001C58', text: '#fff', rating: 67, division: 'championship' },
+    { id: 'norwich',       name: 'Norwich City',           short: 'NOR', color: '#00A650', text: '#FFF200', rating: 69, division: 'championship' },
+    { id: 'oxford',        name: 'Oxford United',          short: 'OXF', color: '#FFD200', text: '#000', rating: 66, division: 'championship' },
+    { id: 'portsmouth',    name: 'Portsmouth',             short: 'POM', color: '#001489', text: '#fff', rating: 67, division: 'championship' },
+    { id: 'prestonne',     name: 'Preston North End',      short: 'PNE', color: '#004B87', text: '#fff', rating: 66, division: 'championship' },
+    { id: 'qpr',           name: 'Queens Park Rangers',    short: 'QPR', color: '#004B8D', text: '#fff', rating: 65, division: 'championship' },
+    { id: 'sheffieldu',    name: 'Sheffield United',       short: 'SHU', color: '#EC2227', text: '#000', rating: 69, division: 'championship' },
+    { id: 'sheffieldw',    name: 'Sheffield Wednesday',    short: 'SHW', color: '#003366', text: '#fff', rating: 65, division: 'championship' },
+    { id: 'southampton',   name: 'Southampton',            short: 'SOT', color: '#C8102E', text: '#fff', rating: 72, division: 'championship' },
+    { id: 'stoke',         name: 'Stoke City',             short: 'STK', color: '#E03A3E', text: '#fff', rating: 66, division: 'championship' },
+    { id: 'swansea',       name: 'Swansea City',           short: 'SWA', color: '#000000', text: '#fff', rating: 66, division: 'championship' },
+    { id: 'watford',       name: 'Watford',                short: 'WAT', color: '#FBEE23', text: '#000', rating: 68, division: 'championship' },
+    { id: 'westbrom',      name: 'West Bromwich Albion',   short: 'WBA', color: '#122F67', text: '#fff', rating: 68, division: 'championship' },
+    { id: 'wrexham',       name: 'Wrexham',                short: 'WRX', color: '#DC241F', text: '#fff', rating: 65, division: 'championship' },
+    // ---- League One ----
+    { id: 'wimbledon',     name: 'AFC Wimbledon',          short: 'WIM', color: '#0000FF', text: '#fff', rating: 59, division: 'league-one' },
+    { id: 'barnsley',      name: 'Barnsley',               short: 'BAR', color: '#C8102E', text: '#fff', rating: 62, division: 'league-one' },
+    { id: 'blackpool',     name: 'Blackpool',              short: 'BPL', color: '#F47920', text: '#fff', rating: 62, division: 'league-one' },
+    { id: 'bolton',        name: 'Bolton Wanderers',       short: 'BOL', color: '#FFFFFF', text: '#000', rating: 65, division: 'league-one' },
+    { id: 'bradford',      name: 'Bradford City',          short: 'BFC', color: '#A7154B', text: '#fff', rating: 59, division: 'league-one' },
+    { id: 'burton',        name: 'Burton Albion',          short: 'BAL', color: '#FFD200', text: '#000', rating: 60, division: 'league-one' },
+    { id: 'cardiff',       name: 'Cardiff City',           short: 'CAR', color: '#0070B5', text: '#fff', rating: 67, division: 'league-one' },
+    { id: 'doncaster',     name: 'Doncaster Rovers',       short: 'DON', color: '#CC0000', text: '#fff', rating: 59, division: 'league-one' },
+    { id: 'exeter',        name: 'Exeter City',            short: 'EXE', color: '#C8102E', text: '#fff', rating: 62, division: 'league-one' },
+    { id: 'huddersfield',  name: 'Huddersfield Town',      short: 'HUD', color: '#0E63AD', text: '#fff', rating: 64, division: 'league-one' },
+    { id: 'leytonorient',  name: 'Leyton Orient',          short: 'LEO', color: '#CC0000', text: '#fff', rating: 62, division: 'league-one' },
+    { id: 'lincoln',       name: 'Lincoln City',           short: 'LIN', color: '#CF0000', text: '#fff', rating: 61, division: 'league-one' },
+    { id: 'luton',         name: 'Luton Town',             short: 'LUT', color: '#F78F1E', text: '#fff', rating: 67, division: 'league-one' },
+    { id: 'mansfield',     name: 'Mansfield Town',         short: 'MAN', color: '#FFF200', text: '#003087', rating: 64, division: 'league-one' },
+    { id: 'northampton',   name: 'Northampton Town',       short: 'NTN', color: '#8B0000', text: '#fff', rating: 60, division: 'league-one' },
+    { id: 'peterborough',  name: 'Peterborough United',    short: 'PBR', color: '#0000FF', text: '#fff', rating: 64, division: 'league-one' },
+    { id: 'plymouth',      name: 'Plymouth Argyle',        short: 'PLY', color: '#007F3F', text: '#fff', rating: 65, division: 'league-one' },
+    { id: 'portvale',      name: 'Port Vale',              short: 'PVA', color: '#000000', text: '#fff', rating: 59, division: 'league-one' },
+    { id: 'reading',       name: 'Reading',                short: 'REA', color: '#004494', text: '#fff', rating: 63, division: 'league-one' },
+    { id: 'rotherham',     name: 'Rotherham United',       short: 'ROT', color: '#CC0000', text: '#fff', rating: 63, division: 'league-one' },
+    { id: 'stevenage',     name: 'Stevenage',              short: 'STE', color: '#CC0000', text: '#fff', rating: 60, division: 'league-one' },
+    { id: 'stockport',     name: 'Stockport County',       short: 'SKC', color: '#00A0E2', text: '#fff', rating: 64, division: 'league-one' },
+    { id: 'wigan',         name: 'Wigan Athletic',         short: 'WIG', color: '#005291', text: '#fff', rating: 62, division: 'league-one' },
+    { id: 'wycombe',       name: 'Wycombe Wanderers',      short: 'WYC', color: '#00A0E3', text: '#000', rating: 59, division: 'league-one' },
+    // ---- League Two ----
+    { id: 'accrington',    name: 'Accrington Stanley',     short: 'ACC', color: '#CC0000', text: '#fff', rating: 56, division: 'league-two' },
+    { id: 'barnet',        name: 'Barnet',                 short: 'BNT', color: '#F0A500', text: '#000', rating: 57, division: 'league-two' },
+    { id: 'barrow',        name: 'Barrow',                 short: 'BRW', color: '#002B5C', text: '#fff', rating: 56, division: 'league-two' },
+    { id: 'bromley',       name: 'Bromley',                short: 'BRO', color: '#000080', text: '#fff', rating: 55, division: 'league-two' },
+    { id: 'cambridge',     name: 'Cambridge United',       short: 'CAM', color: '#F5A623', text: '#000', rating: 61, division: 'league-two' },
+    { id: 'cheltenham',    name: 'Cheltenham Town',        short: 'CHT', color: '#C8102E', text: '#fff', rating: 57, division: 'league-two' },
+    { id: 'chesterfield',  name: 'Chesterfield',           short: 'CHE', color: '#00A4E4', text: '#fff', rating: 60, division: 'league-two' },
+    { id: 'colchester',    name: 'Colchester United',      short: 'COL', color: '#00498C', text: '#fff', rating: 58, division: 'league-two' },
+    { id: 'crawley',       name: 'Crawley Town',           short: 'CRA', color: '#CC0000', text: '#fff', rating: 57, division: 'league-two' },
+    { id: 'crewe',         name: 'Crewe Alexandra',        short: 'CRE', color: '#CC0000', text: '#fff', rating: 59, division: 'league-two' },
+    { id: 'fleetwood',     name: 'Fleetwood Town',         short: 'FLE', color: '#CC0000', text: '#fff', rating: 56, division: 'league-two' },
+    { id: 'gillingham',    name: 'Gillingham',             short: 'GIL', color: '#003087', text: '#fff', rating: 57, division: 'league-two' },
+    { id: 'grimsby',       name: 'Grimsby Town',           short: 'GRI', color: '#000000', text: '#fff', rating: 58, division: 'league-two' },
+    { id: 'harrogate',     name: 'Harrogate Town',         short: 'HAR', color: '#FFD700', text: '#000', rating: 56, division: 'league-two' },
+    { id: 'mkdons',        name: 'MK Dons',                short: 'MKD', color: '#FFD700', text: '#003087', rating: 62, division: 'league-two' },
+    { id: 'newport',       name: 'Newport County',         short: 'NPC', color: '#F5A623', text: '#000', rating: 55, division: 'league-two' },
+    { id: 'nottscounty',   name: 'Notts County',           short: 'NCO', color: '#000000', text: '#fff', rating: 61, division: 'league-two' },
+    { id: 'oldham',        name: 'Oldham Athletic',        short: 'OLD', color: '#003DB7', text: '#fff', rating: 55, division: 'league-two' },
+    { id: 'salford',       name: 'Salford City',           short: 'SAL', color: '#CC0000', text: '#fff', rating: 60, division: 'league-two' },
+    { id: 'shrewsbury',    name: 'Shrewsbury Town',        short: 'SHR', color: '#003087', text: '#fff', rating: 59, division: 'league-two' },
+    { id: 'swindon',       name: 'Swindon Town',           short: 'SWI', color: '#CC0000', text: '#fff', rating: 59, division: 'league-two' },
+    { id: 'tranmere',      name: 'Tranmere Rovers',        short: 'TRA', color: '#003087', text: '#fff', rating: 57, division: 'league-two' },
+    { id: 'walsall',       name: 'Walsall',                short: 'WAL', color: '#CC0000', text: '#fff', rating: 58, division: 'league-two' },
+    { id: 'bristolrovers', name: 'Bristol Rovers',         short: 'BRV', color: '#005891', text: '#fff', rating: 61, division: 'league-two' },
 ];
+
+const PLM_ALL_TEAMS_BY_ID = Object.fromEntries(PLM_ALL_TEAMS.map(t => [t.id, t]));
+
+// Legacy references used by shared helpers
+const PLM_TEAMS = PLM_ALL_TEAMS.filter(t => t.division === 'premier-league');
 const PLM_TEAMS_BY_ID = Object.fromEntries(PLM_TEAMS.map(t => [t.id, t]));
 
-// ---------- Transfer budgets (£M, approx. real 2025-26) ----------
-const PLM_TEAM_BUDGETS = {
-    mancity:      200, chelsea:      180, liverpool:    130,
-    arsenal:      110, manunited:     90, newcastle:     80,
-    tottenham:     70, astonvilla:    65, brighton:      50,
-    westham:       45, fulham:        35, crystalpalace: 30,
-    brentford:     28, bournemouth:   28, everton:       25,
-    nforest:       25, wolves:        20, leeds:         18,
-    burnley:       15, sunderland:    12,
+// ---------- Division config ----------
+const PLM_DIVISIONS = {
+    'premier-league': { name: 'Premier League',   matchdays: 38, janTrigger: 20 },
+    'championship':   { name: 'Championship',     matchdays: 46, janTrigger: 24 },
+    'league-one':     { name: 'League One',       matchdays: 46, janTrigger: 24 },
+    'league-two':     { name: 'League Two',       matchdays: 46, janTrigger: 24 },
+};
+const PLM_DIV_ORDER = ['premier-league', 'championship', 'league-one', 'league-two'];
+
+// ---------- Initial division composition ----------
+const PLM_INITIAL_DIVISIONS = {
+    'premier-league': ['arsenal','astonvilla','bournemouth','brentford','brighton','burnley','chelsea','crystalpalace','everton','fulham','leeds','liverpool','mancity','manunited','newcastle','nforest','sunderland','tottenham','westham','wolves'],
+    'championship':   ['birmingham','blackburn','bristolcity','charlton','coventry','derby','hull','ipswich','leicester','middlesbrough','millwall','norwich','oxford','portsmouth','prestonne','qpr','sheffieldu','sheffieldw','southampton','stoke','swansea','watford','westbrom','wrexham'],
+    'league-one':     ['wimbledon','barnsley','blackpool','bolton','bradford','burton','cardiff','doncaster','exeter','huddersfield','leytonorient','lincoln','luton','mansfield','northampton','peterborough','plymouth','portvale','reading','rotherham','stevenage','stockport','wigan','wycombe'],
+    'league-two':     ['accrington','barnet','barrow','bromley','cambridge','cheltenham','chesterfield','colchester','crawley','crewe','fleetwood','gillingham','grimsby','harrogate','mkdons','newport','nottscounty','oldham','salford','shrewsbury','swindon','tranmere','walsall','bristolrovers'],
 };
 
-// ---------- Prize money per finishing position (£M, index 0 = 1st) ----------
-const PLM_PRIZE_MONEY = [
-    160, 150, 140, 130, 120, 112, 104, 96, 90, 84,
-     78,  72,  66,  60,  54,  48,  42, 36, 30, 24,
-];
+// ---------- Budgets (£M) — all 92 clubs ----------
+const PLM_TEAM_BUDGETS = {
+    // Premier League
+    mancity: 200, chelsea: 180, liverpool: 130, arsenal: 110, manunited: 90,
+    newcastle: 80, tottenham: 70, astonvilla: 65, brighton: 50, westham: 45,
+    fulham: 35, crystalpalace: 30, brentford: 28, bournemouth: 28, everton: 25,
+    nforest: 25, wolves: 20, leeds: 18, burnley: 15, sunderland: 12,
+    // Championship
+    leicester: 20, southampton: 15, sheffieldu: 10, ipswich: 12, middlesbrough: 8,
+    coventry: 8, norwich: 8, watford: 7, westbrom: 10, hull: 7,
+    prestonne: 6, swansea: 6, millwall: 6, derby: 5, stoke: 5,
+    oxford: 5, portsmouth: 5, qpr: 4, sheffieldw: 4, blackburn: 4,
+    birmingham: 3, bristolcity: 3, charlton: 2, wrexham: 4,
+    // League One
+    luton: 3, cardiff: 2.5, plymouth: 2, bolton: 2, stockport: 2,
+    peterborough: 1.5, mansfield: 1.5, rotherham: 1.5, reading: 1.5, exeter: 1.2,
+    huddersfield: 1.2, barnsley: 1, blackpool: 1, bradford: 0.8, burton: 0.8,
+    doncaster: 0.7, leytonorient: 1, lincoln: 0.8, northampton: 0.6, portvale: 0.5,
+    stevenage: 0.7, wigan: 1, wimbledon: 0.5, wycombe: 0.5,
+    // League Two
+    mkdons: 1, nottscounty: 0.8, cambridge: 0.7, chesterfield: 0.6, bristolrovers: 0.6,
+    crewe: 0.5, shrewsbury: 0.5, swindon: 0.5, salford: 0.8, gillingham: 0.4,
+    grimsby: 0.4, colchester: 0.4, walsall: 0.4, cheltenham: 0.3, barnet: 0.5,
+    barrow: 0.3, bromley: 0.3, crawley: 0.3, fleetwood: 0.3, harrogate: 0.3,
+    newport: 0.2, oldham: 0.3, tranmere: 0.3, accrington: 0.2,
+};
+
+// ---------- Prize money per finishing position (£M) ----------
+const PLM_DIVISION_PRIZE_MONEY = {
+    'premier-league': [160,150,140,130,120,112,104,96,90,84,78,72,66,60,54,48,42,36,30,24],
+    'championship':   [15,13,11,9,8,7,6.5,6,5.5,5,4.5,4,3.5,3,2.5,2.5,2,2,1.5,1.5,1.5,1.5,1,1],
+    'league-one':     [2,1.7,1.5,1.3,1.1,1,0.9,0.8,0.8,0.7,0.7,0.6,0.6,0.5,0.5,0.5,0.4,0.4,0.4,0.3,0.3,0.3,0.2,0.2],
+    'league-two':     [0.5,0.4,0.35,0.3,0.25,0.25,0.2,0.2,0.18,0.18,0.15,0.15,0.15,0.15,0.12,0.12,0.1,0.1,0.1,0.08,0.08,0.08,0.05,0.05],
+};
 
 // ---------- Player market value (£M) ----------
 function plmPlayerValue(rating) {
@@ -53,7 +170,8 @@ function plmPlayerValue(rating) {
     if (rating >= 75) return Math.round(10 + (rating - 75) * 2);
     if (rating >= 70) return Math.round(5  + (rating - 70) * 1);
     if (rating >= 65) return Math.round(2  + (rating - 65) * 0.6);
-    return Math.max(1, Math.round((rating - 60) * 0.4 + 0.5));
+    if (rating >= 60) return Math.max(1, Math.round((rating - 60) * 0.4 + 0.5));
+    return 1;
 }
 
 // ---------- Free agent pool ----------
@@ -69,22 +187,37 @@ function plmMakeFreeAgent(pos, rating) {
         name: `${fn} ${ln}`,
         pos, rating,
         value: plmPlayerValue(rating),
-        goals: 0, assists: 0,
-        yellows: 0, reds: 0, suspended: 0, injured: 0,
+        goals: 0, assists: 0, yellows: 0, reds: 0, suspended: 0, injured: 0,
     };
 }
 
-function plmGenerateFreeAgentPool() {
+function plmGenerateFreeAgentPool(divisionId) {
+    const div = divisionId || 'premier-league';
+    let bands;
+    if (div === 'premier-league') {
+        bands = [
+            { min: 88, max: 92, count: 4 }, { min: 83, max: 87, count: 8 },
+            { min: 78, max: 82, count: 12 }, { min: 73, max: 77, count: 14 },
+            { min: 68, max: 72, count: 12 }, { min: 63, max: 67, count: 8 },
+            { min: 58, max: 62, count: 4 },
+        ];
+    } else if (div === 'championship') {
+        bands = [
+            { min: 73, max: 78, count: 6 }, { min: 68, max: 72, count: 12 },
+            { min: 63, max: 67, count: 14 }, { min: 58, max: 62, count: 10 },
+        ];
+    } else if (div === 'league-one') {
+        bands = [
+            { min: 66, max: 70, count: 6 }, { min: 62, max: 65, count: 12 },
+            { min: 57, max: 61, count: 10 },
+        ];
+    } else {
+        bands = [
+            { min: 62, max: 65, count: 6 }, { min: 57, max: 61, count: 12 },
+            { min: 53, max: 56, count: 8 },
+        ];
+    }
     const posBag = ['GK','DEF','DEF','DEF','DEF','MID','MID','MID','FWD','FWD','FWD'];
-    const bands = [
-        { min: 88, max: 92, count: 4  },
-        { min: 83, max: 87, count: 8  },
-        { min: 78, max: 82, count: 12 },
-        { min: 73, max: 77, count: 14 },
-        { min: 68, max: 72, count: 12 },
-        { min: 63, max: 67, count: 8  },
-        { min: 58, max: 62, count: 4  },
-    ];
     const pool = [];
     for (const { min, max, count } of bands) {
         for (let i = 0; i < count; i++) {
@@ -145,7 +278,7 @@ function plmAutoPickXI(squad, formationKey) {
 
 // ---------- Fixture generation ----------
 function plmGenerateFixtures(teams) {
-    const ids = teams.map(t => t.id);
+    const ids = teams.map(t => (typeof t === 'string' ? t : t.id));
     if (ids.length % 2 !== 0) ids.push(null);
     const n = ids.length, rounds = n - 1, half = n / 2;
     const arr = ids.slice();
@@ -188,9 +321,9 @@ function plmFallbackSquad(team) {
     const pickFrom = arr => arr[Math.floor(rng() * arr.length)];
     const roles = [
         { pos: 'GK',  count: 2, modifier: -3 },
-        { pos: 'DEF', count: 5, modifier: -2 },
-        { pos: 'MID', count: 5, modifier:  0 },
-        { pos: 'FWD', count: 4, modifier: +3 },
+        { pos: 'DEF', count: 6, modifier: -2 },
+        { pos: 'MID', count: 6, modifier:  0 },
+        { pos: 'FWD', count: 4, modifier: +2 },
     ];
     const squad = [];
     let i = 0;
@@ -200,7 +333,7 @@ function plmFallbackSquad(team) {
                 id: `${team.id}_${i++}`,
                 name: `${pickFrom(PLM_FIRST_NAMES)} ${pickFrom(PLM_LAST_NAMES)}`,
                 pos: role.pos,
-                rating: Math.max(55, Math.min(92, team.rating + role.modifier + Math.floor(rng() * 9) - 4)),
+                rating: Math.max(48, Math.min(92, team.rating + role.modifier + Math.floor(rng() * 9) - 4)),
                 goals: 0, assists: 0, yellows: 0, reds: 0, suspended: 0, injured: 0,
             });
         }
@@ -326,13 +459,14 @@ function plmSimulateMatch(homeTeam, homeXI, awayTeam, awayXI, homeFormation, awa
 }
 
 // ---------- Table ----------
-function plmEmptyTable() {
+function plmEmptyTable(teamIds) {
     const t = {};
-    for (const team of PLM_TEAMS) t[team.id] = { id: team.id, P: 0, W: 0, D: 0, L: 0, GF: 0, GA: 0, GD: 0, Pts: 0 };
+    for (const id of teamIds) t[id] = { id, P: 0, W: 0, D: 0, L: 0, GF: 0, GA: 0, GD: 0, Pts: 0 };
     return t;
 }
 function plmApplyResult(table, homeId, awayId, hs, as) {
     const H = table[homeId], A = table[awayId];
+    if (!H || !A) return;
     H.P++; A.P++;
     H.GF += hs; H.GA += as; A.GF += as; A.GA += hs;
     H.GD = H.GF - H.GA; A.GD = A.GF - A.GA;
@@ -354,8 +488,8 @@ function plmStatusBadge(p) {
     return bits.length ? ` ${bits.join(' ')}` : '';
 }
 
-// ---------- Save key (v2 — new state shape) ----------
-const PLM_SAVE_KEY = 'plm_save_v2';
+// ---------- Save key ----------
+const PLM_SAVE_KEY = 'plm_save_v3';
 
 // ---------- Game class ----------
 class PLManager {
@@ -363,7 +497,7 @@ class PLManager {
         this.rootEl = document.getElementById('plm-root');
         if (!this.rootEl) return;
         this.squads = {};
-        for (const team of PLM_TEAMS) this.squads[team.id] = plmGenerateSquad(team);
+        for (const team of PLM_ALL_TEAMS) this.squads[team.id] = plmGenerateSquad(team);
         this._tFilter = 'all';
         this._pFilter = 'all';
         this.load();
@@ -376,11 +510,10 @@ class PLManager {
             const raw = localStorage.getItem(PLM_SAVE_KEY);
             this.state = raw ? JSON.parse(raw) : null;
         } catch (e) { this.state = null; }
-        if (this.state && (!this.state.playerTeam || !this.state.fixtures)) this.state = null;
+        if (this.state && (!this.state.playerTeam || !this.state.fixtures || !this.state.divisionId)) this.state = null;
         if (this.state) {
-            const known = new Set(PLM_TEAMS.map(t => t.id));
-            const ok = this.state.fixtures.every(r => r.every(fx => known.has(fx.home) && known.has(fx.away)));
-            if (!known.has(this.state.playerTeam) || !ok) {
+            const known = new Set(PLM_ALL_TEAMS.map(t => t.id));
+            if (!known.has(this.state.playerTeam)) {
                 localStorage.removeItem(PLM_SAVE_KEY);
                 this.state = null;
             }
@@ -391,34 +524,58 @@ class PLManager {
     }
 
     // ---- new game ----
-    newGame(playerTeamId, carryoverBudgets = null) {
-        const budgets = {};
-        for (const team of PLM_TEAMS) {
-            budgets[team.id] = carryoverBudgets
-                ? (carryoverBudgets[team.id] ?? PLM_TEAM_BUDGETS[team.id] ?? 20)
-                : (PLM_TEAM_BUDGETS[team.id] ?? 20);
+    newGame(playerTeamId, carryoverBudgets = null, newDivisions = null, forceDivId = null) {
+        const currentDivisions = newDivisions || JSON.parse(JSON.stringify(PLM_INITIAL_DIVISIONS));
+
+        // Determine the player's division
+        let divisionId = forceDivId;
+        if (!divisionId) {
+            for (const [divId, ids] of Object.entries(currentDivisions)) {
+                if (ids.includes(playerTeamId)) { divisionId = divId; break; }
+            }
         }
+        if (!divisionId) divisionId = 'premier-league';
+
+        const divisionTeamIds = currentDivisions[divisionId];
+        const divisionTeamObjects = divisionTeamIds.map(id => PLM_ALL_TEAMS_BY_ID[id]).filter(Boolean);
+
+        // Build budgets for all 92 teams
+        const allBudgets = {};
+        for (const team of PLM_ALL_TEAMS) {
+            allBudgets[team.id] = carryoverBudgets
+                ? (carryoverBudgets[team.id] ?? PLM_TEAM_BUDGETS[team.id] ?? 1)
+                : (PLM_TEAM_BUDGETS[team.id] ?? 1);
+        }
+
         this.state = {
-            playerTeam:       playerTeamId,
-            season:           1,
-            matchDay:         1,
-            fixtures:         plmGenerateFixtures(PLM_TEAMS),
-            results:          [],
-            table:            plmEmptyTable(),
-            screen:           'transferWindow',
+            playerTeam:         playerTeamId,
+            season:             1,
+            matchDay:           1,
+            divisionId,
+            divisionTeamIds,
+            currentDivisions,
+            fixtures:           plmGenerateFixtures(divisionTeamObjects),
+            results:            [],
+            table:              plmEmptyTable(divisionTeamIds),
+            screen:             'transferWindow',
             transferWindowType: 'summer',
-            lastMatch:        null,
-            formation:        PLM_DEFAULT_FORMATION,
-            xi:               [],
-            budgets,
-            freeAgents:       plmGenerateFreeAgentPool(),
-            transferLog:      [],
-            janWindowDone:    false,
-            prizeAwarded:     false,
+            lastMatch:          null,
+            formation:          PLM_DEFAULT_FORMATION,
+            xi:                 [],
+            allBudgets,
+            freeAgents:         plmGenerateFreeAgentPool(divisionId),
+            transferLog:        [],
+            janWindowDone:      false,
+            prizeAwarded:       false,
         };
-        for (const team of PLM_TEAMS) this.squads[team.id] = plmGenerateSquad(team);
+
+        // Re-generate squads for teams in this division
+        for (const id of divisionTeamIds) {
+            const team = PLM_ALL_TEAMS_BY_ID[id];
+            if (team) this.squads[id] = plmGenerateSquad(team);
+        }
+
         this.state.xi = plmAutoPickXI(this.squads[playerTeamId], PLM_DEFAULT_FORMATION).map(p => p.id);
-        // AI teams do their summer business before the player gets the window.
         this.doAITransfers('summer');
         this.save();
     }
@@ -433,15 +590,19 @@ class PLManager {
     // ---- helpers ----
     currentFixtures() { return this.state ? (this.state.fixtures[this.state.matchDay - 1] || []) : []; }
     playerFixture()   { return this.currentFixtures().find(m => m.home === this.state.playerTeam || m.away === this.state.playerTeam); }
-    playerTeam()      { return PLM_TEAMS_BY_ID[this.state.playerTeam]; }
-    budget()          { return this.state.budgets ? (this.state.budgets[this.state.playerTeam] || 0) : 0; }
+    playerTeam()      { return PLM_ALL_TEAMS_BY_ID[this.state.playerTeam]; }
+    budget()          { return this.state.allBudgets ? (this.state.allBudgets[this.state.playerTeam] || 0) : 0; }
+    divConfig()       { return PLM_DIVISIONS[this.state.divisionId] || PLM_DIVISIONS['premier-league']; }
 
     // ---- AI transfer logic ----
     doAITransfers(windowType) {
         const log  = [];
         const fas  = this.state.freeAgents;
-        const aiTeams = PLM_TEAMS.filter(t => t.id !== this.state.playerTeam);
-        // Shuffle so teams compete fairly for the best free agents.
+        const divTeamIds = this.state.divisionTeamIds || [];
+        const aiTeams = divTeamIds
+            .filter(id => id !== this.state.playerTeam)
+            .map(id => PLM_ALL_TEAMS_BY_ID[id]).filter(Boolean);
+
         for (let i = aiTeams.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [aiTeams[i], aiTeams[j]] = [aiTeams[j], aiTeams[i]];
@@ -449,27 +610,25 @@ class PLManager {
         for (const team of aiTeams) {
             const squad = this.squads[team.id];
             const sellChance = windowType === 'summer' ? 0.85 : 0.65;
-            // --- Sell worst non-GK player ---
             if (Math.random() < sellChance && squad.length > 14) {
                 const weakest = squad.filter(p => p.pos !== 'GK').sort((a, b) => a.rating - b.rating)[0];
                 if (weakest) {
                     const sp = Math.round(plmPlayerValue(weakest.rating) * (0.8 + Math.random() * 0.2));
-                    this.state.budgets[team.id] = (this.state.budgets[team.id] || 0) + sp;
+                    this.state.allBudgets[team.id] = (this.state.allBudgets[team.id] || 0) + sp;
                     squad.splice(squad.indexOf(weakest), 1);
                     fas.push({ ...weakest, id: plmUniqueId('fa'), value: Math.round(plmPlayerValue(weakest.rating)) });
                     log.push(`💰 ${team.name} sell ${weakest.name} (${weakest.pos} ${weakest.rating}) for £${sp}m`);
                 }
             }
-            // --- Buy 1-2 players (1 in January) ---
             const maxBuys = windowType === 'summer' ? (Math.random() < 0.4 ? 2 : 1) : 1;
             let bought = 0;
             const affordable = fas
-                .filter(p => p.value > 0 && p.value <= (this.state.budgets[team.id] || 0))
+                .filter(p => p.value > 0 && p.value <= (this.state.allBudgets[team.id] || 0))
                 .sort((a, b) => b.rating - a.rating);
             for (const fa of affordable) {
                 if (bought >= maxBuys || squad.length >= 23) break;
-                if (fa.value > (this.state.budgets[team.id] || 0)) continue;
-                this.state.budgets[team.id] -= fa.value;
+                if (fa.value > (this.state.allBudgets[team.id] || 0)) continue;
+                this.state.allBudgets[team.id] -= fa.value;
                 fas.splice(fas.indexOf(fa), 1);
                 squad.push({ ...fa, id: plmUniqueId(team.id),
                     goals: 0, assists: 0, yellows: 0, reds: 0, suspended: 0, injured: 0 });
@@ -480,24 +639,29 @@ class PLManager {
         this.state.transferLog = [...(this.state.transferLog || []), ...log];
     }
 
-    // ---- Player buys a free agent ----
-    buyPlayer(faId) {
-        const fas   = this.state.freeAgents || [];
-        const fa    = fas.find(p => p.id === faId);
-        if (!fa) return;
-        const budget = this.budget();
+    // ---- Player buys from another club ----
+    buyFromClub(playerId, sellingTeamId) {
+        const sellingSquad = this.squads[sellingTeamId];
+        const idx = sellingSquad ? sellingSquad.findIndex(p => p.id === playerId) : -1;
+        if (idx < 0) return;
+        const player = sellingSquad[idx];
+        const value  = plmPlayerValue(player.rating);
         const squad  = this.squads[this.state.playerTeam];
-        if (fa.value > budget || squad.length >= 25) return;
-        this.state.budgets[this.state.playerTeam] -= fa.value;
-        fas.splice(fas.indexOf(fa), 1);
-        squad.push({ ...fa, id: plmUniqueId(this.state.playerTeam),
-            goals: 0, assists: 0, yellows: 0, reds: 0, suspended: 0, injured: 0 });
-        this.state.transferLog.push(`✍️ You sign ${fa.name} (${fa.pos} ${fa.rating}) for £${fa.value}m`);
+        if (value > this.budget() || squad.length >= 25) return;
+
+        sellingSquad.splice(idx, 1);
+        squad.push({ ...player });
+
+        this.state.allBudgets[this.state.playerTeam] -= value;
+        this.state.allBudgets[sellingTeamId] = (this.state.allBudgets[sellingTeamId] || 0) + Math.round(value * 0.9);
+
+        const sellingTeam = PLM_ALL_TEAMS_BY_ID[sellingTeamId];
+        this.state.transferLog.push(`✍️ You sign ${player.name} from ${sellingTeam.name} for £${value}m`);
         this.save();
         this.renderTransferWindow();
     }
 
-    // ---- Player sells one of their players ----
+    // ---- Player sells ----
     sellPlayer(playerId) {
         const squad = this.squads[this.state.playerTeam];
         if (squad.length <= 14) return;
@@ -505,7 +669,7 @@ class PLManager {
         if (idx < 0) return;
         const sold = squad.splice(idx, 1)[0];
         const sp   = Math.round(plmPlayerValue(sold.rating) * 0.9);
-        this.state.budgets[this.state.playerTeam] = (this.state.budgets[this.state.playerTeam] || 0) + sp;
+        this.state.allBudgets[this.state.playerTeam] = (this.state.allBudgets[this.state.playerTeam] || 0) + sp;
         if (this.state.xi) this.state.xi = this.state.xi.filter(id => id !== playerId);
         this.state.freeAgents.push({ ...sold, id: plmUniqueId('fa'), value: Math.round(plmPlayerValue(sold.rating)) });
         this.state.transferLog.push(`💰 You sell ${sold.name} (${sold.pos} ${sold.rating}) for £${sp}m`);
@@ -534,7 +698,8 @@ class PLManager {
         const md = this.state.matchDay;
         let playerResult = null;
         for (const fx of this.currentFixtures()) {
-            const home = PLM_TEAMS_BY_ID[fx.home], away = PLM_TEAMS_BY_ID[fx.away];
+            const home = PLM_ALL_TEAMS_BY_ID[fx.home], away = PLM_ALL_TEAMS_BY_ID[fx.away];
+            if (!home || !away) continue;
             const homeXI = this.getXIFor(home.id), awayXI = this.getXIFor(away.id);
             const sim = plmSimulateMatch(home, homeXI, away, awayXI,
                 this.getFormationFor(home.id), this.getFormationFor(away.id));
@@ -543,10 +708,9 @@ class PLManager {
             if (home.id === this.state.playerTeam || away.id === this.state.playerTeam)
                 playerResult = { fixture: fx, ...sim, home, away };
         }
-        // Tick suspension / injury counters.
         for (const teamId of Object.keys(this.squads))
             for (const p of this.squads[teamId]) { if (p.suspended > 0) p.suspended--; if (p.injured > 0) p.injured--; }
-        // Auto-fill any gaps in the player's XI.
+
         if (this.state.xi) {
             const squad  = this.squads[this.state.playerTeam];
             const byId   = Object.fromEntries(squad.map(p => [p.id, p]));
@@ -571,7 +735,8 @@ class PLManager {
         this.state.lastMatch = playerResult;
         this.state.matchDay++;
 
-        if (this.state.matchDay > this.state.fixtures.length) {
+        const totalMD = this.divConfig().matchdays;
+        if (this.state.matchDay > totalMD) {
             this.state.screen = 'seasonEnd';
         } else {
             this.state.screen = 'matchResult';
@@ -580,15 +745,93 @@ class PLManager {
         this.render();
     }
 
+    // ---- Simulate other 3 divisions (rating + noise based) ----
+    simulateOtherDivisions() {
+        const results = {};
+        for (const [divId, teamIds] of Object.entries(this.state.currentDivisions)) {
+            if (divId === this.state.divisionId) continue;
+            const scored = teamIds.map(id => {
+                const team = PLM_ALL_TEAMS_BY_ID[id];
+                return { id, score: (team ? team.rating : 60) + (Math.random() - 0.5) * 22 };
+            });
+            results[divId] = scored.sort((a, b) => b.score - a.score).map(r => r.id);
+        }
+        return results;
+    }
+
+    // ---- Calculate new divisions after promotion/relegation ----
+    calculateNewDivisions(playerSortedIds, otherDivResults) {
+        const sorted = { ...otherDivResults, [this.state.divisionId]: playerSortedIds };
+
+        const pl = sorted['premier-league'] || [];
+        const ch = sorted['championship']   || [];
+        const l1 = sorted['league-one']     || [];
+        const l2 = sorted['league-two']     || [];
+
+        const playoffWinner = (arr, start, end) => {
+            const candidates = arr.slice(start, end + 1).filter(Boolean);
+            if (!candidates.length) return null;
+            const weights = [40, 30, 20, 10].slice(0, candidates.length);
+            const total = weights.reduce((a, b) => a + b, 0);
+            let r = Math.random() * total;
+            for (let i = 0; i < candidates.length; i++) { r -= weights[i]; if (r <= 0) return candidates[i]; }
+            return candidates[0];
+        };
+
+        // Promotion from lower divisions
+        const l2AutoUp   = l2.slice(0, 3);
+        const l2Playoff  = playoffWinner(l2, 3, 6);
+        const l1AutoUp   = l1.slice(0, 2);
+        const l1Playoff  = playoffWinner(l1, 2, 5);
+        const chAutoUp   = ch.slice(0, 2);
+        const chPlayoff  = playoffWinner(ch, 2, 5);
+
+        // Relegation
+        const plRel  = pl.slice(-3);
+        const chRel  = ch.slice(-3);
+        const l1Rel  = l1.slice(-4);
+        this._l2Bottom2 = l2.slice(-2); // these get £0 budget
+
+        const l2PromoSet = new Set([...l2AutoUp, l2Playoff].filter(Boolean));
+        const l1PromoSet = new Set([...l1AutoUp, l1Playoff].filter(Boolean));
+        const chPromoSet = new Set([...chAutoUp, chPlayoff].filter(Boolean));
+        const plRelSet   = new Set(plRel);
+        const chRelSet   = new Set(chRel);
+        const l1RelSet   = new Set(l1Rel);
+
+        const next = {
+            'premier-league': [
+                ...pl.filter(id => !plRelSet.has(id)),
+                ...chAutoUp, ...(chPlayoff ? [chPlayoff] : []),
+            ],
+            'championship': [
+                ...ch.filter(id => !chPromoSet.has(id) && !chRelSet.has(id)),
+                ...plRel,
+                ...l1AutoUp, ...(l1Playoff ? [l1Playoff] : []),
+            ],
+            'league-one': [
+                ...l1.filter(id => !l1PromoSet.has(id) && !l1RelSet.has(id)),
+                ...chRel,
+                ...l2AutoUp, ...(l2Playoff ? [l2Playoff] : []),
+            ],
+            'league-two': [
+                ...l2.filter(id => !l2PromoSet.has(id)),
+                ...l1Rel,
+            ],
+        };
+        return next;
+    }
+
     // ---- rendering ----
     render() {
         if (!this.rootEl) return;
         if (!this.state) return this.renderTeamSelect();
-        // Patch old/missing fields.
         if (!this.state.formation)    this.state.formation    = PLM_DEFAULT_FORMATION;
+        if (!this.state.divisionId)   this.state.divisionId   = 'premier-league';
+        if (!this.state.divisionTeamIds) this.state.divisionTeamIds = PLM_INITIAL_DIVISIONS['premier-league'];
         if (!this.state.xi)           this.state.xi           = plmAutoPickXI(this.squads[this.state.playerTeam], this.state.formation).map(p => p.id);
-        if (!this.state.budgets)      this.state.budgets      = Object.fromEntries(PLM_TEAMS.map(t => [t.id, PLM_TEAM_BUDGETS[t.id] || 20]));
-        if (!this.state.freeAgents)   this.state.freeAgents   = plmGenerateFreeAgentPool();
+        if (!this.state.allBudgets)   this.state.allBudgets   = Object.fromEntries(PLM_ALL_TEAMS.map(t => [t.id, PLM_TEAM_BUDGETS[t.id] || 1]));
+        if (!this.state.freeAgents)   this.state.freeAgents   = plmGenerateFreeAgentPool(this.state.divisionId);
         if (!this.state.transferLog)  this.state.transferLog  = [];
         switch (this.state.screen) {
             case 'transferWindow': return this.renderTransferWindow();
@@ -601,20 +844,29 @@ class PLManager {
 
     // ---- Team select ----
     renderTeamSelect() {
-        const cards = PLM_TEAMS.map(t => {
-            const budget = PLM_TEAM_BUDGETS[t.id] || 20;
-            return `
-                <button class="plm-team-card" data-team="${t.id}"
-                        style="background:${t.color};color:${t.text}">
+        const sections = PLM_DIV_ORDER.map(divId => {
+            const div   = PLM_DIVISIONS[divId];
+            const teams = PLM_ALL_TEAMS.filter(t => t.division === divId);
+            const cards = teams.map(t => {
+                const budget = PLM_TEAM_BUDGETS[t.id] || 1;
+                const budgetStr = budget < 1 ? `£${(budget * 1000).toFixed(0)}k` : `£${budget}m`;
+                return `<button class="plm-team-card" data-team="${t.id}"
+                    style="background:${t.color};color:${t.text}">
                     <span class="plm-team-name">${t.name}</span>
-                    <span class="plm-team-meta">OVR <b>${t.rating}</b> · Budget <b>£${budget}m</b></span>
+                    <span class="plm-team-meta">OVR <b>${t.rating}</b> · <b>${budgetStr}</b></span>
                 </button>`;
+            }).join('');
+            return `<div class="plm-div-section">
+                <h3 class="plm-div-header">${div.name}</h3>
+                <div class="plm-team-grid">${cards}</div>
+            </div>`;
         }).join('');
+
         this.rootEl.innerHTML = `
             <div class="plm-select">
                 <h2 class="plm-select-h">Pick your club</h2>
-                <p class="plm-select-sub">Take charge and play through a 38-match Premier League season. Each club has a realistic transfer budget.</p>
-                <div class="plm-team-grid">${cards}</div>
+                <p class="plm-select-sub">Choose from all 92 English professional clubs across 4 divisions. Win promotion, avoid relegation!</p>
+                ${sections}
             </div>`;
         this.rootEl.querySelectorAll('.plm-team-card').forEach(el =>
             el.addEventListener('click', () => { this.newGame(el.getAttribute('data-team')); this.render(); })
@@ -631,14 +883,17 @@ class PLManager {
         const closeLabel  = windowType === 'summer' ? 'Begin Season →' : 'Close Window & Continue →';
         const recentLog   = (this.state.transferLog || []).slice(-25);
 
-        // Build the market from other clubs' real squads.
         const tFilter = this._tFilter || 'all';
         const pFilter = this._pFilter || 'all';
+
+        // Market = other clubs in same division
         const allMarket = [];
-        for (const t of PLM_TEAMS) {
-            if (t.id === this.state.playerTeam) continue;
-            for (const p of this.squads[t.id]) {
-                allMarket.push({ ...p, sellingTeamId: t.id, sellingTeam: t, value: plmPlayerValue(p.rating) });
+        for (const id of (this.state.divisionTeamIds || [])) {
+            if (id === this.state.playerTeam) continue;
+            const t = PLM_ALL_TEAMS_BY_ID[id];
+            if (!t) continue;
+            for (const p of (this.squads[id] || [])) {
+                allMarket.push({ ...p, sellingTeamId: id, sellingTeam: t, value: plmPlayerValue(p.rating) });
             }
         }
         allMarket.sort((a, b) => b.rating - a.rating);
@@ -647,8 +902,11 @@ class PLManager {
             (pFilter === 'all' || p.pos === pFilter)
         );
 
-        const teamOpts = [{ id: 'all', name: 'All Clubs' },
-            ...PLM_TEAMS.filter(t => t.id !== this.state.playerTeam)]
+        const divTeams = (this.state.divisionTeamIds || [])
+            .filter(id => id !== this.state.playerTeam)
+            .map(id => PLM_ALL_TEAMS_BY_ID[id]).filter(Boolean);
+
+        const teamOpts = [{ id: 'all', name: 'All Clubs' }, ...divTeams]
             .map(t => `<option value="${t.id}" ${t.id === tFilter ? 'selected' : ''}>${t.name}</option>`)
             .join('');
         const posOpts = [['all','All Positions'],['GK','GK'],['DEF','DEF'],['MID','MID'],['FWD','FWD']]
@@ -684,31 +942,29 @@ class PLManager {
             </tr>`;
         }).join('');
 
+        const budgetDisplay = budget < 1 ? `£${(budget * 1000).toFixed(0)}k` : `£${Math.round(budget)}m`;
+
         this.rootEl.innerHTML = `
             <div class="plm-transfer">
                 <header class="plm-header" style="background:${team.color};color:${team.text}">
                     <div>
-                        <div class="plm-hdr-small">${windowLabel} · Season ${this.state.season}</div>
+                        <div class="plm-hdr-small">${windowLabel} · Season ${this.state.season} · ${PLM_DIVISIONS[this.state.divisionId].name}</div>
                         <div class="plm-hdr-name">${team.name}</div>
                     </div>
                     <div class="plm-hdr-right">
                         <div class="plm-hdr-small">Transfer Budget</div>
-                        <div class="plm-hdr-name">£${budget}m</div>
+                        <div class="plm-hdr-name">${budgetDisplay}</div>
                     </div>
                 </header>
-
                 <div class="plm-transfer-body">
                     <div class="plm-transfer-cols">
-
                         <section class="plm-transfer-section">
-                            <h3>🛒 Buy Players <span class="plm-budget-chip">£${budget}m left</span></h3>
-                            <div class="plm-transfer-filters">
+                            <h3>🛒 Buy Players <span class="plm-budget-chip">${budgetDisplay} left</span></h3>
+                            <div class="plm-transfer-filters" style="display:flex;gap:8px;margin-bottom:8px">
                                 <select id="plm-tfilter">${teamOpts}</select>
                                 <select id="plm-pfilter">${posOpts}</select>
                             </div>
-                            <p class="plm-transfer-hint">
-                                ${filtered.length} player${filtered.length !== 1 ? 's' : ''} shown · Squad ${squad.length}/25 · Dimmed = over budget
-                            </p>
+                            <p class="plm-transfer-hint">${filtered.length} player${filtered.length !== 1 ? 's' : ''} shown · Squad ${squad.length}/25</p>
                             <div class="plm-transfer-scroll">
                                 <table class="plm-squad">
                                     <thead><tr><th>Pos</th><th>Name</th><th>Rtg</th><th>Fee</th></tr></thead>
@@ -716,10 +972,9 @@ class PLManager {
                                 </table>
                             </div>
                         </section>
-
                         <section class="plm-transfer-section">
                             <h3>💰 Sell Players</h3>
-                            <p class="plm-transfer-hint">Min squad 14 · You have ${squad.length} · Sale price = 90% of market value</p>
+                            <p class="plm-transfer-hint">Min squad 14 · You have ${squad.length} · Sale price = 90% of value</p>
                             <div class="plm-transfer-scroll">
                                 <table class="plm-squad">
                                     <thead><tr><th>Pos</th><th>Name</th><th>Rtg</th><th>Fee</th></tr></thead>
@@ -728,7 +983,6 @@ class PLManager {
                             </div>
                         </section>
                     </div>
-
                     <section class="plm-transfer-section plm-transfer-news">
                         <h3>📰 Transfer News</h3>
                         <ul class="plm-transfer-log">
@@ -738,7 +992,6 @@ class PLManager {
                         </ul>
                     </section>
                 </div>
-
                 <div class="plm-transfer-footer">
                     <button class="plm-play-btn" id="plm-close-window">${closeLabel}</button>
                 </div>
@@ -767,49 +1020,27 @@ class PLManager {
         });
     }
 
-    // ---- Buy a real player from another club ----
-    buyFromClub(playerId, sellingTeamId) {
-        const sellingSquad = this.squads[sellingTeamId];
-        const idx = sellingSquad.findIndex(p => p.id === playerId);
-        if (idx < 0) return;
-        const player = sellingSquad[idx];
-        const value  = plmPlayerValue(player.rating);
-        const squad  = this.squads[this.state.playerTeam];
-        if (value > this.budget() || squad.length >= 25) return;
-
-        // Move player between squads.
-        sellingSquad.splice(idx, 1);
-        squad.push({ ...player });
-
-        // Debit buyer, credit seller (90% of market value as fee).
-        this.state.budgets[this.state.playerTeam] -= value;
-        this.state.budgets[sellingTeamId] = (this.state.budgets[sellingTeamId] || 0) + Math.round(value * 0.9);
-
-        const sellingTeam = PLM_TEAMS_BY_ID[sellingTeamId];
-        this.state.transferLog.push(`✍️ You sign ${player.name} from ${sellingTeam.name} for £${value}m`);
-        this.save();
-        this.renderTransferWindow();
-    }
-
     // ---- Dashboard ----
     renderDashboard() {
-        const team = this.playerTeam();
-        const fx   = this.playerFixture();
+        const team     = this.playerTeam();
+        const fx       = this.playerFixture();
         const isHome   = fx && fx.home === team.id;
-        const opponent = fx ? PLM_TEAMS_BY_ID[isHome ? fx.away : fx.home] : null;
+        const opponent = fx ? PLM_ALL_TEAMS_BY_ID[isHome ? fx.away : fx.home] : null;
         const venue    = isHome ? 'vs' : '@';
         const budget   = this.budget();
+        const budgetDisplay = budget < 1 ? `£${(budget * 1000).toFixed(0)}k` : `£${Math.round(budget)}m`;
+        const totalMD  = this.divConfig().matchdays;
+        const divName  = this.divConfig().name;
 
         this.rootEl.innerHTML = `
             <div class="plm-dashboard">
                 <header class="plm-header" style="background:${team.color};color:${team.text}">
                     <div>
-                        <div class="plm-hdr-small">You are managing</div>
+                        <div class="plm-hdr-small">${divName} · Season ${this.state.season}</div>
                         <div class="plm-hdr-name">${team.name}</div>
                     </div>
                     <div class="plm-hdr-right">
-                        <div class="plm-hdr-small">MD ${this.state.matchDay}/38 · Budget £${budget}m</div>
-                        <div class="plm-hdr-name">Season ${this.state.season}</div>
+                        <div class="plm-hdr-small">MD ${this.state.matchDay}/${totalMD} · Budget ${budgetDisplay}</div>
                     </div>
                 </header>
 
@@ -956,7 +1187,7 @@ class PLManager {
         const squadRows = ['GK','DEF','MID','FWD'].flatMap(pos => squadByPos[pos].map(renderSquadRow)).join('');
 
         const fx  = this.playerFixture();
-        const opp = fx ? PLM_TEAMS_BY_ID[fx.home === team.id ? fx.away : fx.home] : null;
+        const opp = fx ? PLM_ALL_TEAMS_BY_ID[fx.home === team.id ? fx.away : fx.home] : null;
         const vsText = opp ? `${fx.home === team.id ? 'vs' : '@'} ${opp.name}` : '';
 
         this.rootEl.innerHTML = `
@@ -1021,8 +1252,8 @@ class PLManager {
         const lost = (res.home.id === team.id && res.homeScore < res.awayScore) || (res.away.id === team.id && res.awayScore < res.homeScore);
         const verdict = won ? '🎉 You won!' : lost ? '😞 You lost.' : '🤝 Draw.';
 
-        // Show a hint if January window is about to open.
-        const janHint = (this.state.matchDay === 20 && !this.state.janWindowDone)
+        const janTrigger = this.divConfig().janTrigger;
+        const janHint = (this.state.matchDay === janTrigger && !this.state.janWindowDone)
             ? '<p class="plm-jan-hint">❄️ The January Transfer Window opens now — you can buy and sell players.</p>' : '';
 
         this.rootEl.innerHTML = `
@@ -1037,9 +1268,8 @@ class PLManager {
             </div>`;
 
         this.rootEl.querySelector('#plm-continue').addEventListener('click', () => {
-            // Open January window if this was match day 19 (matchDay now = 20).
-            if (this.state.matchDay === 20 && !this.state.janWindowDone) {
-                const extra = plmGenerateFreeAgentPool().slice(0, 20);
+            if (this.state.matchDay === janTrigger && !this.state.janWindowDone) {
+                const extra = plmGenerateFreeAgentPool(this.state.divisionId).slice(0, 20);
                 this.state.freeAgents = [...(this.state.freeAgents || []), ...extra];
                 this.doAITransfers('january');
                 this.state.transferWindowType = 'january';
@@ -1054,52 +1284,108 @@ class PLManager {
 
     // ---- Season end ----
     renderSeasonEnd() {
-        const team   = this.playerTeam();
-        const sorted = plmSortedTable(this.state.table);
-        const yourPos = sorted.findIndex(r => r.id === team.id) + 1;
+        const team     = this.playerTeam();
+        const divName  = this.divConfig().name;
+        const sorted   = plmSortedTable(this.state.table);
+        const yourPos  = sorted.findIndex(r => r.id === team.id) + 1;
+        const divPrize = PLM_DIVISION_PRIZE_MONEY[this.state.divisionId] || PLM_DIVISION_PRIZE_MONEY['league-two'];
+        const divTeams = this.state.divisionTeamIds.length;
 
-        // Award prize money once.
+        // Award prize money once
+        let promoRelInfo = null;
         if (!this.state.prizeAwarded) {
             for (let i = 0; i < sorted.length; i++) {
-                const prize = PLM_PRIZE_MONEY[i] || 24;
-                this.state.budgets[sorted[i].id] = (this.state.budgets[sorted[i].id] || 0) + prize;
+                const prize = divPrize[i] || divPrize[divPrize.length - 1] || 0;
+                this.state.allBudgets[sorted[i].id] = (this.state.allBudgets[sorted[i].id] || 0) + prize;
             }
-            this.state.prizeAwarded = true;
+
+            // Calculate promo/rel
+            const otherDivResults = this.simulateOtherDivisions();
+            const playerSortedIds = sorted.map(r => r.id);
+            const newDivisions    = this.calculateNewDivisions(playerSortedIds, otherDivResults);
+
+            // Zero budgets for L2 bottom 2
+            if (this._l2Bottom2) {
+                for (const id of this._l2Bottom2) {
+                    this.state.allBudgets[id] = 0;
+                }
+            }
+
+            this.state.prizeAwarded  = true;
+            this.state.newDivisions  = newDivisions;
+            this.state.otherDivSorted = otherDivResults;
             this.save();
         }
 
-        const yourPrize  = PLM_PRIZE_MONEY[yourPos - 1] || 24;
-        const nextBudget = this.budget();
+        const newDivisions = this.state.newDivisions || null;
 
-        const ordinal = n => { const s = ['th','st','nd','rd'], v = n % 100; return n + (s[(v-20)%10] || s[v] || s[0]); };
+        // Find player's new division
+        let newDivId = this.state.divisionId;
+        if (newDivisions) {
+            for (const [divId, ids] of Object.entries(newDivisions)) {
+                if (ids.includes(this.state.playerTeam)) { newDivId = divId; break; }
+            }
+        }
+        const promoted  = newDivId !== this.state.divisionId && PLM_DIV_ORDER.indexOf(newDivId) < PLM_DIV_ORDER.indexOf(this.state.divisionId);
+        const relegated = newDivId !== this.state.divisionId && PLM_DIV_ORDER.indexOf(newDivId) > PLM_DIV_ORDER.indexOf(this.state.divisionId);
+
+        const yourPrize  = divPrize[yourPos - 1] || divPrize[divPrize.length - 1] || 0;
+        const nextBudget = this.state.allBudgets[this.state.playerTeam] || 0;
+        const nextBudgetDisplay = nextBudget < 1 ? `£${(nextBudget * 1000).toFixed(0)}k` : `£${Math.round(nextBudget)}m`;
+
+        const ordinal = n => { const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
+
         let verdict;
-        if      (yourPos === 1)    verdict = `🏆 CHAMPIONS! ${team.name} win the Premier League!`;
-        else if (yourPos <= 4)     verdict = `✨ Champions League qualification — finished ${ordinal(yourPos)}.`;
-        else if (yourPos <= 7)     verdict = `🥈 European qualification — finished ${ordinal(yourPos)}.`;
-        else if (yourPos >= 18)    verdict = `💀 Relegated — finished ${ordinal(yourPos)}.`;
-        else                       verdict = `Finished ${ordinal(yourPos)}.`;
+        if      (promoted && yourPos === 1)   verdict = `🏆 CHAMPIONS of ${divName} — and promoted!`;
+        else if (promoted)                     verdict = `🎉 Promoted to ${PLM_DIVISIONS[newDivId].name}! Finished ${ordinal(yourPos)}.`;
+        else if (relegated)                    verdict = `💀 Relegated to ${PLM_DIVISIONS[newDivId].name}. Finished ${ordinal(yourPos)}.`;
+        else if (yourPos === 1)                verdict = `🏆 CHAMPIONS of ${divName}!`;
+        else if (this.state.divisionId === 'premier-league' && yourPos <= 4)  verdict = `✨ Champions League qualification — ${ordinal(yourPos)}!`;
+        else if (this.state.divisionId === 'premier-league' && yourPos <= 7)  verdict = `🥈 European qualification — ${ordinal(yourPos)}.`;
+        else                                   verdict = `Finished ${ordinal(yourPos)} in ${divName}.`;
 
-        // Prize money breakdown for the table.
+        // Promotion/relegation summary for player's division
+        let moveLines = '';
+        if (newDivisions) {
+            const divId = this.state.divisionId;
+            const curIds = this.state.divisionTeamIds;
+            const nextIds = newDivisions[divId] || [];
+            const relIds  = curIds.filter(id => !nextIds.includes(id));
+            const promIds = nextIds.filter(id => !curIds.includes(id));
+            if (relIds.length || promIds.length) {
+                const relNames = relIds.map(id => PLM_ALL_TEAMS_BY_ID[id]?.name || id).join(', ');
+                const promNames = promIds.map(id => PLM_ALL_TEAMS_BY_ID[id]?.name || id).join(', ');
+                moveLines = `
+                    <div class="plm-promo-box">
+                        ${promIds.length ? `<p>⬆️ <b>Promoted in:</b> ${promNames}</p>` : ''}
+                        ${relIds.length  ? `<p>⬇️ <b>Relegated out:</b> ${relNames}</p>` : ''}
+                    </div>`;
+            }
+        }
+
         const prizeRows = sorted.map((r, i) => {
-            const t     = PLM_TEAMS_BY_ID[r.id];
-            const prize = PLM_PRIZE_MONEY[i] || 24;
+            const t     = PLM_ALL_TEAMS_BY_ID[r.id];
+            const prize = divPrize[i] || divPrize[divPrize.length - 1] || 0;
             const cls   = r.id === this.state.playerTeam ? 'me' : '';
-            return `<tr class="${cls}"><td>${i+1}</td><td>${t.name}</td><td>${r.Pts}pts</td><td>£${prize}m</td></tr>`;
+            return `<tr class="${cls}"><td>${i+1}</td><td>${t ? t.name : r.id}</td><td>${r.Pts}pts</td><td>£${prize}m</td></tr>`;
         }).join('');
 
         this.rootEl.innerHTML = `
             <div class="plm-season-end">
-                <h2>Season ${this.state.season} · Full Time</h2>
+                <h2>Season ${this.state.season} · Full Time · ${divName}</h2>
                 <p class="plm-verdict-big">${verdict}</p>
 
                 <div class="plm-prize-box">
                     <div class="plm-prize-pos">${ordinal(yourPos)} place</div>
                     <div class="plm-prize-amount">£${yourPrize}m prize money</div>
-                    <div class="plm-prize-sub">Transfer budget for next season: <b>£${nextBudget}m</b></div>
+                    <div class="plm-prize-sub">Budget for next season: <b>${nextBudgetDisplay}</b>
+                        ${newDivId !== this.state.divisionId ? ` (${PLM_DIVISIONS[newDivId].name})` : ''}</div>
                 </div>
 
+                ${moveLines}
+
                 <details class="plm-prize-details">
-                    <summary>View prize money for all clubs</summary>
+                    <summary>Prize money breakdown</summary>
                     <table class="plm-table" style="margin-top:8px">
                         <thead><tr><th>#</th><th>Club</th><th>Points</th><th>Prize</th></tr></thead>
                         <tbody>${prizeRows}</tbody>
@@ -1118,8 +1404,9 @@ class PLManager {
         this.rootEl.querySelector('#plm-next-season').addEventListener('click', () => {
             const teamId       = this.state.playerTeam;
             const season       = this.state.season + 1;
-            const savedBudgets = { ...this.state.budgets }; // carry prize money into next season
-            this.newGame(teamId, savedBudgets);
+            const savedBudgets = { ...this.state.allBudgets };
+            const newDivs      = this.state.newDivisions || null;
+            this.newGame(teamId, savedBudgets, newDivs, newDivId);
             this.state.season = season;
             this.save();
             this.render();
@@ -1129,15 +1416,35 @@ class PLManager {
 
     // ---- Shared HTML helpers ----
     tableHtml() {
-        const sorted = plmSortedTable(this.state.table);
-        const rows   = sorted.map((r, i) => {
-            const team = PLM_TEAMS_BY_ID[r.id];
+        const sorted  = plmSortedTable(this.state.table);
+        const divId   = this.state.divisionId;
+        const divSize = (this.state.divisionTeamIds || []).length;
+
+        const rows = sorted.map((r, i) => {
+            const team = PLM_ALL_TEAMS_BY_ID[r.id];
             const pos  = i + 1;
-            const cls  = pos <= 4 ? 'pos-cl' : pos <= 6 ? 'pos-eur' : pos >= 18 ? 'pos-rel' : '';
+            let cls = '';
+            if (divId === 'premier-league') {
+                if (pos <= 4) cls = 'pos-cl';
+                else if (pos <= 7) cls = 'pos-eur';
+                else if (pos >= divSize - 2) cls = 'pos-rel';
+            } else if (divId === 'championship') {
+                if (pos <= 2) cls = 'pos-cl';
+                else if (pos <= 6) cls = 'pos-eur';
+                else if (pos >= divSize - 2) cls = 'pos-rel';
+            } else if (divId === 'league-one') {
+                if (pos <= 2) cls = 'pos-cl';
+                else if (pos <= 6) cls = 'pos-eur';
+                else if (pos >= divSize - 3) cls = 'pos-rel';
+            } else {
+                if (pos <= 3) cls = 'pos-cl';
+                else if (pos <= 7) cls = 'pos-eur';
+                else if (pos >= divSize - 1) cls = 'pos-rel';
+            }
             const highlight = r.id === this.state.playerTeam ? 'me' : '';
             return `<tr class="${cls} ${highlight}">
                 <td class="plm-tbl-pos">${pos}</td>
-                <td class="plm-tbl-team"><span class="plm-tbl-dot" style="background:${team.color}"></span>${team.short}</td>
+                <td class="plm-tbl-team"><span class="plm-tbl-dot" style="background:${team ? team.color : '#999'}"></span>${team ? team.short : r.id}</td>
                 <td>${r.P}</td><td>${r.W}</td><td>${r.D}</td><td>${r.L}</td>
                 <td>${r.GF}:${r.GA}</td>
                 <td>${r.GD > 0 ? '+' : ''}${r.GD}</td>

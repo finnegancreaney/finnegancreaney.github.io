@@ -2846,3 +2846,16 @@ body {
     border-radius: 6px; font-size: 0.82rem; background: var(--card-bg); color: var(--text);
     cursor: pointer;
 }
+/* Division sections on team-select screen */
+.plm-div-section { margin-bottom: 28px; }
+.plm-div-header {
+    font-size: 1rem; font-weight: 700; color: var(--primary-dark);
+    border-bottom: 2px solid var(--primary); padding-bottom: 6px; margin: 0 0 12px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+}
+/* Promotion/relegation summary box */
+.plm-promo-box {
+    background: #f0fdf4; border: 1px solid #6ee7b7; border-radius: 8px;
+    padding: 12px 16px; margin: 14px 0; font-size: 0.9rem; line-height: 1.8;
+}
+.plm-promo-box p { margin: 0; }
