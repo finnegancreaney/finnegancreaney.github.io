@@ -2831,3 +2831,18 @@ body {
 @media (max-width: 700px) {
     .plm-transfer-cols { grid-template-columns: 1fr; }
 }
+
+/* Transfer market — club badge & filters */
+.plm-market-club {
+    display: inline-block; font-size: 0.68rem; font-weight: 700;
+    padding: 1px 5px; border-radius: 4px; vertical-align: middle;
+    line-height: 1.4; white-space: nowrap;
+}
+.plm-transfer-filters {
+    display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
+}
+.plm-transfer-filters select {
+    flex: 1; min-width: 120px; padding: 5px 8px; border: 1px solid var(--border);
+    border-radius: 6px; font-size: 0.82rem; background: var(--card-bg); color: var(--text);
+    cursor: pointer;
+}

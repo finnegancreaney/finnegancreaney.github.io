@@ -364,6 +364,8 @@ class PLManager {
         if (!this.rootEl) return;
         this.squads = {};
         for (const team of PLM_TEAMS) this.squads[team.id] = plmGenerateSquad(team);
+        this._tFilter = 'all';
+        this._pFilter = 'all';
         this.load();
         this.render();
     }
@@ -627,29 +629,51 @@ class PLManager {
         const windowType  = this.state.transferWindowType || 'summer';
         const windowLabel = windowType === 'summer' ? '☀️ Summer Transfer Window' : '❄️ January Transfer Window';
         const closeLabel  = windowType === 'summer' ? 'Begin Season →' : 'Close Window & Continue →';
-        const recentLog   = (this.state.transferLog || []).slice(-20);
+        const recentLog   = (this.state.transferLog || []).slice(-25);
 
-        // Sort free agents best first; mark unaffordable.
-        const sortedFAs = [...(this.state.freeAgents || [])].sort((a, b) => b.rating - a.rating);
-        const buyRows = sortedFAs.map(fa => {
-            const canAfford = fa.value <= budget;
+        // Build the market from other clubs' real squads.
+        const tFilter = this._tFilter || 'all';
+        const pFilter = this._pFilter || 'all';
+        const allMarket = [];
+        for (const t of PLM_TEAMS) {
+            if (t.id === this.state.playerTeam) continue;
+            for (const p of this.squads[t.id]) {
+                allMarket.push({ ...p, sellingTeamId: t.id, sellingTeam: t, value: plmPlayerValue(p.rating) });
+            }
+        }
+        allMarket.sort((a, b) => b.rating - a.rating);
+        const filtered = allMarket.filter(p =>
+            (tFilter === 'all' || p.sellingTeamId === tFilter) &&
+            (pFilter === 'all' || p.pos === pFilter)
+        );
+
+        const teamOpts = [{ id: 'all', name: 'All Clubs' },
+            ...PLM_TEAMS.filter(t => t.id !== this.state.playerTeam)]
+            .map(t => `<option value="${t.id}" ${t.id === tFilter ? 'selected' : ''}>${t.name}</option>`)
+            .join('');
+        const posOpts = [['all','All Positions'],['GK','GK'],['DEF','DEF'],['MID','MID'],['FWD','FWD']]
+            .map(([v, l]) => `<option value="${v}" ${v === pFilter ? 'selected' : ''}>${l}</option>`)
+            .join('');
+
+        const buyRows = filtered.map(p => {
+            const canAfford = p.value <= budget;
             const canBuy    = canAfford && squad.length < 25;
-            const rowCls    = canAfford ? '' : 'plm-fa-unaffordable';
+            const badge     = `<span class="plm-market-club" style="background:${p.sellingTeam.color};color:${p.sellingTeam.text}">${p.sellingTeam.short}</span>`;
             const btn       = canBuy
-                ? `<button class="plm-xfer-btn plm-buy-btn" data-faid="${fa.id}">Buy £${fa.value}m</button>`
-                : `<span class="plm-xfer-price">£${fa.value}m</span>`;
-            return `<tr class="${rowCls}">
-                <td class="plm-sq-pos pos-${fa.pos}">${fa.pos}</td>
-                <td class="plm-sq-name">${fa.name}</td>
-                <td class="plm-sq-rating">${fa.rating}</td>
+                ? `<button class="plm-xfer-btn plm-buy-btn" data-pid="${p.id}" data-tid="${p.sellingTeamId}">Buy £${p.value}m</button>`
+                : `<span class="plm-xfer-price">£${p.value}m</span>`;
+            return `<tr class="${canAfford ? '' : 'plm-fa-unaffordable'}">
+                <td class="plm-sq-pos pos-${p.pos}">${p.pos}</td>
+                <td class="plm-sq-name">${p.name} ${badge}</td>
+                <td class="plm-sq-rating">${p.rating}</td>
                 <td>${btn}</td>
             </tr>`;
         }).join('');
 
         const sellRows = [...squad].sort((a, b) => a.rating - b.rating).map(p => {
-            const sp     = Math.round(plmPlayerValue(p.rating) * 0.9);
+            const sp      = Math.round(plmPlayerValue(p.rating) * 0.9);
             const canSell = squad.length > 14;
-            const btn    = canSell
+            const btn     = canSell
                 ? `<button class="plm-xfer-btn plm-sell-btn" data-pid="${p.id}">Sell £${sp}m</button>`
                 : `<span class="plm-xfer-price">Min squad</span>`;
             return `<tr>
@@ -677,21 +701,25 @@ class PLManager {
                     <div class="plm-transfer-cols">
 
                         <section class="plm-transfer-section">
-                            <h3>🛒 Buy Players
-                                <span class="plm-budget-chip">£${budget}m remaining</span>
-                            </h3>
-                            <p class="plm-transfer-hint">Squad: ${squad.length}/25 players. Green rows are affordable.</p>
+                            <h3>🛒 Buy Players <span class="plm-budget-chip">£${budget}m left</span></h3>
+                            <div class="plm-transfer-filters">
+                                <select id="plm-tfilter">${teamOpts}</select>
+                                <select id="plm-pfilter">${posOpts}</select>
+                            </div>
+                            <p class="plm-transfer-hint">
+                                ${filtered.length} player${filtered.length !== 1 ? 's' : ''} shown · Squad ${squad.length}/25 · Dimmed = over budget
+                            </p>
                             <div class="plm-transfer-scroll">
                                 <table class="plm-squad">
-                                    <thead><tr><th>Pos</th><th>Name</th><th>Rtg</th><th>Price</th></tr></thead>
-                                    <tbody>${buyRows || '<tr><td colspan="4" style="text-align:center;color:#888">No free agents available.</td></tr>'}</tbody>
+                                    <thead><tr><th>Pos</th><th>Name</th><th>Rtg</th><th>Fee</th></tr></thead>
+                                    <tbody>${buyRows || '<tr><td colspan="4" style="text-align:center;padding:12px;color:#888">No players match your filters.</td></tr>'}</tbody>
                                 </table>
                             </div>
                         </section>
 
                         <section class="plm-transfer-section">
                             <h3>💰 Sell Players</h3>
-                            <p class="plm-transfer-hint">Minimum squad: 14 players. You have ${squad.length}. Sale price = 90% of market value.</p>
+                            <p class="plm-transfer-hint">Min squad 14 · You have ${squad.length} · Sale price = 90% of market value</p>
                             <div class="plm-transfer-scroll">
                                 <table class="plm-squad">
                                     <thead><tr><th>Pos</th><th>Name</th><th>Rtg</th><th>Fee</th></tr></thead>
@@ -705,7 +733,7 @@ class PLManager {
                         <h3>📰 Transfer News</h3>
                         <ul class="plm-transfer-log">
                             ${recentLog.length
-                                ? recentLog.map(l => `<li>${l}</li>`).join('')
+                                ? [...recentLog].reverse().map(l => `<li>${l}</li>`).join('')
                                 : '<li style="color:#888">No transfers yet this window.</li>'}
                         </ul>
                     </section>
@@ -716,18 +744,51 @@ class PLManager {
                 </div>
             </div>`;
 
+        this.rootEl.querySelector('#plm-tfilter').addEventListener('change', e => {
+            this._tFilter = e.target.value; this.renderTransferWindow();
+        });
+        this.rootEl.querySelector('#plm-pfilter').addEventListener('change', e => {
+            this._pFilter = e.target.value; this.renderTransferWindow();
+        });
         this.rootEl.querySelectorAll('.plm-buy-btn').forEach(btn =>
-            btn.addEventListener('click', () => this.buyPlayer(btn.getAttribute('data-faid')))
+            btn.addEventListener('click', () =>
+                this.buyFromClub(btn.getAttribute('data-pid'), btn.getAttribute('data-tid')))
         );
         this.rootEl.querySelectorAll('.plm-sell-btn').forEach(btn =>
             btn.addEventListener('click', () => this.sellPlayer(btn.getAttribute('data-pid')))
         );
         this.rootEl.querySelector('#plm-close-window').addEventListener('click', () => {
             if (this.state.transferWindowType === 'january') this.state.janWindowDone = true;
+            this._tFilter = 'all';
+            this._pFilter = 'all';
             this.state.screen = 'dashboard';
             this.save();
             this.render();
         });
+    }
+
+    // ---- Buy a real player from another club ----
+    buyFromClub(playerId, sellingTeamId) {
+        const sellingSquad = this.squads[sellingTeamId];
+        const idx = sellingSquad.findIndex(p => p.id === playerId);
+        if (idx < 0) return;
+        const player = sellingSquad[idx];
+        const value  = plmPlayerValue(player.rating);
+        const squad  = this.squads[this.state.playerTeam];
+        if (value > this.budget() || squad.length >= 25) return;
+
+        // Move player between squads.
+        sellingSquad.splice(idx, 1);
+        squad.push({ ...player });
+
+        // Debit buyer, credit seller (90% of market value as fee).
+        this.state.budgets[this.state.playerTeam] -= value;
+        this.state.budgets[sellingTeamId] = (this.state.budgets[sellingTeamId] || 0) + Math.round(value * 0.9);
+
+        const sellingTeam = PLM_TEAMS_BY_ID[sellingTeamId];
+        this.state.transferLog.push(`✍️ You sign ${player.name} from ${sellingTeam.name} for £${value}m`);
+        this.save();
+        this.renderTransferWindow();
     }
 
     // ---- Dashboard ----
