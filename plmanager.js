@@ -1,5 +1,5 @@
 // ==================================================================
-// The Gaffer v4
+// The Boss v4
 // All 92 English professional clubs + UEFA European competitions.
 // Champions League, Europa League, Conference League.
 // Multi-season: squad persists across seasons.
@@ -1146,7 +1146,7 @@ class PLManager {
 
         this.rootEl.innerHTML = `
             <div class="plm-select">
-                <h2 class="plm-select-h">⚽ The Gaffer</h2>
+                <h2 class="plm-select-h">⚽ The Boss</h2>
                 <p class="plm-select-sub">Manage any club from England's 92 or Europe's top leagues. Compete in Europe, win cups, and build a dynasty across multiple seasons!</p>
                 <p class="plm-select-sub" style="font-size:.8em;color:#888">⭐ = UCL · 🟠 = UEL · 🟡 = UECL (based on 2024/25)</p>
                 ${engSections}
