@@ -165,13 +165,28 @@ const PLM_DIVISION_PRIZE_MONEY = {
 
 // ---------- European club teams ----------
 const PLM_EUR_TEAMS = [
-    // La Liga
+    // ── La Liga (Spain) ─────────────────────────────────────────────
     { id: 'realmadrid',   name: 'Real Madrid',           short: 'RMA', color: '#FEBE10', text: '#fff', rating: 92, country: 'Spain'       },
     { id: 'barcelona',    name: 'Barcelona',              short: 'BAR', color: '#A50044', text: '#fff', rating: 88, country: 'Spain'       },
     { id: 'atletico',     name: 'Atletico Madrid',        short: 'ATM', color: '#CE3524', text: '#fff', rating: 85, country: 'Spain'       },
-    { id: 'girona',       name: 'Girona',                 short: 'GIR', color: '#CD1515', text: '#fff', rating: 75, country: 'Spain'       },
+    { id: 'villarreal',   name: 'Villarreal',             short: 'VIL', color: '#FFD700', text: '#000', rating: 78, country: 'Spain'       },
     { id: 'realsociedad', name: 'Real Sociedad',          short: 'RSO', color: '#0033A0', text: '#fff', rating: 74, country: 'Spain'       },
-    // Bundesliga
+    { id: 'girona',       name: 'Girona',                 short: 'GIR', color: '#CD1515', text: '#fff', rating: 75, country: 'Spain'       },
+    { id: 'athletic',     name: 'Athletic Club',          short: 'ATH', color: '#CC0000', text: '#fff', rating: 76, country: 'Spain'       },
+    { id: 'realbetis',    name: 'Real Betis',             short: 'BET', color: '#00A650', text: '#fff', rating: 74, country: 'Spain'       },
+    { id: 'sevilla',      name: 'Sevilla',                short: 'SEV', color: '#C8102E', text: '#fff', rating: 76, country: 'Spain'       },
+    { id: 'celta',        name: 'Celta Vigo',             short: 'CEL', color: '#6DAEE3', text: '#fff', rating: 70, country: 'Spain'       },
+    { id: 'valencia',     name: 'Valencia',               short: 'VAL', color: '#FF7F00', text: '#000', rating: 72, country: 'Spain'       },
+    { id: 'osasuna',      name: 'Osasuna',                short: 'OSA', color: '#CC0000', text: '#fff', rating: 68, country: 'Spain'       },
+    { id: 'getafe',       name: 'Getafe',                 short: 'GET', color: '#0057A8', text: '#fff', rating: 67, country: 'Spain'       },
+    { id: 'mallorca',     name: 'Mallorca',               short: 'MAL', color: '#CC0000', text: '#fff', rating: 66, country: 'Spain'       },
+    { id: 'alaves',       name: 'Deportivo Alaves',       short: 'ALA', color: '#0057A8', text: '#fff', rating: 64, country: 'Spain'       },
+    { id: 'leganes',      name: 'Leganes',                short: 'LEG', color: '#004EA8', text: '#fff', rating: 63, country: 'Spain'       },
+    { id: 'espanyol',     name: 'Espanyol',               short: 'ESP', color: '#0046AD', text: '#fff', rating: 65, country: 'Spain'       },
+    { id: 'laspalmas',    name: 'Las Palmas',             short: 'LPA', color: '#FFD700', text: '#000', rating: 62, country: 'Spain'       },
+    { id: 'rayo',         name: 'Rayo Vallecano',         short: 'RAY', color: '#CC0000', text: '#fff', rating: 67, country: 'Spain'       },
+    { id: 'valladolid',   name: 'Real Valladolid',        short: 'VLD', color: '#6600CC', text: '#fff', rating: 61, country: 'Spain'       },
+    // ── Bundesliga (Germany) ────────────────────────────────────────
     { id: 'bayernmunich', name: 'Bayern Munich',          short: 'BAY', color: '#DC052D', text: '#fff', rating: 90, country: 'Germany'     },
     { id: 'leverkusen',   name: 'Bayer Leverkusen',       short: 'LEV', color: '#E32221', text: '#fff', rating: 86, country: 'Germany'     },
     { id: 'dortmund',     name: 'Borussia Dortmund',      short: 'BVB', color: '#FDE100', text: '#000', rating: 84, country: 'Germany'     },
@@ -179,51 +194,96 @@ const PLM_EUR_TEAMS = [
     { id: 'vfbstuttgart', name: 'VfB Stuttgart',          short: 'STU', color: '#E32221', text: '#fff', rating: 80, country: 'Germany'     },
     { id: 'frankfurt',    name: 'Eintracht Frankfurt',    short: 'EFR', color: '#E2001A', text: '#fff', rating: 79, country: 'Germany'     },
     { id: 'hoffenheim',   name: 'TSG Hoffenheim',         short: 'HOF', color: '#1261AD', text: '#fff', rating: 74, country: 'Germany'     },
-    // Serie A
+    { id: 'gladbach',     name: 'Borussia M\'gladbach',   short: 'BMG', color: '#000000', text: '#fff', rating: 76, country: 'Germany'     },
+    { id: 'wolfsburg',    name: 'VfL Wolfsburg',          short: 'WOB', color: '#65B32E', text: '#fff', rating: 75, country: 'Germany'     },
+    { id: 'unionberlin',  name: 'Union Berlin',           short: 'UNB', color: '#CC0000', text: '#fff', rating: 72, country: 'Germany'     },
+    { id: 'freiburg',     name: 'SC Freiburg',            short: 'SCF', color: '#CC0000', text: '#000', rating: 74, country: 'Germany'     },
+    { id: 'mainz',        name: 'FSV Mainz 05',           short: 'M05', color: '#CC0000', text: '#fff', rating: 70, country: 'Germany'     },
+    { id: 'werderbremen', name: 'Werder Bremen',          short: 'SVW', color: '#1D6337', text: '#fff', rating: 71, country: 'Germany'     },
+    { id: 'augsburg',     name: 'FC Augsburg',            short: 'FCA', color: '#CC0000', text: '#fff', rating: 67, country: 'Germany'     },
+    { id: 'heidenheim',   name: 'FC Heidenheim',          short: 'FCH', color: '#CC0000', text: '#fff', rating: 65, country: 'Germany'     },
+    { id: 'bochum',       name: 'VfL Bochum',             short: 'BOC', color: '#1B4F9B', text: '#fff', rating: 63, country: 'Germany'     },
+    { id: 'stpauli',      name: 'FC St. Pauli',           short: 'STP', color: '#8B4513', text: '#fff', rating: 64, country: 'Germany'     },
+    { id: 'holstein',     name: 'Holstein Kiel',          short: 'KIE', color: '#CC0000', text: '#fff', rating: 62, country: 'Germany'     },
+    // ── Serie A (Italy) ─────────────────────────────────────────────
     { id: 'inter',        name: 'Inter Milan',            short: 'INT', color: '#010E80', text: '#fff', rating: 87, country: 'Italy'       },
     { id: 'acmilan',      name: 'AC Milan',               short: 'MIL', color: '#FB090B', text: '#fff', rating: 84, country: 'Italy'       },
     { id: 'juventus',     name: 'Juventus',               short: 'JUV', color: '#000000', text: '#fff', rating: 83, country: 'Italy'       },
     { id: 'atalanta',     name: 'Atalanta',               short: 'ATA', color: '#1E90FF', text: '#fff', rating: 82, country: 'Italy'       },
-    { id: 'bologna',      name: 'Bologna',                short: 'BOL', color: '#CE1E29', text: '#fff', rating: 75, country: 'Italy'       },
+    { id: 'napoli',       name: 'Napoli',                 short: 'NAP', color: '#12A0C5', text: '#fff', rating: 83, country: 'Italy'       },
     { id: 'roma',         name: 'AS Roma',                short: 'ROM', color: '#8B1A1A', text: '#FFD700', rating: 80, country: 'Italy'   },
     { id: 'lazio',        name: 'Lazio',                  short: 'LAZ', color: '#87CEEB', text: '#003', rating: 79,  country: 'Italy'      },
     { id: 'fiorentina',   name: 'Fiorentina',             short: 'FIO', color: '#6600CC', text: '#fff', rating: 77, country: 'Italy'       },
-    // Ligue 1
+    { id: 'bologna',      name: 'Bologna',                short: 'BOL', color: '#CE1E29', text: '#fff', rating: 75, country: 'Italy'       },
+    { id: 'torino',       name: 'Torino',                 short: 'TOR', color: '#8B0000', text: '#fff', rating: 72, country: 'Italy'       },
+    { id: 'udinese',      name: 'Udinese',                short: 'UDI', color: '#000000', text: '#fff', rating: 68, country: 'Italy'       },
+    { id: 'sassuolo',     name: 'Sassuolo',               short: 'SAS', color: '#00AA44', text: '#000', rating: 70, country: 'Italy'       },
+    { id: 'genoa',        name: 'Genoa',                  short: 'GEN', color: '#CC0000', text: '#fff', rating: 67, country: 'Italy'       },
+    { id: 'lecce',        name: 'US Lecce',               short: 'LEC', color: '#FFD700', text: '#CC0000', rating: 63, country: 'Italy'  },
+    { id: 'cagliari',     name: 'Cagliari',               short: 'CAG', color: '#CC0000', text: '#fff', rating: 64, country: 'Italy'       },
+    { id: 'empoli',       name: 'Empoli',                 short: 'EMP', color: '#1B75BB', text: '#fff', rating: 63, country: 'Italy'       },
+    { id: 'verona',       name: 'Hellas Verona',          short: 'VER', color: '#FFD700', text: '#003', rating: 62, country: 'Italy'       },
+    { id: 'monza',        name: 'AC Monza',               short: 'MON', color: '#CC0000', text: '#fff', rating: 65, country: 'Italy'       },
+    { id: 'parma',        name: 'Parma',                  short: 'PAR', color: '#FFD700', text: '#000', rating: 64, country: 'Italy'       },
+    { id: 'como',         name: 'Como 1907',              short: 'COM', color: '#004EA8', text: '#fff', rating: 62, country: 'Italy'       },
+    // ── Ligue 1 (France) ────────────────────────────────────────────
     { id: 'psg',          name: 'Paris Saint-Germain',    short: 'PSG', color: '#004170', text: '#fff', rating: 89, country: 'France'      },
     { id: 'monaco',       name: 'Monaco',                 short: 'MON', color: '#CE1126', text: '#fff', rating: 78, country: 'France'      },
-    { id: 'brest',        name: 'Stade Brestois',         short: 'BRE', color: '#DA0202', text: '#fff', rating: 72, country: 'France'      },
     { id: 'lille',        name: 'Lille',                  short: 'LIL', color: '#C61C23', text: '#fff', rating: 76, country: 'France'      },
     { id: 'lyon',         name: 'Olympique Lyonnais',     short: 'LYO', color: '#0032A0', text: '#fff', rating: 75, country: 'France'      },
-    // Portugal
+    { id: 'marseille',    name: 'Olympique Marseille',    short: 'OM',  color: '#009FDF', text: '#fff', rating: 76, country: 'France'      },
+    { id: 'nice',         name: 'OGC Nice',               short: 'NIC', color: '#000000', text: '#e00', rating: 73, country: 'France'      },
+    { id: 'rennes',       name: 'Stade Rennais',          short: 'REN', color: '#CC0000', text: '#000', rating: 72, country: 'France'      },
+    { id: 'brest',        name: 'Stade Brestois',         short: 'SBR', color: '#DA0202', text: '#fff', rating: 72, country: 'France'      },
+    { id: 'lens',         name: 'RC Lens',                short: 'RCL', color: '#FFD700', text: '#CC0000', rating: 74, country: 'France' },
+    { id: 'strasbourg',   name: 'Strasbourg',             short: 'STR', color: '#005BA7', text: '#fff', rating: 68, country: 'France'      },
+    { id: 'toulouse',     name: 'Toulouse',               short: 'TOU', color: '#6600CC', text: '#fff', rating: 67, country: 'France'      },
+    { id: 'reims',        name: 'Reims',                  short: 'REI', color: '#CC0000', text: '#fff', rating: 66, country: 'France'      },
+    { id: 'nantes',       name: 'FC Nantes',              short: 'FCN', color: '#FFD700', text: '#000', rating: 65, country: 'France'      },
+    { id: 'montpellier',  name: 'Montpellier HSC',        short: 'MTP', color: '#0033A0', text: '#fff', rating: 64, country: 'France'      },
+    { id: 'havre',        name: 'Le Havre AC',            short: 'LHA', color: '#0057A8', text: '#fff', rating: 62, country: 'France'      },
+    { id: 'auxerre',      name: 'AJ Auxerre',             short: 'AJA', color: '#0033A0', text: '#fff', rating: 63, country: 'France'      },
+    { id: 'angers',       name: 'Angers SCO',             short: 'ANG', color: '#000000', text: '#fff', rating: 61, country: 'France'      },
+    { id: 'saintetienne', name: 'Saint-Etienne',          short: 'STE', color: '#007B3A', text: '#fff', rating: 63, country: 'France'      },
+    // ── Portugal ────────────────────────────────────────────────────
     { id: 'benfica',      name: 'Benfica',                short: 'BEN', color: '#E11D28', text: '#fff', rating: 80, country: 'Portugal'    },
-    { id: 'sporting',     name: 'Sporting CP',            short: 'SPO', color: '#006600', text: '#fff', rating: 78, country: 'Portugal'    },
     { id: 'porto',        name: 'FC Porto',               short: 'POR', color: '#0046AE', text: '#fff', rating: 79, country: 'Portugal'    },
+    { id: 'sporting',     name: 'Sporting CP',            short: 'SPO', color: '#006600', text: '#fff', rating: 78, country: 'Portugal'    },
     { id: 'braga',        name: 'Sporting Braga',         short: 'BRA', color: '#CC0000', text: '#fff', rating: 74, country: 'Portugal'    },
-    // Netherlands
+    { id: 'guimaraes',    name: 'Vitoria Guimaraes',      short: 'GUI', color: '#000000', text: '#fff', rating: 67, country: 'Portugal'    },
+    // ── Netherlands ─────────────────────────────────────────────────
     { id: 'psv',          name: 'PSV Eindhoven',          short: 'PSV', color: '#E31E24', text: '#fff', rating: 80, country: 'Netherlands' },
-    { id: 'feyenoord',    name: 'Feyenoord',              short: 'FEY', color: '#C8102E', text: '#fff', rating: 78, country: 'Netherlands' },
     { id: 'ajax',         name: 'Ajax',                   short: 'AJX', color: '#D2001A', text: '#fff', rating: 77, country: 'Netherlands' },
-    // Belgium
+    { id: 'feyenoord',    name: 'Feyenoord',              short: 'FEY', color: '#C8102E', text: '#fff', rating: 78, country: 'Netherlands' },
+    { id: 'az',           name: 'AZ Alkmaar',             short: 'AZ',  color: '#CC0000', text: '#fff', rating: 72, country: 'Netherlands' },
+    { id: 'twente',       name: 'FC Twente',              short: 'FCT', color: '#CC0000', text: '#fff', rating: 70, country: 'Netherlands' },
+    // ── Belgium ─────────────────────────────────────────────────────
     { id: 'clubbrugge',   name: 'Club Brugge',            short: 'BRU', color: '#1A73B8', text: '#fff', rating: 75, country: 'Belgium'     },
     { id: 'anderlecht',   name: 'Anderlecht',             short: 'AND', color: '#6C0E6D', text: '#fff', rating: 71, country: 'Belgium'     },
-    // Turkey
+    { id: 'genk',         name: 'KRC Genk',               short: 'GNK', color: '#004499', text: '#fff', rating: 69, country: 'Belgium'     },
+    // ── Turkey ──────────────────────────────────────────────────────
     { id: 'galatasaray',  name: 'Galatasaray',            short: 'GAL', color: '#F5A623', text: '#000', rating: 77, country: 'Turkey'      },
     { id: 'fenerbahce',   name: 'Fenerbahce',             short: 'FEN', color: '#FFD700', text: '#003', rating: 75, country: 'Turkey'      },
-    // Scotland
+    { id: 'besiktas',     name: 'Besiktas',               short: 'BJK', color: '#000000', text: '#fff', rating: 72, country: 'Turkey'      },
+    { id: 'trabzonspor',  name: 'Trabzonspor',            short: 'TRA', color: '#8B0000', text: '#fff', rating: 69, country: 'Turkey'      },
+    // ── Scotland ────────────────────────────────────────────────────
     { id: 'celtic',       name: 'Celtic',                 short: 'CEL', color: '#16A950', text: '#fff', rating: 74, country: 'Scotland'    },
     { id: 'rangers',      name: 'Rangers',                short: 'RAN', color: '#1B458F', text: '#fff', rating: 72, country: 'Scotland'    },
-    // Other UCL/UEL
+    // ── Other Europe ────────────────────────────────────────────────
     { id: 'shakhtar',     name: 'Shakhtar Donetsk',       short: 'SHA', color: '#FF6B00', text: '#000', rating: 74, country: 'Ukraine'     },
     { id: 'redstar',      name: 'Red Star Belgrade',      short: 'RSB', color: '#CC0000', text: '#fff', rating: 73, country: 'Serbia'      },
     { id: 'youngboys',    name: 'Young Boys',             short: 'YBY', color: '#FDD800', text: '#000', rating: 70, country: 'Switzerland' },
     { id: 'sturmgraz',    name: 'Sturm Graz',             short: 'STG', color: '#000000', text: '#fff', rating: 70, country: 'Austria'     },
+    { id: 'rapidwien',    name: 'Rapid Wien',             short: 'RAP', color: '#006633', text: '#fff', rating: 67, country: 'Austria'     },
     { id: 'dinamozagreb', name: 'Dinamo Zagreb',          short: 'DZG', color: '#0000CD', text: '#fff', rating: 71, country: 'Croatia'     },
     { id: 'slovan',       name: 'Slovan Bratislava',      short: 'SLV', color: '#0044AA', text: '#fff', rating: 68, country: 'Slovakia'    },
     { id: 'sparta',       name: 'Sparta Prague',          short: 'SPA', color: '#AA0000', text: '#fff', rating: 72, country: 'Czech Rep'   },
+    { id: 'slavia',       name: 'Slavia Prague',          short: 'SLA', color: '#CC0000', text: '#fff', rating: 70, country: 'Czech Rep'   },
     { id: 'olympiakos',   name: 'Olympiacos',             short: 'OLY', color: '#CC0000', text: '#fff', rating: 72, country: 'Greece'      },
+    { id: 'paok',         name: 'PAOK',                   short: 'PAO', color: '#000000', text: '#fff', rating: 69, country: 'Greece'      },
     { id: 'basel',        name: 'FC Basel',               short: 'BAS', color: '#BB2222', text: '#fff', rating: 71, country: 'Switzerland' },
     { id: 'ferencvaros',  name: 'Ferencvaros',            short: 'FER', color: '#006633', text: '#fff', rating: 70, country: 'Hungary'     },
-    { id: 'villarreal',   name: 'Villarreal',             short: 'VIL', color: '#FFD700', text: '#000', rating: 78, country: 'Spain'       },
+    { id: 'rosenborg',    name: 'Rosenborg',              short: 'RBK', color: '#000000', text: '#fff', rating: 65, country: 'Norway'      },
 ];
 const PLM_EUR_TEAMS_BY_ID = Object.fromEntries(PLM_EUR_TEAMS.map(t => [t.id, t]));
 
@@ -246,6 +306,58 @@ const PLM_UECL_EUR_S1     = ['fiorentina','realsociedad','hoffenheim','youngboys
 // European prize money (£M)
 const PLM_EUR_PRIZES = { ucl: 80, uel: 40, uecl: 25 };
 const PLM_EUR_LABELS = { ucl: '⭐ Champions League', uel: '🟠 Europa League', uecl: '🟡 Conference League' };
+
+// Real UEFA coefficient spots per country (non-English leagues)
+// Format: { ucl, uel, uecl } = how many clubs from each league qualify
+const PLM_COUNTRY_SPOTS = {
+    'Spain':        { ucl: 4, uel: 2, uecl: 1 },
+    'Germany':      { ucl: 4, uel: 2, uecl: 1 },
+    'Italy':        { ucl: 4, uel: 2, uecl: 1 },
+    'France':       { ucl: 2, uel: 2, uecl: 2 },
+    'Portugal':     { ucl: 2, uel: 2, uecl: 1 },
+    'Netherlands':  { ucl: 1, uel: 2, uecl: 1 },
+    'Belgium':      { ucl: 1, uel: 1, uecl: 1 },
+    'Turkey':       { ucl: 1, uel: 1, uecl: 1 },
+    'Scotland':     { ucl: 1, uel: 1, uecl: 0 },
+    'Ukraine':      { ucl: 1, uel: 0, uecl: 1 },
+    'Serbia':       { ucl: 1, uel: 0, uecl: 0 },
+    'Switzerland':  { ucl: 0, uel: 1, uecl: 1 },
+    'Austria':      { ucl: 0, uel: 1, uecl: 1 },
+    'Croatia':      { ucl: 0, uel: 1, uecl: 1 },
+    'Slovakia':     { ucl: 0, uel: 0, uecl: 1 },
+    'Czech Rep':    { ucl: 0, uel: 1, uecl: 1 },
+    'Greece':       { ucl: 0, uel: 1, uecl: 1 },
+    'Hungary':      { ucl: 0, uel: 0, uecl: 1 },
+};
+
+// ---------- European domestic league configs ----------
+const PLM_EUR_LEAGUES = {
+    'la-liga':    { name: 'La Liga',         matchdays: 38, janTrigger: 20, country: 'Spain'       },
+    'bundesliga': { name: 'Bundesliga',      matchdays: 34, janTrigger: 18, country: 'Germany'     },
+    'serie-a':    { name: 'Serie A',         matchdays: 38, janTrigger: 20, country: 'Italy'       },
+    'ligue-1':    { name: 'Ligue 1',         matchdays: 34, janTrigger: 18, country: 'France'      },
+    'eur-other':  { name: 'European League', matchdays: 34, janTrigger: 18, country: null           },
+};
+const PLM_COUNTRY_TO_LEAGUE = {
+    'Spain':       'la-liga',    'Germany':      'bundesliga', 'Italy':       'serie-a',
+    'France':      'ligue-1',    'Portugal':     'eur-other',  'Netherlands': 'eur-other',
+    'Belgium':     'eur-other',  'Turkey':       'eur-other',  'Scotland':    'eur-other',
+    'Ukraine':     'eur-other',  'Serbia':       'eur-other',  'Switzerland': 'eur-other',
+    'Austria':     'eur-other',  'Croatia':      'eur-other',  'Slovakia':    'eur-other',
+    'Czech Rep':   'eur-other',  'Greece':       'eur-other',  'Hungary':     'eur-other',
+    'Norway':      'eur-other',
+};
+const PLM_BIG5_COUNTRIES = new Set(['Spain','Germany','Italy','France']);
+// Prize money (£M) for European domestic leagues
+const PLM_EUR_PRIZE_MONEY = {
+    'la-liga':    [50,40,35,28,22,18,15,12,10,9,8,7,6,5,4,4,3,3,2,2],
+    'bundesliga': [45,36,30,25,20,16,13,10,8,7,7,6,5,5,4,3,3,2],
+    'serie-a':    [48,38,32,26,21,17,14,11,9,8,7,6,5,4,4,3,3,2,2,2],
+    'ligue-1':    [40,32,27,22,18,14,11,9,7,6,6,5,4,4,3,3,2,2],
+    'eur-other':  [30,24,20,16,12,9,7,6,5,4,4,3,3,2,2,2,1,1],
+};
+function plmEurBudget(rating) { return Math.max(5, Math.round((rating - 60) * 5)); }
+function plmIsEurTeam(id) { return !!PLM_EUR_TEAMS_BY_ID[id]; }
 
 // ---------- Player market value (£M) ----------
 function plmPlayerValue(rating) {
@@ -277,7 +389,8 @@ function plmMakeFreeAgent(pos, rating) {
 }
 
 function plmGenerateFreeAgentPool(divisionId) {
-    const div = divisionId || 'premier-league';
+    // European leagues → treat as premier-league quality for the free agent pool
+    const div = (PLM_EUR_LEAGUES && PLM_EUR_LEAGUES[divisionId]) ? 'premier-league' : (divisionId || 'premier-league');
     let bands;
     if (div === 'premier-league') {
         bands = [
@@ -598,7 +711,7 @@ class PLManager {
         } catch (e) { this.state = null; }
         if (this.state && (!this.state.playerTeam || !this.state.fixtures || !this.state.divisionId)) this.state = null;
         if (this.state) {
-            const known = new Set(PLM_ALL_TEAMS.map(t => t.id));
+            const known = new Set([...PLM_ALL_TEAMS, ...PLM_EUR_TEAMS].map(t => t.id));
             if (!known.has(this.state.playerTeam)) {
                 localStorage.removeItem(PLM_SAVE_KEY);
                 this.state = null;
@@ -609,9 +722,29 @@ class PLManager {
         try { localStorage.setItem(PLM_SAVE_KEY, JSON.stringify(this.state)); } catch (e) {}
     }
 
+    // ---- European league helpers ----
+    _getEurLeagueId(eurTeam) {
+        return PLM_BIG5_COUNTRIES.has(eurTeam.country)
+            ? (PLM_COUNTRY_TO_LEAGUE[eurTeam.country] || 'eur-other')
+            : 'eur-other';
+    }
+    _getEurLeagueTeamIds(eurTeam, leagueId) {
+        if (PLM_BIG5_COUNTRIES.has(eurTeam.country)) {
+            return PLM_EUR_TEAMS.filter(t => t.country === eurTeam.country).map(t => t.id);
+        }
+        // eur-other: top 18 non-big5 teams by rating
+        return PLM_EUR_TEAMS
+            .filter(t => !PLM_BIG5_COUNTRIES.has(t.country))
+            .sort((a, b) => b.rating - a.rating)
+            .slice(0, 18)
+            .map(t => t.id);
+    }
+
     // ---- new game ----
     newGame(playerTeamId, carryoverBudgets = null, newDivisions = null, forceDivId = null) {
-        const currentDivisions = newDivisions || JSON.parse(JSON.stringify(PLM_INITIAL_DIVISIONS));
+        const currentDivisions = newDivisions
+            ? JSON.parse(JSON.stringify(newDivisions))
+            : JSON.parse(JSON.stringify(PLM_INITIAL_DIVISIONS));
 
         // Determine the player's division
         let divisionId = forceDivId;
@@ -620,17 +753,31 @@ class PLManager {
                 if (ids.includes(playerTeamId)) { divisionId = divId; break; }
             }
         }
+        // Handle European clubs — ensure their domestic league is in currentDivisions
+        const _eurTeamObj = PLM_EUR_TEAMS_BY_ID[playerTeamId];
+        if (_eurTeamObj) {
+            const _lid = this._getEurLeagueId(_eurTeamObj);
+            if (!currentDivisions[_lid]) {
+                currentDivisions[_lid] = this._getEurLeagueTeamIds(_eurTeamObj, _lid);
+            }
+            if (!divisionId) divisionId = _lid;
+        }
         if (!divisionId) divisionId = 'premier-league';
 
-        const divisionTeamIds = currentDivisions[divisionId];
-        const divisionTeamObjects = divisionTeamIds.map(id => PLM_ALL_TEAMS_BY_ID[id]).filter(Boolean);
+        const divisionTeamIds = currentDivisions[divisionId] || PLM_INITIAL_DIVISIONS['premier-league'];
+        const divisionTeamObjects = divisionTeamIds.map(id => plmGetTeam(id)).filter(Boolean);
 
-        // Build budgets for all 92 teams
+        // Build budgets for all 92 English + all European teams
         const allBudgets = {};
         for (const team of PLM_ALL_TEAMS) {
             allBudgets[team.id] = carryoverBudgets
                 ? (carryoverBudgets[team.id] ?? PLM_TEAM_BUDGETS[team.id] ?? 1)
                 : (PLM_TEAM_BUDGETS[team.id] ?? 1);
+        }
+        for (const team of PLM_EUR_TEAMS) {
+            allBudgets[team.id] = carryoverBudgets
+                ? (carryoverBudgets[team.id] ?? plmEurBudget(team.rating))
+                : plmEurBudget(team.rating);
         }
 
         this.state = {
@@ -657,7 +804,7 @@ class PLManager {
 
         // Re-generate squads for teams in this division
         for (const id of divisionTeamIds) {
-            const team = PLM_ALL_TEAMS_BY_ID[id];
+            const team = plmGetTeam(id);
             if (team) this.squads[id] = plmGenerateSquad(team);
         }
 
@@ -685,9 +832,9 @@ class PLManager {
     // ---- helpers ----
     currentFixtures() { return this.state ? (this.state.fixtures[this.state.matchDay - 1] || []) : []; }
     playerFixture()   { return this.currentFixtures().find(m => m.home === this.state.playerTeam || m.away === this.state.playerTeam); }
-    playerTeam()      { return PLM_ALL_TEAMS_BY_ID[this.state.playerTeam]; }
+    playerTeam()      { return plmGetTeam(this.state.playerTeam); }
     budget()          { return this.state.allBudgets ? (this.state.allBudgets[this.state.playerTeam] || 0) : 0; }
-    divConfig()       { return PLM_DIVISIONS[this.state.divisionId] || PLM_DIVISIONS['premier-league']; }
+    divConfig()       { return PLM_DIVISIONS[this.state.divisionId] || PLM_EUR_LEAGUES[this.state.divisionId] || PLM_DIVISIONS['premier-league']; }
 
     // ---- AI transfer logic ----
     doAITransfers(windowType) {
@@ -696,7 +843,7 @@ class PLManager {
         const divTeamIds = this.state.divisionTeamIds || [];
         const aiTeams = divTeamIds
             .filter(id => id !== this.state.playerTeam)
-            .map(id => PLM_ALL_TEAMS_BY_ID[id]).filter(Boolean);
+            .map(id => plmGetTeam(id)).filter(Boolean);
 
         for (let i = aiTeams.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -750,8 +897,8 @@ class PLManager {
         this.state.allBudgets[this.state.playerTeam] -= value;
         this.state.allBudgets[sellingTeamId] = (this.state.allBudgets[sellingTeamId] || 0) + Math.round(value * 0.9);
 
-        const sellingTeam = PLM_ALL_TEAMS_BY_ID[sellingTeamId];
-        this.state.transferLog.push(`✍️ You sign ${player.name} from ${sellingTeam.name} for £${value}m`);
+        const sellingTeam = plmGetTeam(sellingTeamId);
+        this.state.transferLog.push(`✍️ You sign ${player.name} from ${sellingTeam?.name || sellingTeamId} for £${value}m`);
         this.save();
         this.renderTransferWindow();
     }
@@ -795,7 +942,7 @@ class PLManager {
         const md = this.state.matchDay;
         let playerResult = null;
         for (const fx of this.currentFixtures()) {
-            const home = PLM_ALL_TEAMS_BY_ID[fx.home], away = PLM_ALL_TEAMS_BY_ID[fx.away];
+            const home = plmGetTeam(fx.home), away = plmGetTeam(fx.away);
             if (!home || !away) continue;
             const homeXI = this.getXIFor(home.id), awayXI = this.getXIFor(away.id);
             const sim = plmSimulateMatch(home, homeXI, away, awayXI,
@@ -941,33 +1088,70 @@ class PLManager {
 
     // ---- Team select ----
     renderTeamSelect() {
-        const sections = PLM_DIV_ORDER.map(divId => {
+        const _makeCard = (t, budget, budgetIsEur) => {
+            const b = budgetIsEur ? budget : (budget || 1);
+            const budgetStr = b < 1 ? `£${(b * 1000).toFixed(0)}k` : `£${Math.round(b)}m`;
+            const eurBadge = PLM_UCL_ENGLISH_S1.includes(t.id) || PLM_UCL_EUR_S1.includes(t.id) ? '⭐'
+                           : PLM_UEL_ENGLISH_S1.includes(t.id) || PLM_UEL_EUR_S1.includes(t.id) ? '🟠'
+                           : PLM_UECL_ENGLISH_S1.includes(t.id) || PLM_UECL_EUR_S1.includes(t.id) ? '🟡' : '';
+            return `<button class="plm-team-card" data-team="${t.id}"
+                style="background:${t.color};color:${t.text}">
+                <span class="plm-team-name">${t.name} ${eurBadge}</span>
+                <span class="plm-team-meta">OVR <b>${t.rating}</b> · <b>${budgetStr}</b></span>
+            </button>`;
+        };
+
+        // English divisions
+        const engSections = PLM_DIV_ORDER.map(divId => {
             const div   = PLM_DIVISIONS[divId];
             const teams = PLM_ALL_TEAMS.filter(t => t.division === divId);
-            const cards = teams.map(t => {
-                const budget = PLM_TEAM_BUDGETS[t.id] || 1;
-                const budgetStr = budget < 1 ? `£${(budget * 1000).toFixed(0)}k` : `£${budget}m`;
-                const eurBadge = PLM_UCL_ENGLISH_S1.includes(t.id) ? '⭐'
-                               : PLM_UEL_ENGLISH_S1.includes(t.id) ? '🟠'
-                               : PLM_UECL_ENGLISH_S1.includes(t.id) ? '🟡' : '';
-                return `<button class="plm-team-card" data-team="${t.id}"
-                    style="background:${t.color};color:${t.text}">
-                    <span class="plm-team-name">${t.name} ${eurBadge}</span>
-                    <span class="plm-team-meta">OVR <b>${t.rating}</b> · <b>${budgetStr}</b></span>
-                </button>`;
-            }).join('');
+            const cards = teams.map(t => _makeCard(t, PLM_TEAM_BUDGETS[t.id] || 1, false)).join('');
             return `<div class="plm-div-section">
-                <h3 class="plm-div-header">${div.name}</h3>
+                <h3 class="plm-div-header">🏴󠁧󠁢󠁥󠁮󠁧󠁿 ${div.name}</h3>
                 <div class="plm-team-grid">${cards}</div>
             </div>`;
         }).join('');
 
+        // European sections: big-5 leagues then eur-other
+        const eurLeagueSections = [
+            { leagueId: 'la-liga',    label: '🇪🇸 La Liga',    country: 'Spain'   },
+            { leagueId: 'bundesliga', label: '🇩🇪 Bundesliga',  country: 'Germany' },
+            { leagueId: 'serie-a',    label: '🇮🇹 Serie A',     country: 'Italy'   },
+            { leagueId: 'ligue-1',    label: '🇫🇷 Ligue 1',     country: 'France'  },
+        ].map(({ leagueId, label, country }) => {
+            const teams = PLM_EUR_TEAMS.filter(t => t.country === country).sort((a, b) => b.rating - a.rating);
+            const cards = teams.map(t => _makeCard(t, plmEurBudget(t.rating), true)).join('');
+            return `<div class="plm-div-section">
+                <h3 class="plm-div-header">${label}</h3>
+                <div class="plm-team-grid">${cards}</div>
+            </div>`;
+        }).join('');
+
+        // European League (all non-big-5, top 18 by rating)
+        const eurOtherTeams = PLM_EUR_TEAMS
+            .filter(t => !PLM_BIG5_COUNTRIES.has(t.country))
+            .sort((a, b) => b.rating - a.rating)
+            .slice(0, 18);
+        // Plus the rest still selectable (just outside top-18)
+        const eurOtherRest = PLM_EUR_TEAMS
+            .filter(t => !PLM_BIG5_COUNTRIES.has(t.country))
+            .sort((a, b) => b.rating - a.rating)
+            .slice(18);
+        const eurOtherCards = [...eurOtherTeams, ...eurOtherRest]
+            .map(t => _makeCard(t, plmEurBudget(t.rating), true)).join('');
+        const eurOtherSection = `<div class="plm-div-section">
+            <h3 class="plm-div-header">🌍 European League <span style="font-size:.8em;font-weight:normal;opacity:.7">(Portugal · Netherlands · Belgium · Turkey · Scotland & more)</span></h3>
+            <div class="plm-team-grid">${eurOtherCards}</div>
+        </div>`;
+
         this.rootEl.innerHTML = `
             <div class="plm-select">
                 <h2 class="plm-select-h">⚽ The Gaffer</h2>
-                <p class="plm-select-sub">Pick your club from all 92 English professional clubs. Win promotion, compete in Europe, and build a dynasty across multiple seasons!</p>
-                <p class="plm-select-sub" style="font-size:.8em;color:#888">⭐ = UCL · 🟠 = UEL · 🟡 = UECL (based on 2024/25 finish)</p>
-                ${sections}
+                <p class="plm-select-sub">Manage any club from England's 92 or Europe's top leagues. Compete in Europe, win cups, and build a dynasty across multiple seasons!</p>
+                <p class="plm-select-sub" style="font-size:.8em;color:#888">⭐ = UCL · 🟠 = UEL · 🟡 = UECL (based on 2024/25)</p>
+                ${engSections}
+                ${eurLeagueSections}
+                ${eurOtherSection}
             </div>`;
         this.rootEl.querySelectorAll('.plm-team-card').forEach(el =>
             el.addEventListener('click', () => { this.newGame(el.getAttribute('data-team')); this.render(); })
@@ -991,7 +1175,7 @@ class PLManager {
         const allMarket = [];
         for (const id of (this.state.divisionTeamIds || [])) {
             if (id === this.state.playerTeam) continue;
-            const t = PLM_ALL_TEAMS_BY_ID[id];
+            const t = plmGetTeam(id);
             if (!t) continue;
             for (const p of (this.squads[id] || [])) {
                 allMarket.push({ ...p, sellingTeamId: id, sellingTeam: t, value: plmPlayerValue(p.rating) });
@@ -1005,7 +1189,7 @@ class PLManager {
 
         const divTeams = (this.state.divisionTeamIds || [])
             .filter(id => id !== this.state.playerTeam)
-            .map(id => PLM_ALL_TEAMS_BY_ID[id]).filter(Boolean);
+            .map(id => plmGetTeam(id)).filter(Boolean);
 
         const teamOpts = [{ id: 'all', name: 'All Clubs' }, ...divTeams]
             .map(t => `<option value="${t.id}" ${t.id === tFilter ? 'selected' : ''}>${t.name}</option>`)
@@ -1126,7 +1310,7 @@ class PLManager {
         const team     = this.playerTeam();
         const fx       = this.playerFixture();
         const isHome   = fx && fx.home === team.id;
-        const opponent = fx ? PLM_ALL_TEAMS_BY_ID[isHome ? fx.away : fx.home] : null;
+        const opponent = fx ? plmGetTeam(isHome ? fx.away : fx.home) : null;
         const venue    = isHome ? 'vs' : '@';
         const budget   = this.budget();
         const budgetDisplay = budget < 1 ? `£${(budget * 1000).toFixed(0)}k` : `£${Math.round(budget)}m`;
@@ -1443,7 +1627,9 @@ class PLManager {
         const divName  = this.divConfig().name;
         const sorted   = plmSortedTable(this.state.table);
         const yourPos  = sorted.findIndex(r => r.id === team.id) + 1;
-        const divPrize = PLM_DIVISION_PRIZE_MONEY[this.state.divisionId] || PLM_DIVISION_PRIZE_MONEY['league-two'];
+        const divPrize = PLM_DIVISION_PRIZE_MONEY[this.state.divisionId]
+            || PLM_EUR_PRIZE_MONEY[this.state.divisionId]
+            || PLM_DIVISION_PRIZE_MONEY['league-two'];
         const divTeams = this.state.divisionTeamIds.length;
 
         // Award prize money once
@@ -1490,23 +1676,44 @@ class PLManager {
 
         const ordinal = n => { const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
 
+        const isEurTeamManaged = plmIsEurTeam(this.state.playerTeam);
         let verdict;
-        if      (promoted && yourPos === 1)   verdict = `🏆 CHAMPIONS of ${divName} — and promoted!`;
-        else if (promoted)                     verdict = `🎉 Promoted to ${PLM_DIVISIONS[newDivId].name}! Finished ${ordinal(yourPos)}.`;
-        else if (relegated)                    verdict = `💀 Relegated to ${PLM_DIVISIONS[newDivId].name}. Finished ${ordinal(yourPos)}.`;
-        else if (yourPos === 1)                verdict = `🏆 CHAMPIONS of ${divName}!`;
-        else if (this.state.divisionId === 'premier-league' && yourPos <= 5)  verdict = `⭐ Champions League qualification — ${ordinal(yourPos)} place!`;
-        else if (this.state.divisionId === 'premier-league' && yourPos === 6) verdict = `🟠 Europa League qualification — 6th place.`;
-        else if (this.state.divisionId === 'premier-league' && yourPos === 7) verdict = `🟡 Conference League qualification — 7th place.`;
-        else {
+        if (isEurTeamManaged) {
+            // European club — verdict based on domestic finish and UEFA spots
+            const _eurT  = PLM_EUR_TEAMS_BY_ID[this.state.playerTeam];
+            const _spots = PLM_COUNTRY_SPOTS[_eurT?.country] || { ucl: 0, uel: 0, uecl: 0 };
+            const _wonUCL = this.state.ucl?.winner === this.state.playerTeam;
+            const _wonUEL = this.state.uel?.winner === this.state.playerTeam;
+            if      (_wonUCL)                            verdict = `🏆 CHAMPIONS LEAGUE WINNERS! Back to defend next season!`;
+            else if (_wonUEL)                            verdict = `⭐ Europa League WINNERS — UCL next season!`;
+            else if (yourPos === 1)                      verdict = `🏆 ${divName} CHAMPIONS! ⭐ Champions League!`;
+            else if (yourPos <= _spots.ucl)              verdict = `⭐ Champions League qualification — ${ordinal(yourPos)} place!`;
+            else if (yourPos <= _spots.ucl + _spots.uel) verdict = `🟠 Europa League qualification — ${ordinal(yourPos)} place.`;
+            else if (yourPos <= _spots.ucl + _spots.uel + _spots.uecl) verdict = `🟡 Conference League qualification — ${ordinal(yourPos)} place.`;
+            else                                         verdict = `Finished ${ordinal(yourPos)} in ${divName}.`;
+        } else if (promoted && yourPos === 1) {
+            verdict = `🏆 CHAMPIONS of ${divName} — and promoted!`;
+        } else if (promoted) {
+            verdict = `🎉 Promoted to ${(PLM_DIVISIONS[newDivId] || {}).name || newDivId}! Finished ${ordinal(yourPos)}.`;
+        } else if (relegated) {
+            verdict = `💀 Relegated to ${(PLM_DIVISIONS[newDivId] || {}).name || newDivId}. Finished ${ordinal(yourPos)}.`;
+        } else if (yourPos === 1) {
+            verdict = `🏆 CHAMPIONS of ${divName}!`;
+        } else if (this.state.divisionId === 'premier-league' && yourPos <= 5) {
+            verdict = `⭐ Champions League qualification — ${ordinal(yourPos)} place!`;
+        } else if (this.state.divisionId === 'premier-league' && yourPos === 6) {
+            verdict = `🟠 Europa League qualification — 6th place.`;
+        } else if (this.state.divisionId === 'premier-league' && yourPos === 7) {
+            verdict = `🟡 Conference League qualification — 7th place.`;
+        } else {
             const pt = this.state.playerTeam;
             const wonUEL    = this.state.uel?.winner === pt;
             const wonFACup  = this.state.facup?.winner === pt;
             const wonCarabo = this.state.carabaocup?.winner === pt;
-            if (wonUEL)    verdict = `⭐ Europa League WINNERS — into the Champions League next season!`;
+            if (wonUEL)         verdict = `⭐ Europa League WINNERS — into the Champions League next season!`;
             else if (wonFACup)  verdict = `🟠 FA Cup Winners — Europa League qualification!`;
             else if (wonCarabo) verdict = `🟡 Carabao Cup Winners — Conference League qualification!`;
-            else               verdict = `Finished ${ordinal(yourPos)} in ${divName}.`;
+            else                verdict = `Finished ${ordinal(yourPos)} in ${divName}.`;
         }
 
         // Promotion/relegation summary for player's division
@@ -1518,8 +1725,8 @@ class PLManager {
             const relIds  = curIds.filter(id => !nextIds.includes(id));
             const promIds = nextIds.filter(id => !curIds.includes(id));
             if (relIds.length || promIds.length) {
-                const relNames = relIds.map(id => PLM_ALL_TEAMS_BY_ID[id]?.name || id).join(', ');
-                const promNames = promIds.map(id => PLM_ALL_TEAMS_BY_ID[id]?.name || id).join(', ');
+                const relNames = relIds.map(id => plmGetTeam(id)?.name || id).join(', ');
+                const promNames = promIds.map(id => plmGetTeam(id)?.name || id).join(', ');
                 moveLines = `
                     <div class="plm-promo-box">
                         ${promIds.length ? `<p>⬆️ <b>Promoted in:</b> ${promNames}</p>` : ''}
@@ -1529,7 +1736,7 @@ class PLManager {
         }
 
         const prizeRows = sorted.map((r, i) => {
-            const t     = PLM_ALL_TEAMS_BY_ID[r.id];
+            const t     = plmGetTeam(r.id);
             const prize = divPrize[i] || divPrize[divPrize.length - 1] || 0;
             const cls   = r.id === this.state.playerTeam ? 'me' : '';
             return `<tr class="${cls}"><td>${i+1}</td><td>${t ? t.name : r.id}</td><td>${r.Pts}pts</td><td>£${prize}m</td></tr>`;
@@ -1544,7 +1751,7 @@ class PLManager {
                     <div class="plm-prize-pos">${ordinal(yourPos)} place</div>
                     <div class="plm-prize-amount">£${yourPrize}m prize money</div>
                     <div class="plm-prize-sub">Budget for next season: <b>${nextBudgetDisplay}</b>
-                        ${newDivId !== this.state.divisionId ? ` (${PLM_DIVISIONS[newDivId].name})` : ''}</div>
+                        ${newDivId !== this.state.divisionId ? ` (${(PLM_DIVISIONS[newDivId] || PLM_EUR_LEAGUES[newDivId] || {}).name || newDivId})` : ''}</div>
                 </div>
 
                 ${moveLines}
@@ -1594,8 +1801,9 @@ class PLManager {
             this.state.formation   = savedFormation || PLM_DEFAULT_FORMATION;
             this.state.xi          = plmAutoPickXI(this.squads[teamId], this.state.formation).map(p => p.id);
             this.state.season      = season;
-            // Override European competitions for next season based on PL finish
+            // Override European competitions for next season
             if (newDivId === 'premier-league') {
+                // English PL team — use PL finish position
                 const plTeams = newDivs ? [...(newDivs['premier-league'] || [])] : [...PLM_INITIAL_DIVISIONS['premier-league']];
                 this.state.ucl.survivors  = nextEurQual === 'ucl'  ? [...plTeams.slice(0,4), ...PLM_UCL_EUR_S1]  : [...PLM_UCL_EUR_S1];
                 this.state.ucl.playerIn   = nextEurQual === 'ucl';
@@ -1603,6 +1811,26 @@ class PLManager {
                 this.state.uel.playerIn   = nextEurQual === 'uel';
                 this.state.uecl.survivors = nextEurQual === 'uecl' ? [teamId, ...PLM_UECL_EUR_S1] : [...PLM_UECL_EUR_S1];
                 this.state.uecl.playerIn  = nextEurQual === 'uecl';
+            } else if (plmIsEurTeam(teamId)) {
+                // European club — qual based on domestic finish + PLM_COUNTRY_SPOTS
+                const _eT = PLM_EUR_TEAMS_BY_ID[teamId];
+                const _sp = PLM_COUNTRY_SPOTS[_eT?.country] || { ucl: 0, uel: 0, uecl: 0 };
+                let _eurQ = null;
+                if      (yourPos <= _sp.ucl)                          _eurQ = 'ucl';
+                else if (yourPos <= _sp.ucl + _sp.uel)                _eurQ = 'uel';
+                else if (yourPos <= _sp.ucl + _sp.uel + _sp.uecl)    _eurQ = 'uecl';
+                // Also check if they won UCL/UEL
+                if (eurBonuses.wonUCL || eurBonuses.wonUEL) _eurQ = 'ucl';
+                this.state.ucl.playerIn   = _eurQ === 'ucl';
+                this.state.uel.playerIn   = _eurQ === 'uel';
+                this.state.uecl.playerIn  = _eurQ === 'uecl';
+                // Ensure player is in / out of survivors
+                for (const comp of ['ucl','uel','uecl']) {
+                    const cup = this.state[comp];
+                    if (!cup) continue;
+                    if (cup.playerIn && !cup.survivors.includes(teamId)) cup.survivors.push(teamId);
+                    if (!cup.playerIn) cup.survivors = cup.survivors.filter(id => id !== teamId);
+                }
             }
             this.save();
             this.render();
@@ -1617,12 +1845,12 @@ class PLManager {
         const divSize = (this.state.divisionTeamIds || []).length;
 
         const rows = sorted.map((r, i) => {
-            const team = PLM_ALL_TEAMS_BY_ID[r.id];
+            const team = plmGetTeam(r.id);
             const pos  = i + 1;
             let cls = '';
             if (divId === 'premier-league') {
-                if (pos <= 5) cls = 'pos-cl';       // 5 UCL spots (England coefficient)
-                else if (pos <= 7) cls = 'pos-eur'; // 6th UEL, 7th UECL
+                if (pos <= 5) cls = 'pos-cl';
+                else if (pos <= 7) cls = 'pos-eur';
                 else if (pos >= divSize - 2) cls = 'pos-rel';
             } else if (divId === 'championship') {
                 if (pos <= 2) cls = 'pos-cl';
@@ -1632,10 +1860,17 @@ class PLManager {
                 if (pos <= 2) cls = 'pos-cl';
                 else if (pos <= 6) cls = 'pos-eur';
                 else if (pos >= divSize - 3) cls = 'pos-rel';
-            } else {
+            } else if (divId === 'league-two') {
                 if (pos <= 3) cls = 'pos-cl';
                 else if (pos <= 7) cls = 'pos-eur';
                 else if (pos >= divSize - 1) cls = 'pos-rel';
+            } else if (PLM_EUR_LEAGUES[divId]) {
+                // European domestic league — show UEFA spots
+                const country = PLM_EUR_LEAGUES[divId].country;
+                const spots = (country && PLM_COUNTRY_SPOTS[country]) || { ucl: 0, uel: 0, uecl: 0 };
+                if (pos <= spots.ucl) cls = 'pos-cl';
+                else if (pos <= spots.ucl + spots.uel) cls = 'pos-eur';
+                else if (pos <= spots.ucl + spots.uel + spots.uecl) cls = 'pos-eur';
             }
             const highlight = r.id === this.state.playerTeam ? 'me' : '';
             return `<tr class="${cls} ${highlight}">
@@ -1721,7 +1956,7 @@ class PLManager {
             roundIdx: 0,
             roundNames: ['Round 1','Round 2','Round 3','Round 4','Quarter-Final','Semi-Final','Final'],
             triggers,
-            playerIn: divId !== 'premier-league',
+            playerIn: PLM_DIV_ORDER.includes(divId) && divId !== 'premier-league',
             playerEntryRound: divId === 'premier-league' ? 1 : 0,
             roundInProgress: false,
             winner: null, done: false, log: [],
@@ -1999,7 +2234,7 @@ class PLManager {
             eurTeams     = isS1 ? [...PLM_UECL_EUR_S1]      : [...PLM_UECL_EUR_S1];
         }
 
-        const playerIn   = englishTeams.includes(pt);
+        const playerIn   = englishTeams.includes(pt) || eurTeams.includes(pt);
         const survivors  = [...englishTeams, ...eurTeams];
         const totalMD    = this.divConfig().matchdays;
         const triggers   = this._eurTriggers(totalMD, comp);
