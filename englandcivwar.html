@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>England 1637 — Civil War</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#c9922b;--gold-light:#f5d78e;--gold-dark:#8b6010;
+  --parchment:#f5edd6;--parchment-dark:#e8d9b5;--ink:#2c1a0e;
+  --royalist:#8b0000;--parliament:#1a3a6b;
+  --stone:#7a7060;--stone-light:#b0a898;
+  --green:#3a6b3a;--red:#8b1a1a;
+}
+body{
+  font-family:'Georgia',serif;
+  background:#1a1006;
+  color:var(--ink);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── HEADER ── */
+#header{
+  background:linear-gradient(180deg,#0d0800 0%,#1e1205 100%);
+  border-bottom:3px solid var(--gold-dark);
+  padding:10px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+#header h1{
+  color:var(--gold-light);font-size:1.4em;letter-spacing:2px;
+  text-shadow:0 0 10px rgba(201,146,43,0.5);
+}
+#hud{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.hud-pill{
+  background:rgba(201,146,43,0.15);border:1px solid var(--gold-dark);
+  border-radius:4px;padding:4px 10px;font-size:.85em;color:var(--gold-light);
+}
+.hud-pill span{color:#fff;font-weight:bold}
+#header-back{
+  background:none;border:1px solid var(--stone);color:var(--stone-light);
+  padding:5px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:.8em;
+}
+#header-back:hover{border-color:var(--gold);color:var(--gold-light)}
+
+/* ── MAIN LAYOUT ── */
+#game-area{
+  display:grid;
+  grid-template-columns:260px 1fr 280px;
+  flex:1;
+  gap:0;
+}
+
+/* ── LEFT PANEL ── */
+#left-panel{
+  background:#1e1205;
+  border-right:2px solid var(--gold-dark);
+  padding:14px;
+  overflow-y:auto;
+  max-height:calc(100vh - 58px);
+}
+.panel-title{
+  color:var(--gold);font-size:.9em;letter-spacing:1px;
+  border-bottom:1px solid var(--gold-dark);padding-bottom:6px;margin-bottom:10px;
+  text-transform:uppercase;
+}
+.lord-card{
+  background:rgba(201,146,43,0.08);border:1px solid var(--gold-dark);
+  border-radius:6px;padding:10px;margin-bottom:12px;
+}
+.lord-name{color:var(--gold-light);font-size:1em;font-weight:bold}
+.lord-title{color:var(--stone-light);font-size:.78em;margin-bottom:8px}
+.stat-row{display:flex;justify-content:space-between;font-size:.8em;margin:3px 0}
+.stat-label{color:#a09080}
+.stat-val{color:#fff;font-weight:bold}
+.stat-bar-wrap{width:60px;background:#333;border-radius:2px;height:8px;display:inline-block;vertical-align:middle}
+.stat-bar{height:8px;border-radius:2px;background:var(--gold)}
+
+.faction-badge{
+  display:inline-block;padding:2px 8px;border-radius:10px;font-size:.72em;
+  font-weight:bold;letter-spacing:1px;margin-top:4px;
+}
+.faction-royalist{background:var(--royalist);color:#ffd0d0}
+.faction-parliament{background:var(--parliament);color:#c0d0ff}
+.faction-neutral{background:#444;color:#ccc}
+
+#holdings-list{margin-bottom:12px}
+.holding-item{
+  background:rgba(255,255,255,0.04);border:1px solid #333;
+  border-radius:4px;padding:8px;margin-bottom:6px;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.holding-item:hover{border-color:var(--gold);background:rgba(201,146,43,0.1)}
+.holding-name{color:var(--gold-light);font-size:.88em;font-weight:bold}
+.holding-info{color:var(--stone-light);font-size:.75em;margin-top:2px}
+
+.btn{
+  display:block;width:100%;padding:8px;border:1px solid var(--gold-dark);
+  background:rgba(201,146,43,0.15);color:var(--gold-light);
+  border-radius:4px;cursor:pointer;font-family:inherit;font-size:.85em;
+  margin-bottom:6px;transition:all .2s;text-align:center;
+}
+.btn:hover{background:rgba(201,146,43,0.3);border-color:var(--gold)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-danger{border-color:#8b1a1a;background:rgba(139,26,26,0.2);color:#ffa0a0}
+.btn-danger:hover{background:rgba(139,26,26,0.4)}
+.btn-primary{border-color:var(--gold);background:rgba(201,146,43,0.25);color:var(--gold-light)}
+
+/* ── MAP ── */
+#map-area{
+  background:#0d1a0d;
+  padding:16px;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-y:auto;
+  max-height:calc(100vh - 58px);
+}
+#map-title{color:var(--gold);font-size:.85em;letter-spacing:1px;margin-bottom:10px;text-transform:uppercase}
+#england-map{
+  position:relative;
+  width:380px;height:640px;
+  background:radial-gradient(ellipse at 50% 50%,#1a3a1a,#0a1a0a);
+  border:2px solid var(--gold-dark);
+  border-radius:8px;
+  flex-shrink:0;
+}
+.county{
+  position:absolute;
+  border:1px solid rgba(201,146,43,0.3);
+  border-radius:3px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.55em;color:#d4c9b0;font-weight:bold;text-align:center;
+  transition:all .2s;
+  line-height:1.1;
+  user-select:none;
+}
+.county:hover{z-index:10;border-color:var(--gold);color:var(--gold-light)}
+.county.player-county{background:rgba(201,146,43,0.25)!important;border-color:var(--gold)!important}
+.county.royalist-county{background:rgba(139,0,0,0.35)!important;border-color:#cc4444!important}
+.county.parliament-county{background:rgba(26,58,107,0.45)!important;border-color:#5588cc!important}
+.county.contested-county{background:rgba(139,90,0,0.4)!important;border-color:#cc8800!important;animation:pulse 1s infinite}
+.county.neutral-county{background:rgba(60,80,60,0.3)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* county size classes */
+.county-sm{padding:2px}
+.county-md{padding:3px}
+.county-lg{padding:4px}
+
+/* ── RIGHT PANEL ── */
+#right-panel{
+  background:#1e1205;
+  border-left:2px solid var(--gold-dark);
+  padding:14px;
+  overflow-y:auto;
+  max-height:calc(100vh - 58px);
+}
+#event-log{margin-bottom:14px}
+.log-entry{
+  font-size:.78em;line-height:1.5;padding:6px 8px;
+  border-left:3px solid;margin-bottom:4px;border-radius:0 4px 4px 0;
+}
+.log-normal{border-color:var(--stone);background:rgba(122,112,96,0.1);color:#c0b090}
+.log-event{border-color:var(--gold);background:rgba(201,146,43,0.12);color:var(--gold-light)}
+.log-war{border-color:var(--royalist);background:rgba(139,0,0,0.15);color:#ff9090}
+.log-good{border-color:var(--green);background:rgba(58,107,58,0.15);color:#90d090}
+.log-bad{border-color:var(--red);background:rgba(139,26,26,0.15);color:#ff8080}
+
+/* ── MODAL ── */
+#modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.75);z-index:200;
+  align-items:center;justify-content:center;
+}
+#modal-overlay.open{display:flex}
+#modal{
+  background:linear-gradient(180deg,#2a1a08,#1a1005);
+  border:2px solid var(--gold);
+  border-radius:10px;
+  padding:24px;
+  max-width:500px;width:90%;
+  max-height:85vh;overflow-y:auto;
+  box-shadow:0 0 40px rgba(201,146,43,0.3);
+}
+#modal h2{color:var(--gold-light);font-size:1.2em;margin-bottom:12px;border-bottom:1px solid var(--gold-dark);padding-bottom:8px}
+#modal-body{font-size:.88em;line-height:1.7;color:var(--parchment)}
+#modal-actions{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── START SCREEN ── */
+#start-screen{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;
+  background:radial-gradient(ellipse at 50% 30%,#1a0d02,#0d0800);
+  padding:20px;
+}
+#start-screen h1{
+  color:var(--gold-light);font-size:2.5em;text-align:center;
+  letter-spacing:4px;margin-bottom:6px;
+  text-shadow:0 0 20px rgba(201,146,43,0.6);
+}
+#start-screen .subtitle{color:var(--stone-light);font-size:1em;margin-bottom:6px;letter-spacing:2px}
+#start-screen .year{color:var(--gold);font-size:1.3em;font-weight:bold;margin-bottom:30px}
+.lord-select-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:14px;width:100%;max-width:900px;margin-bottom:24px;
+}
+.lord-option{
+  background:rgba(201,146,43,0.08);
+  border:2px solid var(--gold-dark);
+  border-radius:8px;padding:16px;cursor:pointer;
+  transition:all .25s;
+}
+.lord-option:hover,.lord-option.selected{
+  border-color:var(--gold);background:rgba(201,146,43,0.2);
+  box-shadow:0 0 16px rgba(201,146,43,0.3);
+}
+.lord-option h3{color:var(--gold-light);font-size:1em;margin-bottom:4px}
+.lord-option .lo-title{color:var(--stone-light);font-size:.78em;margin-bottom:8px}
+.lord-option .lo-stats{font-size:.75em;color:#a08060;line-height:1.8}
+.lord-option .lo-holdings{font-size:.75em;color:#8aac8a;margin-top:6px}
+.lo-faction{margin-top:6px}
+
+/* ── FACTION CHOICE ── */
+#faction-screen{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;
+  background:radial-gradient(ellipse at 50% 50%,#1a0505,#0d0800);
+  padding:30px;
+  text-align:center;
+}
+#faction-screen h1{color:#ffcccc;font-size:2em;margin-bottom:10px;letter-spacing:3px}
+#faction-screen p{color:#c0a080;max-width:600px;font-size:.95em;line-height:1.7;margin-bottom:30px}
+.faction-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:600px;width:100%}
+.faction-card{
+  border-radius:10px;padding:24px;cursor:pointer;transition:all .25s;
+}
+.faction-card.royalist-card{
+  background:rgba(139,0,0,0.2);border:2px solid var(--royalist);
+}
+.faction-card.parliament-card{
+  background:rgba(26,58,107,0.2);border:2px solid var(--parliament);
+}
+.faction-card:hover{transform:scale(1.04);box-shadow:0 0 20px rgba(255,255,255,0.15)}
+.faction-card h2{font-size:1.3em;margin-bottom:8px}
+.royalist-card h2{color:#ffaaaa}
+.parliament-card h2{color:#aaccff}
+.faction-card p{font-size:.82em;line-height:1.6;color:#bbb}
+
+/* ── WAR SCREEN ── */
+#war-screen{
+  display:none;flex-direction:column;align-items:center;
+  background:#0d0805;padding:20px;min-height:100vh;
+}
+#war-screen h2{color:var(--gold);font-size:1.4em;margin-bottom:16px;letter-spacing:2px}
+#war-map{
+  display:flex;gap:30px;align-items:center;margin-bottom:20px;
+  font-size:.9em;color:#ccc;
+}
+.war-side{text-align:center;min-width:180px}
+.war-side h3{font-size:1.1em;margin-bottom:8px}
+.royalist-side h3{color:#ffaaaa}
+.parliament-side h3{color:#aaccff}
+.war-strength{
+  font-size:2.5em;font-weight:bold;margin:10px 0;
+}
+.royalist-side .war-strength{color:var(--royalist)}
+.parliament-side .war-strength{color:var(--parliament)}
+.war-vs{font-size:1.5em;color:var(--gold);font-weight:bold}
+#war-log{
+  max-width:600px;width:100%;max-height:300px;overflow-y:auto;
+  background:rgba(0,0,0,0.3);border:1px solid #333;border-radius:6px;padding:12px;
+  margin-bottom:16px;
+}
+.war-log-entry{font-size:.82em;color:#c0b090;padding:4px 0;border-bottom:1px solid #222}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0d0800}
+::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:3px}
+
+/* ── BUILDING LIST ── */
+.building-list{margin-top:8px}
+.building-item{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.78em;padding:4px 0;border-bottom:1px solid #2a2010;
+}
+.building-name{color:#c0a870}
+.building-built{color:#80c080;font-size:.85em}
+.building-progress{color:var(--gold);font-size:.85em}
+
+/* ── MISC ── */
+.divider{height:1px;background:var(--gold-dark);margin:10px 0;opacity:.4}
+.text-gold{color:var(--gold)}
+.text-muted{color:var(--stone-light)}
+.small{font-size:.8em}
+.italic{font-style:italic}
+.mb8{margin-bottom:8px}
+.income-breakdown{font-size:.77em;color:#a08060;line-height:1.8;margin-top:6px}
+</style>
+</head>
+<body>
+<div id="app">
+<!-- START SCREEN -->
+<div id="start-screen">
+  <h1>ENGLAND IN CRISIS</h1>
+  <div class="subtitle">A Chronicle of the Coming Storm</div>
+  <div class="year">Anno Domini 1637</div>
+  <div style="color:#a08060;max-width:680px;text-align:center;font-size:.88em;line-height:1.7;margin-bottom:24px">
+    The realm grows restless. King Charles rules without Parliament, levying ship money across the land.
+    Scotland seethes. The pulpits rage. Within five years, England shall be torn asunder.<br>
+    <em>You have five years to build your strength before the storm breaks.</em>
+  </div>
+  <div style="color:var(--gold);font-size:.9em;margin-bottom:14px;letter-spacing:1px">CHOOSE YOUR LORD</div>
+  <div class="lord-select-grid" id="lord-select-grid"></div>
+  <button class="btn btn-primary" id="start-btn" style="max-width:260px;padding:12px;font-size:1em" onclick="startGame()">
+    Begin — Anno Domini 1637
+  </button>
+</div>
+
+<!-- FACTION CHOICE -->
+<div id="faction-screen">
+  <h1>⚔ THE STORM BREAKS</h1>
+  <div style="color:var(--gold);font-size:1.1em;margin-bottom:10px">January 1642</div>
+  <p>
+    King Charles has raised his standard at Nottingham. Parliament musters its armies.
+    England is at war with itself. Every lord must choose — the Crown or the Commons.
+    There is no middle ground now. Where do your loyalties truly lie?
+  </p>
+  <div class="faction-choice-grid">
+    <div class="faction-card royalist-card" onclick="chooseFaction('royalist')">
+      <h2>⚜ For the King</h2>
+      <p>Stand with Charles I and the ancient rights of the Crown. Fight for monarchy, the Church of England, and the old order.</p>
+      <div style="color:#cc8888;font-size:.8em;margin-top:10px">Strength: +cavalry +nobility<br>Gold bonus: +200</div>
+    </div>
+    <div class="faction-card parliament-card" onclick="chooseFaction('parliament')">
+      <h2>⚖ For Parliament</h2>
+      <p>Stand with the Commons against royal tyranny. Fight for the rights of Englishmen, law, and reformed religion.</p>
+      <div style="color:#88aacc;font-size:.8em;margin-top:10px">Strength: +infantry +cities<br>Gold bonus: +150</div>
+    </div>
+  </div>
+</div>
+
+<!-- WAR SCREEN -->
+<div id="war-screen">
+  <h2>⚔ THE ENGLISH CIVIL WAR — 1642</h2>
+  <div id="war-map">
+    <div class="war-side royalist-side">
+      <h3>⚜ Royalists</h3>
+      <div class="war-strength" id="war-royalist-str">0</div>
+      <div class="small text-muted">Men under arms</div>
+    </div>
+    <div class="war-vs">VS</div>
+    <div class="war-side parliament-side">
+      <h3>⚖ Parliament</h3>
+      <div class="war-strength" id="war-parliament-str">0</div>
+      <div class="small text-muted">Men under arms</div>
+    </div>
+  </div>
+  <div id="war-log"></div>
+  <button class="btn btn-primary" id="war-advance-btn" style="max-width:220px" onclick="warAdvance()">Fight Next Battle</button>
+</div>
+
+<!-- MAIN GAME -->
+<div id="game-area" style="display:none">
+  <!-- LEFT -->
+  <div id="left-panel">
+    <div class="panel-title">Your Lordship</div>
+    <div class="lord-card" id="lord-info"></div>
+    <div class="divider"></div>
+    <div class="panel-title">Your Holdings</div>
+    <div id="holdings-list"></div>
+    <div class="divider"></div>
+    <div class="panel-title">Actions</div>
+    <button class="btn" onclick="nextMonth()">▶ Advance Month</button>
+    <button class="btn" onclick="openBuildMenu(null)">🏗 Build (select county)</button>
+    <button class="btn" onclick="openLevy()">⚔ Raise Levy</button>
+    <button class="btn" onclick="openDiplomacy()">📜 Diplomacy</button>
+  </div>
+
+  <!-- MAP -->
+  <div id="map-area">
+    <div id="map-title">Kingdom of England — <span id="current-date"></span></div>
+    <div id="england-map"></div>
+    <div style="display:flex;gap:16px;margin-top:10px;font-size:.72em">
+      <span><span style="display:inline-block;width:12px;height:12px;background:rgba(201,146,43,0.4);border:1px solid var(--gold);margin-right:4px;vertical-align:middle"></span>Your lands</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:rgba(139,0,0,0.4);border:1px solid #cc4444;margin-right:4px;vertical-align:middle"></span>Royalist</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:rgba(26,58,107,0.45);border:1px solid #5588cc;margin-right:4px;vertical-align:middle"></span>Parliament</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:rgba(60,80,60,0.3);border:1px solid rgba(201,146,43,0.3);margin-right:4px;vertical-align:middle"></span>Neutral</span>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div id="right-panel">
+    <div class="panel-title">Chronicle — Events & News</div>
+    <div id="event-log"></div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h2 id="modal-title"></h2>
+    <div id="modal-body"></div>
+    <div id="modal-actions"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+const LORDS = [
+  {
+    id:'waller_p', name:'Sir William Waller', title:'Governor of Portsmouth',
+    lands:['hampshire','kent'], faction:'parliament',
+    stats:{marshal:14,diplomacy:10,stewardship:11,intrigue:8},
+    startGold:180, incomeBase:22,
+    desc:'A Protestant soldier with friends in Parliament. Hampshire and Kent give you southern ports.',
+    bio:'Known as "William the Conqueror" by his enemies, Waller is a capable military commander sympathetic to the parliamentary cause.'
+  },
+  {
+    id:'hopton', name:'Sir Ralph Hopton', title:'Baron Hopton of Stratton',
+    lands:['somerset','cornwall'], faction:'royalist',
+    stats:{marshal:15,diplomacy:8,stewardship:10,intrigue:9},
+    startGold:160, incomeBase:20,
+    desc:'Loyal cavalier holding the South West for the King. Cornwall gives you silver mines.',
+    bio:'A fierce Royalist commander, Hopton turned the West Country into a Royalist stronghold during the war.'
+  },
+  {
+    id:'newcastle', name:'William Cavendish', title:'Earl of Newcastle',
+    lands:['northumberland','yorkshire_n'], faction:'royalist',
+    stats:{marshal:11,diplomacy:13,stewardship:15,intrigue:10},
+    startGold:300, incomeBase:35,
+    desc:'The wealthiest lord in England. The North is yours — but it is far from London.',
+    bio:'One of the richest men in England, Cavendish bankrolled much of the Royalist war effort in the North.'
+  },
+  {
+    id:'hampden', name:'John Hampden', title:'MP for Buckinghamshire',
+    lands:['buckinghamshire','oxfordshire'], faction:'parliament',
+    stats:{marshal:10,diplomacy:16,stewardship:13,intrigue:14},
+    startGold:200, incomeBase:26,
+    desc:'The man who refused to pay Ship Money. Parliament\'s champion, near London and Oxford.',
+    bio:'Hampden became a national hero for refusing to pay Ship Money, sparking the constitutional crisis that led to the Civil War.'
+  },
+  {
+    id:'fairfax', name:'Sir Thomas Fairfax', title:'Lord Fairfax of Cameron',
+    lands:['yorkshire_w','lancashire'], faction:'parliament',
+    stats:{marshal:17,diplomacy:11,stewardship:9,intrigue:8},
+    startGold:150, incomeBase:24,
+    desc:'England\'s finest general-in-waiting. Command the North for Parliament.',
+    bio:'Later commander of the New Model Army, Fairfax is the most talented military mind of the age.'
+  },
+  {
+    id:'custom', name:'Your Name Here', title:'Lord of Hampshire',
+    lands:['hampshire','wiltshire'], faction:'neutral',
+    stats:{marshal:12,diplomacy:12,stewardship:12,intrigue:12},
+    startGold:200, incomeBase:24,
+    desc:'A balanced lord from Hampshire, home of Winchester. Neutral — choose your allegiance when war comes.',
+    bio:'A local lord of means and reputation. Your estate at Winchester has served the family for three generations.'
+  }
+];
+
+// Map counties — [id, name, left%, top%, width%, height%, controlledBy, isCoastal]
+const COUNTIES = [
+  // Far North
+  ['northumberland','Northumberland',55,2,36,8,'royalist',true],
+  ['cumberland','Cumberland',20,4,30,10,'neutral',true],
+  ['durham','Durham',52,10,30,7,'neutral',false],
+  ['westmorland','Westmorland',22,14,28,8,'neutral',false],
+  // Yorkshire
+  ['yorkshire_n','Yorks (N)',48,17,38,8,'royalist',false],
+  ['yorkshire_w','Yorks (W)',36,24,28,7,'parliament',false],
+  ['yorkshire_e','Yorks (E)',62,22,25,7,'neutral',true],
+  // North Midlands
+  ['lancashire','Lancashire',24,22,24,9,'parliament',true],
+  ['cheshire','Cheshire',26,30,22,7,'neutral',false],
+  ['derbyshire','Derbyshire',45,31,20,7,'neutral',false],
+  ['nottinghamshire','Nottinghamshire',54,31,22,7,'neutral',false],
+  ['lincolnshire','Lincolnshire',60,28,28,11,'neutral',true],
+  // Midlands
+  ['shropshire','Shropshire',20,37,22,7,'neutral',false],
+  ['staffordshire','Staffordshire',34,37,20,7,'neutral',false],
+  ['leicestershire','Leicestershire',50,37,20,7,'neutral',false],
+  ['norfolk','Norfolk',66,35,28,9,'neutral',true],
+  ['suffolk','Suffolk',66,43,25,7,'parliament',true],
+  ['wales_n','Wales (N)',2,20,18,16,'royalist',true],
+  ['wales_s','Wales (S)',2,36,18,16,'royalist',true],
+  // South Midlands
+  ['worcestershire','Worcestershire',24,44,18,7,'royalist',false],
+  ['warwickshire','Warwickshire',38,44,18,7,'neutral',false],
+  ['northamptonshire','Northants',50,44,18,7,'neutral',false],
+  ['cambridge','Cambridgeshire',60,43,18,7,'parliament',false],
+  // Home Counties
+  ['oxfordshire','Oxfordshire',30,51,20,7,'neutral',false],
+  ['buckinghamshire','Buckinghamshire',42,50,18,7,'parliament',false],
+  ['hertfordshire','Hertfordshire',54,50,16,6,'parliament',false],
+  ['essex','Essex',60,50,24,7,'parliament',true],
+  ['gloucestershire','Gloucestershire',20,51,20,7,'neutral',false],
+  ['london','London',56,56,14,6,'parliament',false],
+  // South
+  ['somerset','Somerset',14,58,22,8,'royalist',true],
+  ['wiltshire','Wiltshire',26,58,20,7,'neutral',false],
+  ['berkshire','Berkshire',38,57,18,6,'neutral',false],
+  ['surrey','Surrey',48,57,14,6,'parliament',false],
+  ['kent','Kent',58,57,28,8,'parliament',true],
+  ['hampshire','Hampshire',36,64,22,7,'neutral',true],
+  ['sussex','Sussex',46,64,22,7,'parliament',true],
+  // Far South West
+  ['devon','Devon',6,62,22,9,'neutral',true],
+  ['cornwall','Cornwall',2,68,18,8,'royalist',true],
+  ['dorset','Dorset',24,65,18,7,'neutral',true],
+];
+
+const BUILDINGS = [
+  {id:'market',   name:'Market',      cost:150, months:2, incomeBonus:3,  levyBonus:0,   prestige:1, garrison:0,  desc:'A busy market increases trade and tax revenue.',        coastal:false},
+  {id:'granary',  name:'Granary',     cost:100, months:1, incomeBonus:1,  levyBonus:80,  prestige:0, garrison:0,  desc:'Stored grain means your peasants can field more men.',  coastal:false},
+  {id:'mill',     name:'Mill',        cost:80,  months:1, incomeBonus:2,  levyBonus:0,   prestige:0, garrison:0,  desc:'Mills process grain and generate steady income.',       coastal:false},
+  {id:'barracks', name:'Barracks',    cost:200, months:3, incomeBonus:0,  levyBonus:150, prestige:1, garrison:50, desc:'Trained soldiers are worth ten pressed peasants.',      coastal:false},
+  {id:'guildhall',name:'Guildhall',   cost:250, months:3, incomeBonus:6,  levyBonus:0,   prestige:2, garrison:0,  desc:'Craftsmen and merchants pay handsomely for protection.',coastal:false},
+  {id:'church',   name:'Church',      cost:120, months:2, incomeBonus:0,  levyBonus:20,  prestige:4, garrison:0,  desc:'A church raises morale and the people\'s loyalty.',     coastal:false},
+  {id:'walls',    name:'Town Walls',  cost:350, months:4, incomeBonus:0,  levyBonus:0,   prestige:2, garrison:200,desc:'Walls make your county nearly impossible to take.',      coastal:false},
+  {id:'stable',   name:'Stable',      cost:180, months:2, incomeBonus:0,  levyBonus:60,  prestige:1, garrison:0,  desc:'Cavalry costs gold to maintain but is devastating in battle.', cavalry:true, coastal:false},
+  {id:'armory',   name:'Armory',      cost:280, months:3, incomeBonus:0,  levyBonus:100, prestige:1, garrison:30, desc:'Proper arms and armor improve the quality of your levies.', coastal:false},
+  {id:'docks',    name:'Docks',       cost:300, months:3, incomeBonus:8,  levyBonus:0,   prestige:2, garrison:0,  desc:'Sea trade is immensely profitable. Coastal counties only.', coastal:true},
+  {id:'manor',    name:'Manor House', cost:400, months:4, incomeBonus:4,  levyBonus:30,  prestige:5, garrison:20, desc:'A fine manor shows your power and brings noble allies.', coastal:false},
+];
+
+const HISTORICAL_EVENTS = [
+  {month:0,  year:1637, id:'ship_money',   title:'Ship Money Extended',
+   text:'King Charles has extended ship money — a coastal tax — to all inland counties. The gentry are furious. Is this not taxation without Parliament\'s consent?',
+   options:[
+    {label:'Pay willingly (+prestige with Crown, -50 gold)',   effect:{gold:-50,prestige:2,royalistRel:10}},
+    {label:'Pay reluctantly (-30 gold)',                       effect:{gold:-30}},
+    {label:'Refuse to pay (legal challenge, -prestige)',       effect:{gold:0,prestige:-2,parliamentRel:8,flag:'refused_ship_money'}},
+   ]},
+  {month:6,  year:1637, id:'prayer_book',  title:'The Scottish Prayer Book Riots',
+   text:'In Edinburgh, riots have broken out against the new prayer book. A woman threw her stool at the bishop. Scotland is in revolt against royal religious policy.',
+   options:[
+    {label:'Pray the King handles it wisely',                  effect:{}},
+    {label:'Write in support of Scottish rights (-royalistRel)', effect:{royalistRel:-5,parliamentRel:5}},
+   ]},
+  {month:2,  year:1638, id:'scots_covenant',title:'The National Covenant',
+   text:'Scottish nobles and clergy have signed a National Covenant, pledging to resist changes to their church. Open defiance of the King.',
+   options:[
+    {label:'Support the King — the Scots must obey',           effect:{royalistRel:8,prestige:2}},
+    {label:'Admire Scottish resolve against royal overreach',  effect:{parliamentRel:8,royalistRel:-5}},
+   ]},
+  {month:8,  year:1639, id:'bishops_war_1',  title:'The First Bishops\' War Ends',
+   text:'The King\'s expedition against Scotland has ended in the humiliating Pacification of Berwick. The Scots remain undefeated and Charles has no money for another campaign.',
+   options:[
+    {label:'Offer to contribute to a new campaign (+royalistRel)',effect:{gold:-80,royalistRel:12}},
+    {label:'Note the King\'s weakness with interest',           effect:{parliamentRel:5}},
+   ]},
+  {month:3,  year:1640, id:'short_parliament',title:'The Short Parliament',
+   text:'Desperate for money, the King has recalled Parliament for the first time in 11 years. But Parliament demands redress of grievances before granting any supply.',
+   options:[
+    {label:'Urge Parliament to grant supply to the King',      effect:{royalistRel:10,parliamentRel:-8}},
+    {label:'Support Parliament\'s right to redress grievances',effect:{parliamentRel:12,royalistRel:-5}},
+   ]},
+  {month:7,  year:1640, id:'scots_invade',   title:'The Scots Invade England',
+   text:'A Scottish army has crossed the border and defeated the King\'s forces at Newburn. They now occupy Newcastle. Charles is humiliated and bankrupt.',
+   options:[
+    {label:'Raise troops to defend the border',                effect:{gold:-60,levies:100,prestige:3}},
+    {label:'Watch events from a safe distance',                effect:{}},
+   ]},
+  {month:10, year:1640, id:'long_parliament', title:'The Long Parliament Begins',
+   text:'Parliament has assembled again and is moving against the King\'s ministers. Lord Strafford is to be impeached. Archbishop Laud is arrested. The gentry smell blood.',
+   options:[
+    {label:'Support Parliament\'s actions against royal tyranny',effect:{parliamentRel:15,royalistRel:-10}},
+    {label:'Oppose the attack on the King\'s servants',        effect:{royalistRel:10,parliamentRel:-10}},
+   ]},
+  {month:10, year:1641, id:'grand_remonstrance',title:'The Grand Remonstrance',
+   text:'Parliament has passed the Grand Remonstrance — a list of 204 grievances against the King. It passed by only eleven votes. England is divided.',
+   options:[
+    {label:'Endorse the Remonstrance — these grievances are just',effect:{parliamentRel:12,royalistRel:-8}},
+    {label:'Condemn it — this is sedition against the Crown',  effect:{royalistRel:12,parliamentRel:-8}},
+   ]},
+  {month:0,  year:1642, id:'five_members',   title:'The Five Members',
+   text:'The King himself has entered Parliament with armed soldiers to arrest five members. They had fled by boat. The City of London riots. There is no peace now.',
+   options:[
+    {label:'Join the King — Parliament has gone too far',      effect:{royalistRel:20,gold:100,flag:'pre_royalist'}},
+    {label:'Join Parliament — the King has broken all bounds', effect:{parliamentRel:20,gold:80,flag:'pre_parliament'}},
+   ]},
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let G = null; // game state
+let selectedLordId = 'custom';
+
+function initState(lordId){
+  const lord = LORDS.find(l=>l.id===lordId);
+  const counties = {};
+  COUNTIES.forEach(([id,name,l,t,w,h,ctrl,coast])=>{
+    counties[id] = {
+      id, name, controller: lord.lands.includes(id) ? 'player' : ctrl,
+      buildings:[], constructing:null, levies:0, garrison:0, isCoastal:coast
+    };
+  });
+  return {
+    lordId, lord: {...lord, stats:{...lord.stats}},
+    year:1637, month:0,
+    gold: lord.startGold,
+    income: lord.incomeBase,
+    levies: 0,
+    prestige: lord.stats.diplomacy * 2,
+    royalistRel: lord.faction==='royalist' ? 60 : lord.faction==='parliament' ? 20 : 40,
+    parliamentRel: lord.faction==='parliament' ? 60 : lord.faction==='royalist' ? 20 : 40,
+    faction: lord.faction,
+    counties,
+    pendingEvent: null,
+    log:[],
+    warPhase: false,
+    warDone: false,
+    warResult: null,
+    warRoyalistStr: 0, warParliamentStr: 0,
+    warBattles: 0,
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// START SCREEN
+// ═══════════════════════════════════════════════════════
+function renderStartScreen(){
+  const grid = document.getElementById('lord-select-grid');
+  grid.innerHTML = LORDS.map(l=>`
+    <div class="lord-option ${l.id===selectedLordId?'selected':''}" onclick="selectLord('${l.id}')">
+      <h3>${l.name}</h3>
+      <div class="lo-title">${l.title}</div>
+      <div class="lo-stats">
+        ⚔ Marshal ${l.stats.marshal} &nbsp;|&nbsp; ✉ Diplomacy ${l.stats.diplomacy}<br>
+        📜 Stewardship ${l.stats.stewardship} &nbsp;|&nbsp; 🗡 Intrigue ${l.stats.intrigue}
+      </div>
+      <div class="lo-holdings">🏰 ${l.lands.map(id=>COUNTIES.find(c=>c[0]===id)?.[1]||id).join(', ')}</div>
+      <div class="lo-faction">
+        <span class="faction-badge faction-${l.faction}">${l.faction.toUpperCase()}</span>
+      </div>
+      <div style="font-size:.72em;color:#8a8070;margin-top:6px;font-style:italic">${l.desc}</div>
+    </div>
+  `).join('');
+}
+
+function selectLord(id){
+  selectedLordId = id;
+  renderStartScreen();
+}
+
+function startGame(){
+  G = initState(selectedLordId);
+  addLog('You take control of your estates. The year is 1637. England waits.','event');
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('game-area').style.display='grid';
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function renderAll(){
+  renderHUD();
+  renderLordCard();
+  renderHoldings();
+  renderMap();
+  renderLog();
+}
+
+function renderHUD(){
+  const hud = document.getElementById('hud');
+  hud.innerHTML = `
+    <div class="hud-pill">Gold: <span>${G.gold}⁠ </span></div>
+    <div class="hud-pill">Income: <span>+${calcIncome()}/mo</span></div>
+    <div class="hud-pill">Levies: <span>${G.levies}</span></div>
+    <div class="hud-pill">Prestige: <span>${G.prestige}</span></div>
+    <div class="hud-pill">Royalists: <span style="color:#ffaaaa">${G.royalistRel}</span></div>
+    <div class="hud-pill">Parliament: <span style="color:#aaccff">${G.parliamentRel}</span></div>
+  `;
+  document.getElementById('current-date').textContent=`${MONTHS[G.month]} ${G.year}`;
+}
+
+function renderLordCard(){
+  const l = G.lord;
+  const el = document.getElementById('lord-info');
+  el.innerHTML = `
+    <div class="lord-name">${l.name}</div>
+    <div class="lord-title">${l.title}</div>
+    <span class="faction-badge faction-${G.faction}">${G.faction.toUpperCase()}</span>
+    <div style="margin-top:10px">
+      ${statRow('⚔ Marshal',l.stats.marshal)}
+      ${statRow('✉ Diplomacy',l.stats.diplomacy)}
+      ${statRow('📜 Steward',l.stats.stewardship)}
+      ${statRow('🗡 Intrigue',l.stats.intrigue)}
+    </div>
+    <div class="divider"></div>
+    <div class="income-breakdown">
+      Holdings: ${countPlayerCounties()} counties<br>
+      Monthly income: ${calcIncome()} gold<br>
+      Prestige: ${G.prestige} ✦
+    </div>
+  `;
+}
+
+function statRow(label,val){
+  const w = Math.round((val/20)*100);
+  return `<div class="stat-row"><span class="stat-label">${label}</span>
+    <span><span class="stat-bar-wrap"><span class="stat-bar" style="width:${w}%"></span></span> <span class="stat-val">${val}</span></span>
+  </div>`;
+}
+
+function renderHoldings(){
+  const list = document.getElementById('holdings-list');
+  const player = Object.values(G.counties).filter(c=>c.controller==='player');
+  list.innerHTML = player.map(c=>{
+    const bldgs = c.buildings.map(b=>BUILDINGS.find(x=>x.id===b.id)?.name||b.id).join(', ');
+    const inProg = c.constructing ? `🔨 ${c.constructing.name} (${c.constructing.monthsLeft}mo)` : '';
+    return `<div class="holding-item" onclick="openCountyPanel('${c.id}')">
+      <div class="holding-name">${c.name}${c.isCoastal?' 🌊':''}</div>
+      <div class="holding-info">${bldgs||'No buildings'}${inProg?'<br>'+inProg:''}</div>
+      <div class="holding-info">Levies: ${c.levies} | Garrison: ${c.garrison}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMap(){
+  const map = document.getElementById('england-map');
+  map.innerHTML = COUNTIES.map(([id,name,l,t,w,h])=>{
+    const c = G.counties[id];
+    let cls = 'county county-md neutral-county';
+    if(c.controller==='player') cls='county county-md player-county';
+    else if(c.controller==='royalist') cls='county county-md royalist-county';
+    else if(c.controller==='parliament') cls='county county-md parliament-county';
+    else if(c.controller==='contested') cls='county county-md contested-county';
+    const shortName = name.length>12?name.split(' ')[0]:name;
+    return `<div class="${cls}" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%"
+      onclick="countyClick('${id}')" title="${name}">${shortName}</div>`;
+  }).join('');
+}
+
+function renderLog(){
+  const el = document.getElementById('event-log');
+  el.innerHTML = [...G.log].reverse().slice(0,20).map(e=>
+    `<div class="log-entry log-${e.type||'normal'}">${e.text}</div>`
+  ).join('');
+}
+
+function addLog(text,type='normal'){
+  G.log.push({text:`<strong>${MONTHS[G.month]} ${G.year}:</strong> ${text}`, type});
+}
+
+// ═══════════════════════════════════════════════════════
+// CALCULATIONS
+// ═══════════════════════════════════════════════════════
+function calcIncome(){
+  let inc = G.lord.incomeBase;
+  Object.values(G.counties).forEach(c=>{
+    if(c.controller==='player'){
+      c.buildings.forEach(b=>{
+        const def = BUILDINGS.find(x=>x.id===b.id);
+        if(def) inc += def.incomeBonus;
+      });
+    }
+  });
+  // stewardship bonus
+  inc += Math.floor(G.lord.stats.stewardship * 0.5);
+  return inc;
+}
+
+function calcLevies(){
+  let lev = 0;
+  Object.values(G.counties).forEach(c=>{
+    if(c.controller==='player'){
+      lev += c.levies;
+      c.buildings.forEach(b=>{
+        const def = BUILDINGS.find(x=>x.id===b.id);
+        if(def) lev += def.levyBonus;
+      });
+    }
+  });
+  return lev;
+}
+
+function countPlayerCounties(){
+  return Object.values(G.counties).filter(c=>c.controller==='player').length;
+}
+
+// ═══════════════════════════════════════════════════════
+// COUNTY CLICK
+// ═══════════════════════════════════════════════════════
+function countyClick(id){
+  const c = G.counties[id];
+  if(c.controller==='player'){
+    openCountyPanel(id);
+  } else {
+    openForeignCounty(id);
+  }
+}
+
+function openCountyPanel(id){
+  const c = G.counties[id];
+  const bldgs = c.buildings.map(b=>{
+    const def = BUILDINGS.find(x=>x.id===b.id);
+    return `<div class="building-item"><span class="building-name">${def?.name||b.id}</span><span class="building-built">✓ Built</span></div>`;
+  }).join('');
+  const inProg = c.constructing ? `<div style="margin:8px 0;color:var(--gold)">🔨 Building: ${c.constructing.name} — ${c.constructing.monthsLeft} month${c.constructing.monthsLeft!==1?'s':''} remaining</div>` : '';
+  openModal(`${c.name}${c.isCoastal?' (Coastal)':''}`,
+    `<div class="building-list">${bldgs||'<div class="text-muted small">No buildings constructed.</div>'}</div>
+    ${inProg}
+    <div class="divider"></div>
+    <div class="small text-muted">Garrison: ${c.garrison} | Levies raised: ${c.levies}</div>`,
+    [
+      {label:'🏗 Construct a Building', action:`openBuildMenu('${id}');closeModal()`},
+      {label:'Close', action:'closeModal()'},
+    ]
+  );
+}
+
+function openForeignCounty(id){
+  const c = G.counties[id];
+  openModal(c.name,
+    `<p>This county is held by the <strong>${c.controller}</strong> faction.</p>
+    <p class="small text-muted" style="margin-top:8px">Counties can be gained through diplomacy, conquest, or political manoeuvring.</p>`,
+    [{label:'Close',action:'closeModal()'}]
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// BUILD MENU
+// ═══════════════════════════════════════════════════════
+function openBuildMenu(countyId){
+  const player = Object.values(G.counties).filter(c=>c.controller==='player');
+  if(!countyId && player.length===1) countyId = player[0].id;
+  if(!countyId){
+    // show county picker
+    openModal('Choose a County to Build In',
+      '<div style="margin-bottom:8px">Select which of your counties to build in:</div>' +
+      player.map(c=>`<button class="btn" onclick="openBuildMenu('${c.id}');closeModal()">${c.name}${c.isCoastal?' 🌊':''}</button>`).join(''),
+      [{label:'Cancel',action:'closeModal()'}]
+    );
+    return;
+  }
+  const c = G.counties[countyId];
+  if(c.constructing){
+    openModal('Already Constructing',
+      `<p>You are already building a <strong>${c.constructing.name}</strong> in ${c.name}. Wait ${c.constructing.monthsLeft} more month${c.constructing.monthsLeft!==1?'s':''}.</p>`,
+      [{label:'Close',action:'closeModal()'}]
+    );
+    return;
+  }
+  const builtIds = c.buildings.map(b=>b.id);
+  const available = BUILDINGS.filter(b=>{
+    if(builtIds.includes(b.id)) return false;
+    if(b.coastal && !c.isCoastal) return false;
+    return true;
+  });
+  if(!available.length){
+    openModal('No Buildings Available',
+      `<p>${c.name} has all possible buildings constructed. Well done!</p>`,
+      [{label:'Close',action:'closeModal()'}]
+    );
+    return;
+  }
+  const rows = available.map(b=>`
+    <div style="border:1px solid #333;border-radius:5px;padding:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong style="color:var(--gold-light)">${b.name}</strong>
+        <span style="color:var(--gold)">${b.cost} gold</span>
+      </div>
+      <div class="small text-muted" style="margin:4px 0">${b.desc}</div>
+      <div class="small" style="color:#90c090">
+        ${b.incomeBonus?`+${b.incomeBonus} income/mo `:''}${b.levyBonus?`+${b.levyBonus} levies `:''}${b.prestige?`+${b.prestige} prestige `:''}${b.garrison?`+${b.garrison} garrison `:''}
+        — ${b.months} month${b.months!==1?'s':''}
+      </div>
+      <button class="btn" style="margin-top:6px" onclick="buildStructure('${countyId}','${b.id}');closeModal()"
+        ${G.gold<b.cost?'disabled title="Not enough gold"':''}>
+        ${G.gold>=b.cost?'Build for '+b.cost+' gold':'Insufficient gold ('+G.gold+'/'+b.cost+')'}
+      </button>
+    </div>
+  `).join('');
+  openModal(`Construct in ${c.name}`, rows, [{label:'Cancel',action:'closeModal()'}]);
+}
+
+function buildStructure(countyId, buildingId){
+  const c = G.counties[countyId];
+  const def = BUILDINGS.find(b=>b.id===buildingId);
+  if(!def||!c) return;
+  if(G.gold<def.cost){ alert('Insufficient gold.'); return; }
+  if(c.constructing){ alert('Already constructing here.'); return; }
+  G.gold -= def.cost;
+  c.constructing = {id:buildingId, name:def.name, monthsLeft:def.months};
+  addLog(`Construction began on a ${def.name} in ${c.name}. Cost: ${def.cost} gold. Completion in ${def.months} month${def.months!==1?'s':''}.`,'good');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+// LEVY
+// ═══════════════════════════════════════════════════════
+function openLevy(){
+  const totalLev = calcLevies();
+  openModal('Raise a Levy',
+    `<p>You may call your peasants and retainers to arms.</p>
+    <div class="divider"></div>
+    <div class="small">Estimated strength: <strong>${totalLev}</strong> men</div>
+    <div class="small text-muted" style="margin-top:6px">Your Marshal skill (${G.lord.stats.marshal}) determines how well they fight. Levies consume no gold but cost prestige to maintain beyond six months.</div>`,
+    [
+      {label:`Raise Full Levy — ${totalLev} men`, action:`raiseLevy(${totalLev});closeModal()`},
+      {label:'Dismiss', action:'closeModal()'},
+    ]
+  );
+}
+
+function raiseLevy(n){
+  G.levies = n;
+  addLog(`You have raised a levy of ${n} men.`,'event');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+// DIPLOMACY
+// ═══════════════════════════════════════════════════════
+function openDiplomacy(){
+  openModal('Diplomacy',
+    `<p>Relations with the great factions:</p>
+    <div class="divider"></div>
+    <div class="stat-row"><span class="stat-label" style="color:#ffaaaa">⚜ Royalists</span><span class="stat-val">${G.royalistRel}/100</span></div>
+    <div class="stat-bar-wrap" style="width:100%;margin:4px 0 12px"><span class="stat-bar" style="width:${G.royalistRel}%;background:var(--royalist)"></span></div>
+    <div class="stat-row"><span class="stat-label" style="color:#aaccff">⚖ Parliament</span><span class="stat-val">${G.parliamentRel}/100</span></div>
+    <div class="stat-bar-wrap" style="width:100%;margin:4px 0 12px"><span class="stat-bar" style="width:${G.parliamentRel}%;background:var(--parliament)"></span></div>
+    <div class="divider"></div>
+    <p class="small text-muted">Your relations affect which faction you may join when civil war breaks out in 1642.</p>`,
+    [
+      {label:'Gift 50 gold to Royalists', action:'giftFaction("royalist",50);closeModal()'},
+      {label:'Gift 50 gold to Parliament', action:'giftFaction("parliament",50);closeModal()'},
+      {label:'Close', action:'closeModal()'},
+    ]
+  );
+}
+
+function giftFaction(faction,cost){
+  if(G.gold<cost){ addLog('Not enough gold to send a gift.','bad'); renderAll(); return; }
+  G.gold-=cost;
+  if(faction==='royalist') G.royalistRel=Math.min(100,G.royalistRel+15);
+  else G.parliamentRel=Math.min(100,G.parliamentRel+15);
+  addLog(`You sent ${cost} gold as a gift to the ${faction==='royalist'?'Royalists':'Parliament'}. Relations improved.`,'good');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+// MONTH ADVANCE
+// ═══════════════════════════════════════════════════════
+function nextMonth(){
+  if(G.pendingEvent){
+    openModal('Pending Decision','You must resolve the current event before advancing time.',
+      [{label:'OK',action:'closeModal()'}]);
+    return;
+  }
+  // income
+  const inc = calcIncome();
+  G.gold += inc;
+  // construction progress
+  Object.values(G.counties).forEach(c=>{
+    if(c.constructing){
+      c.constructing.monthsLeft--;
+      if(c.constructing.monthsLeft<=0){
+        const def = BUILDINGS.find(b=>b.id===c.constructing.id);
+        c.buildings.push({id:c.constructing.id});
+        if(def){
+          c.garrison+=def.garrison;
+          if(def.prestige) G.prestige+=def.prestige;
+        }
+        addLog(`${def?.name||c.constructing.id} completed in ${c.name}!`,'good');
+        c.constructing=null;
+      }
+    }
+  });
+  // advance time
+  G.month++;
+  if(G.month>=12){ G.month=0; G.year++; }
+  // check historical events
+  checkEvents();
+  // check war trigger
+  if(G.year===1642 && G.month===2 && !G.warPhase && !G.warDone){
+    triggerWar();
+    return;
+  }
+  renderAll();
+}
+
+function checkEvents(){
+  const ev = HISTORICAL_EVENTS.find(e=>e.year===G.year && e.month===G.month && !G.log.some(l=>l.eventId===e.id));
+  if(ev){
+    G.pendingEvent = ev;
+    setTimeout(()=>showEvent(ev),100);
+  }
+}
+
+function showEvent(ev){
+  const opts = ev.options.map(o=>
+    `{label:'${o.label.replace(/'/g,"\\'")}', action:'applyEventOption(${JSON.stringify(JSON.stringify(o.effect))});closeModal()'}`
+  );
+  openModal(ev.title, `<p style="margin-bottom:12px;font-style:italic">${ev.text}</p>`, ev.options.map(o=>({
+    label: o.label,
+    action: `applyEventEffect(${JSON.stringify(o.effect)});closeModal()`
+  })));
+}
+
+function applyEventEffect(effect){
+  if(!effect) return;
+  if(effect.gold)          G.gold         += effect.gold;
+  if(effect.prestige)      G.prestige     += effect.prestige;
+  if(effect.royalistRel)   G.royalistRel   = Math.max(0,Math.min(100,G.royalistRel+effect.royalistRel));
+  if(effect.parliamentRel) G.parliamentRel = Math.max(0,Math.min(100,G.parliamentRel+effect.parliamentRel));
+  if(effect.levies)        G.levies       += effect.levies;
+  if(effect.flag==='pre_royalist')   G.preChosenFaction='royalist';
+  if(effect.flag==='pre_parliament') G.preChosenFaction='parliament';
+  G.pendingEvent = null;
+  addLog(`Event: ${G.pendingEvent?.title||'Historical event resolved'}.`,'event');
+  renderAll();
+}
+
+// patch: make showEvent use applyEventEffect properly
+function openEventModal(ev){
+  openModal(ev.title, `<p style="margin-bottom:12px;font-style:italic">${ev.text}</p>`,
+    ev.options.map(o=>({
+      label: o.label,
+      action_effect: o.effect,
+    }))
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL SYSTEM
+// ═══════════════════════════════════════════════════════
+function openModal(title, body, actions){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=body;
+  const actEl = document.getElementById('modal-actions');
+  actEl.innerHTML = '';
+  (actions||[]).forEach(a=>{
+    const btn = document.createElement('button');
+    btn.className='btn';
+    btn.textContent=a.label;
+    btn.onclick=()=>eval(a.action);
+    actEl.appendChild(btn);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  if(G) renderAll();
+}
+
+document.getElementById('modal-overlay').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
+
+// Fix event modal to use proper effect application
+function showEvent(ev){
+  document.getElementById('modal-title').textContent = ev.title;
+  document.getElementById('modal-body').innerHTML = `<p style="margin-bottom:12px;font-style:italic">${ev.text}</p>`;
+  const actEl = document.getElementById('modal-actions');
+  actEl.innerHTML='';
+  ev.options.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='btn';
+    btn.textContent=o.label;
+    btn.onclick=()=>{
+      applyEventEffect(o.effect);
+      const ev2 = G.pendingEvent;
+      G.pendingEvent=null;
+      addLog(`Event: "${ev.title}" — ${o.label}.`,'event');
+      closeModal();
+    };
+    actEl.appendChild(btn);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// WAR PHASE
+// ═══════════════════════════════════════════════════════
+function triggerWar(){
+  document.getElementById('game-area').style.display='none';
+  document.getElementById('faction-screen').style.display='flex';
+}
+
+function chooseFaction(faction){
+  G.faction = faction;
+  document.getElementById('faction-screen').style.display='none';
+  // calculate war strengths
+  let royStr=0, parStr=0;
+  COUNTIES.forEach(([id])=>{
+    const c = G.counties[id];
+    const ctrl = c.controller;
+    const bldgLev = c.buildings.reduce((s,b)=>{
+      const def=BUILDINGS.find(x=>x.id===b.id); return s+(def?.levyBonus||0);
+    },0);
+    const strength = (c.levies||0) + bldgLev + (c.garrison||0) + 200;
+    if(ctrl==='royalist' || (ctrl==='player' && faction==='royalist')) royStr+=strength;
+    else if(ctrl==='parliament' || (ctrl==='player' && faction==='parliament')) parStr+=strength;
+  });
+  // faction bonuses
+  if(faction==='royalist') { G.gold+=200; royStr+=G.levies+2000; }
+  else { G.gold+=150; parStr+=G.levies+1500; }
+  royStr+=8000; parStr+=7000;
+  G.warPhase=true;
+  G.warRoyalistStr=royStr;
+  G.warParliamentStr=parStr;
+  G.warBattles=0;
+  G.warLog=[];
+  addLog(`War has broken out! You have declared for the ${faction==='royalist'?'King':'Parliament'}.`,'war');
+  renderWarScreen();
+}
+
+function renderWarScreen(){
+  document.getElementById('war-screen').style.display='flex';
+  document.getElementById('war-royalist-str').textContent=G.warRoyalistStr;
+  document.getElementById('war-parliament-str').textContent=G.warParliamentStr;
+  const wl = document.getElementById('war-log');
+  wl.innerHTML = (G.warLog||[]).map(e=>`<div class="war-log-entry">${e}</div>`).join('');
+  if(wl.children.length) wl.lastChild.scrollIntoView({behavior:'smooth'});
+}
+
+const WAR_BATTLES = [
+  {name:'Edgehill',year:1642},
+  {name:'Adwalton Moor',year:1643},
+  {name:'Newbury',year:1643},
+  {name:'Marston Moor',year:1644},
+  {name:'Naseby',year:1645},
+  {name:'Stow-on-the-Wold',year:1646},
+];
+
+function warAdvance(){
+  if(G.warDone) return;
+  const battle = WAR_BATTLES[G.warBattles] || {name:'Final Engagement',year:1648};
+  G.warBattles++;
+  const playerFaction = G.faction;
+  const marshal = G.lord.stats.marshal;
+  const royBonus = (playerFaction==='royalist'?marshal*50:0) + (Math.random()*1000);
+  const parBonus = (playerFaction==='parliament'?marshal*50:0) + (Math.random()*1000);
+  const royRoll = G.warRoyalistStr * (0.8+Math.random()*0.4) + royBonus;
+  const parRoll = G.warParliamentStr * (0.8+Math.random()*0.4) + parBonus;
+  let msg;
+  if(royRoll>parRoll){
+    const losses = Math.floor(parRoll * 0.15);
+    G.warParliamentStr = Math.max(0, G.warParliamentStr - losses);
+    const gained = Math.floor(royRoll * 0.05);
+    G.warRoyalistStr += gained;
+    msg = `⚜ Battle of ${battle.name} (${battle.year}): ROYALIST VICTORY. Parliamentarians lose ${losses} men. The King's cause advances.`;
+    G.warLog.push(msg);
+  } else {
+    const losses = Math.floor(royRoll * 0.15);
+    G.warRoyalistStr = Math.max(0, G.warRoyalistStr - losses);
+    const gained = Math.floor(parRoll * 0.05);
+    G.warParliamentStr += gained;
+    msg = `⚖ Battle of ${battle.name} (${battle.year}): PARLIAMENT VICTORY. Royalists lose ${losses} men. The Commons press forward.`;
+    G.warLog.push(msg);
+  }
+  // check for decisive victory
+  if(G.warRoyalistStr<=0 || G.warParliamentStr<=0 || G.warBattles>=7){
+    endWar();
+    return;
+  }
+  renderWarScreen();
+}
+
+function endWar(){
+  G.warDone=true;
+  const royWin = G.warRoyalistStr>G.warParliamentStr;
+  const playerWon = (royWin && G.faction==='royalist') || (!royWin && G.faction==='parliament');
+  const winFaction = royWin?'Royalists':'Parliament';
+  G.warResult = {royWin, playerWon, winFaction};
+  let outcome;
+  if(playerWon){
+    G.gold += 500; G.prestige += 30;
+    outcome = `Your faction has triumphed! The ${winFaction} have won the Civil War. You are rewarded with lands, gold, and glory. Your name will live in history.`;
+  } else {
+    G.gold += 50;
+    outcome = `Your faction has been defeated. The ${winFaction} have carried the day. You must make terms — your lands are diminished, but your life is spared.`;
+  }
+  G.warLog.push('');
+  G.warLog.push(`══ THE WAR IS OVER ══ ${winFaction.toUpperCase()} VICTORIOUS ══`);
+  G.warLog.push(outcome);
+  renderWarScreen();
+  document.getElementById('war-advance-btn').textContent='Return to Chronicle';
+  document.getElementById('war-advance-btn').onclick=()=>{
+    document.getElementById('war-screen').style.display='none';
+    document.getElementById('game-area').style.display='grid';
+    addLog(`THE CIVIL WAR IS OVER. ${winFaction} victorious. ${playerWon?'You are victorious!':'You fought well, but were defeated.'}`,'war');
+    renderAll();
+    showEndgame(playerWon, winFaction);
+  };
+}
+
+function showEndgame(playerWon, winFaction){
+  const l = G.lord;
+  openModal(
+    playerWon?'Victory — The War is Won!':'Defeat — The War is Lost',
+    `<p>${playerWon
+      ? `The ${winFaction} stand triumphant across England. You, ${l.name}, fought bravely for your cause and your name shall be remembered. Your estates are secured and your dynasty prospers.`
+      : `Despite your efforts, the ${winFaction} have prevailed. You fought honourably for your cause, but the tide of history has turned against you. Your lands are reduced, but peace returns to England.`
+    }</p>
+    <div class="divider"></div>
+    <div class="small text-muted">
+      Final gold: ${G.gold} | Prestige: ${G.prestige} | Counties held: ${countPlayerCounties()}
+    </div>`,
+    [
+      {label:'Play Again', action:'location.reload()'},
+      {label:'Return to Site', action:'window.location="index.html"'},
+    ]
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════
+renderStartScreen();
+document.getElementById('header-back').onclick=()=>{window.location='index.html'};
+</script>
+</body>
+</html>

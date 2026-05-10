@@ -119,6 +119,12 @@
                         <p>Take charge of a Premier League club. Pick your XI, play the season.</p>
                         <button class="play-btn">Play Now</button>
                     </div>
+                    <div class="game-card" onclick="switchTab('civwar')">
+                        <div class="game-card-icon">⚔</div>
+                        <h3>England in Crisis — 1637</h3>
+                        <p>A CK3-style grand strategy game. Build your estates, navigate the coming Civil War.</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
                 </div>
                 <div class="stats-section" style="margin-top:28px">
                     <h3>Your Stats</h3>
@@ -817,6 +823,17 @@
                 </div>
             </div>
         </div>
+
+            <!-- England Civil War -->
+            <div id="civwar" class="game-page">
+                <div class="game-header-inline">
+                    <h2>⚔ England in Crisis — 1637</h2>
+                    <button class="back-btn" onclick="switchTab('games')">← Back</button>
+                </div>
+                <div class="game-content" style="padding:0;height:calc(100vh - 120px)">
+                    <iframe src="englandcivwar.html" style="width:100%;height:100%;border:none;display:block" allowfullscreen></iframe>
+                </div>
+            </div>
 
         <footer class="hub-footer">
             <p>&copy; 2026 Finnegan Creaney</p>
