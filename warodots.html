@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>War of Dots</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;overflow:hidden;font-family:'Segoe UI',sans-serif;touch-action:none}
+canvas{display:block}
+#ui{position:fixed;top:0;left:0;right:0;pointer-events:none;z-index:10}
+#score-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(0,0,0,0.55)}
+#score-bar .s{color:#fff;font-size:.9em;letter-spacing:1px}
+#score-bar .s span{color:#00e5ff;font-weight:bold;font-size:1.15em}
+#leaderboard{position:fixed;top:54px;right:12px;background:rgba(0,0,0,0.6);border:1px solid #333;border-radius:6px;padding:10px 14px;min-width:140px;pointer-events:none}
+#leaderboard h3{color:#ffd700;font-size:.78em;letter-spacing:2px;margin-bottom:8px;border-bottom:1px solid #333;padding-bottom:4px}
+.lb-row{display:flex;justify-content:space-between;gap:12px;font-size:.78em;padding:2px 0;color:#ccc}
+.lb-row.you{color:#00e5ff;font-weight:bold}
+#minimap{position:fixed;bottom:12px;right:12px;border:1px solid #333;border-radius:4px;background:rgba(0,0,0,0.5);pointer-events:none}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:20}
+#overlay h1{color:#00e5ff;font-size:2.4em;letter-spacing:4px;text-shadow:0 0 20px #00e5ff}
+#overlay .sub{color:#888;font-size:.9em;letter-spacing:2px}
+#overlay .score-final{color:#ffd700;font-size:1.3em}
+#name-input{padding:10px 18px;border-radius:30px;border:2px solid #00e5ff;background:#111;color:#fff;font-size:1em;text-align:center;outline:none;width:200px}
+.play-btn{background:linear-gradient(135deg,#00e5ff,#0077ff);border:none;color:#000;padding:12px 44px;border-radius:30px;font-size:1.1em;font-weight:bold;cursor:pointer;letter-spacing:2px;box-shadow:0 0 20px rgba(0,229,255,0.4);transition:all .2s;pointer-events:all}
+.play-btn:hover{transform:scale(1.07);box-shadow:0 0 30px rgba(0,229,255,0.7)}
+#hints{color:#555;font-size:.78em;text-align:center;line-height:2;pointer-events:none}
+#back-link{position:fixed;top:10px;left:10px;z-index:30;color:#666;font-size:.8em;text-decoration:none;background:rgba(0,0,0,0.5);padding:5px 12px;border-radius:4px;border:1px solid #333;pointer-events:all}
+#back-link:hover{color:#fff}
+</style>
+</head>
+<body>
+<a href="javascript:history.back()" id="back-link">← Back</a>
+<div id="ui">
+  <div id="score-bar">
+    <div class="s">MASS <span id="s-mass">0</span></div>
+    <div class="s">WAR OF DOTS</div>
+    <div class="s">BEST <span id="s-best">0</span></div>
+  </div>
+</div>
+<div id="leaderboard"><h3>LEADERBOARD</h3><div id="lb-list"></div></div>
+<canvas id="minimap" width="120" height="120"></canvas>
+<canvas id="c"></canvas>
+
+<div id="overlay">
+  <h1>WAR OF DOTS</h1>
+  <div class="sub">EAT SMALLER · AVOID BIGGER · DOMINATE</div>
+  <input id="name-input" type="text" placeholder="Your name" maxlength="14" value="Player">
+  <button class="play-btn" id="play-btn">PLAY</button>
+  <div id="hints">
+    Move with mouse / touch<br>
+    SPACE or double-tap to <b style="color:#fff">Split</b><br>
+    W to <b style="color:#fff">Eject mass</b><br>
+    Eat food &amp; smaller dots to grow
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+const WORLD = 3000;
+const FOOD_COUNT = 600;
+const VIRUS_COUNT = 18;
+const AI_COUNT = 18;
+const MIN_SPLIT_MASS = 35;
+const MERGE_TIME = 10000;
+const EJECT_COST = 16;
+const EJECT_MIN = 20;
+const AI_NAMES = ['Slimeball','GhostDot','XenoBall','NeonBlob','VoidCircle','Chomper','BigBoy','TinyTyrant','Blob Jr','The Orb','Splitter','Snapper','Drifter','Lurker','ChaosCell','Nomad','Ravager','Phantom'];
+const COLORS = ['#e74c3c','#2ecc71','#3498db','#9b59b6','#f1c40f','#e67e22','#1abc9c','#e91e63','#00bcd4','#ff5722','#8bc34a','#673ab7','#ff9800','#03a9f4','#4caf50','#f44336','#9c27b0','#cddc39'];
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const mm = document.getElementById('minimap');
+const mctx = mm.getContext('2d');
+
+let W = window.innerWidth, H = window.innerHeight;
+canvas.width = W; canvas.height = H;
+window.addEventListener('resize', () => { W = window.innerWidth; H = window.innerHeight; canvas.width = W; canvas.height = H; });
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let running = false;
+let food = [], viruses = [], ejected = [];
+let player = null; // array of blobs (splits)
+let ais = [];
+let camX = 0, camY = 0, camScale = 1, targetScale = 1;
+let mx = W/2, my = H/2;
+let best = parseInt(localStorage.getItem('wod_best')||'0');
+let playerName = 'Player';
+let playerColor = '#00e5ff';
+let score = 0;
+let frame = 0;
+
+document.getElementById('s-best').textContent = best;
+
+// ══════════════════════════════════════════
+// ENTITY FACTORIES
+// ══════════════════════════════════════════
+function rnd(min,max){ return min + Math.random()*(max-min); }
+function rndWorld(){ return {x:rnd(50,WORLD-50), y:rnd(50,WORLD-50)}; }
+
+function mkFood(){
+  const p = rndWorld();
+  return {x:p.x, y:p.y, r:4+Math.random()*3, color:COLORS[Math.floor(Math.random()*COLORS.length)], mass:1};
+}
+
+function mkVirus(){
+  const p = rndWorld();
+  const r = 40 + Math.random()*10;
+  return {x:p.x, y:p.y, r, mass:massFromR(r), spikes:12};
+}
+
+function mkEjected(x,y,vx,vy,color){
+  return {x,y,vx,vy,r:8,mass:EJECT_COST,color,life:60,settled:false};
+}
+
+function rFromMass(m){ return Math.sqrt(m * 30); }
+function massFromR(r){ return (r*r)/30; }
+
+function mkBlob(x,y,mass,color,name,isPlayer){
+  return {x,y,vx:0,vy:0,r:rFromMass(mass),mass,color,name,isPlayer,mergeTimer:0,splitVx:0,splitVy:0,splitTimer:0};
+}
+
+function mkAI(name,color){
+  const p = rndWorld();
+  const ai = { blobs:[mkBlob(p.x,p.y,20+Math.random()*30,color,name,false)], name, color, targetX:rnd(0,WORLD), targetY:rnd(0,WORLD), thinkTimer:0, splitCooldown:0 };
+  return ai;
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+function init(){
+  food = Array.from({length:FOOD_COUNT}, mkFood);
+  viruses = Array.from({length:VIRUS_COUNT}, mkVirus);
+  ejected = [];
+  ais = AI_NAMES.slice(0,AI_COUNT).map((n,i)=>mkAI(n,COLORS[i%COLORS.length]));
+  const start = rndWorld();
+  const col = COLORS[Math.floor(Math.random()*COLORS.length)];
+  playerColor = col;
+  player = [mkBlob(start.x,start.y,20,col,playerName,true)];
+  camX = start.x; camY = start.y;
+  score = 0;
+  frame = 0;
+}
+
+// ══════════════════════════════════════════
+// PHYSICS / MOVEMENT
+// ══════════════════════════════════════════
+function totalMass(blobs){ return blobs.reduce((s,b)=>s+b.mass,0); }
+
+function updatePlayer(){
+  const worldMX = camX + (mx - W/2)/camScale;
+  const worldMY = camY + (my - H/2)/camScale;
+  player.forEach(b=>{
+    const dx=worldMX-b.x, dy=worldMY-b.y;
+    const dist=Math.hypot(dx,dy);
+    if(dist>1){
+      const spd = Math.max(1.5, 6.5 - Math.log(b.mass)*0.4);
+      const step = Math.min(spd, dist);
+      b.x += (dx/dist)*step;
+      b.y += (dy/dist)*step;
+    }
+    b.x = Math.max(b.r,Math.min(WORLD-b.r,b.x));
+    b.y = Math.max(b.r,Math.min(WORLD-b.r,b.y));
+    // split velocity decay
+    if(b.splitTimer>0){ b.x+=b.splitVx; b.y+=b.splitVy; b.splitVx*=0.88; b.splitVy*=0.88; b.splitTimer--; }
+    b.mergeTimer = Math.max(0,b.mergeTimer-16);
+  });
+  // separation
+  separateBlobs(player);
+  // merge
+  mergeBlobs(player);
+}
+
+function separateBlobs(blobs){
+  for(let i=0;i<blobs.length;i++){
+    for(let j=i+1;j<blobs.length;j++){
+      const a=blobs[i],b=blobs[j];
+      const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy);
+      const minD=a.r+b.r;
+      if(d<minD && d>0.1 && (a.mergeTimer>0||b.mergeTimer>0)){
+        const push=(minD-d)*0.5;
+        const nx=dx/d,ny=dy/d;
+        a.x-=nx*push; a.y-=ny*push;
+        b.x+=nx*push; b.y+=ny*push;
+      }
+    }
+  }
+}
+
+function mergeBlobs(blobs){
+  for(let i=blobs.length-1;i>0;i--){
+    for(let j=0;j<i;j++){
+      const a=blobs[j],b=blobs[i];
+      if(a.mergeTimer>0||b.mergeTimer>0) continue;
+      const d=Math.hypot(b.x-a.x,b.y-a.y);
+      if(d<a.r){
+        a.mass+=b.mass; a.r=rFromMass(a.mass);
+        blobs.splice(i,1); break;
+      }
+    }
+  }
+}
+
+function updateAI(ai){
+  ai.thinkTimer--;
+  ai.splitCooldown=Math.max(0,ai.splitCooldown-1);
+  const totalM = totalMass(ai.blobs);
+  // retarget
+  if(ai.thinkTimer<=0){
+    ai.thinkTimer=60+Math.random()*60;
+    // find nearest food or smaller cell
+    let best2=null,bd=9999;
+    food.forEach(f=>{const d=Math.hypot(f.x-ai.blobs[0].x,f.y-ai.blobs[0].y);if(d<bd){bd=d;best2=f;}});
+    // chase player if smaller
+    const pMass=totalMass(player);
+    if(totalM>pMass*1.2){
+      const d=Math.hypot(player[0].x-ai.blobs[0].x,player[0].y-ai.blobs[0].y);
+      if(d<500){ai.targetX=player[0].x;ai.targetY=player[0].y;}
+    } else if(best2) {ai.targetX=best2.x;ai.targetY=best2.y;}
+    else{ai.targetX=rnd(0,WORLD);ai.targetY=rnd(0,WORLD);}
+    // flee player if bigger
+    if(pMass>totalM*1.2){
+      ai.targetX=ai.blobs[0].x+(ai.blobs[0].x-player[0].x)*2;
+      ai.targetY=ai.blobs[0].y+(ai.blobs[0].y-player[0].y)*2;
+    }
+  }
+  ai.blobs.forEach(b=>{
+    const dx=ai.targetX-b.x,dy=ai.targetY-b.y,d=Math.hypot(dx,dy);
+    if(d>1){const spd=Math.max(1.2,5.5-Math.log(b.mass)*0.35);b.x+=dx/d*Math.min(spd,d);b.y+=dy/d*Math.min(spd,d);}
+    b.x=Math.max(b.r,Math.min(WORLD-b.r,b.x));
+    b.y=Math.max(b.r,Math.min(WORLD-b.r,b.y));
+    if(b.splitTimer>0){b.x+=b.splitVx;b.y+=b.splitVy;b.splitVx*=0.88;b.splitVy*=0.88;b.splitTimer--;}
+    b.mergeTimer=Math.max(0,b.mergeTimer-16);
+  });
+  separateBlobs(ai.blobs);
+  mergeBlobs(ai.blobs);
+  // AI split
+  if(ai.splitCooldown<=0 && totalM>MIN_SPLIT_MASS*2 && Math.random()<0.002){
+    splitBlobs(ai.blobs, ai.targetX-ai.blobs[0].x, ai.targetY-ai.blobs[0].y);
+    ai.splitCooldown=300;
+  }
+}
+
+function splitBlobs(blobs,dx,dy,maxSplits){
+  const max=maxSplits||16;
+  const toAdd=[];
+  const angle=Math.atan2(dy,dx);
+  for(let i=blobs.length-1;i>=0&&blobs.length+toAdd.length<max;i--){
+    const b=blobs[i];
+    if(b.mass<MIN_SPLIT_MASS*2) continue;
+    const half=b.mass/2;
+    b.mass=half; b.r=rFromMass(half);
+    const spd=8;
+    const nb=mkBlob(b.x,b.y,half,b.color,b.name,b.isPlayer);
+    nb.splitVx=Math.cos(angle)*spd; nb.splitVy=Math.sin(angle)*spd;
+    nb.splitTimer=20; nb.mergeTimer=MERGE_TIME;
+    b.mergeTimer=MERGE_TIME;
+    toAdd.push(nb);
+  }
+  toAdd.forEach(b=>blobs.push(b));
+}
+
+function ejectMass(){
+  if(totalMass(player)<EJECT_MIN+EJECT_COST) return;
+  const worldMX=camX+(mx-W/2)/camScale, worldMY=camY+(my-H/2)/camScale;
+  player.forEach(b=>{
+    if(b.mass<EJECT_MIN+EJECT_COST) return;
+    b.mass-=EJECT_COST; b.r=rFromMass(b.mass);
+    const dx=worldMX-b.x,dy=worldMY-b.y,d=Math.hypot(dx,dy)||1;
+    const nx=dx/d,ny=dy/d;
+    ejected.push(mkEjected(b.x+nx*b.r,b.y+ny*b.r,nx*9,ny*9,b.color));
+  });
+}
+
+// ══════════════════════════════════════════
+// EATING
+// ══════════════════════════════════════════
+function eatFood(){
+  for(let i=food.length-1;i>=0;i--){
+    const f=food[i];
+    player.forEach(b=>{
+      if(Math.hypot(f.x-b.x,f.y-b.y)<b.r){
+        b.mass+=f.mass; b.r=rFromMass(b.mass);
+        food.splice(i,1); food.push(mkFood());
+      }
+    });
+    ais.forEach(ai=>{
+      ai.blobs.forEach(b=>{
+        if(food[i]&&Math.hypot(f.x-b.x,f.y-b.y)<b.r){
+          b.mass+=f.mass; b.r=rFromMass(b.mass);
+          food.splice(i,1); food.push(mkFood());
+        }
+      });
+    });
+  }
+}
+
+function eatEjected(){
+  for(let i=ejected.length-1;i>=0;i--){
+    const e=ejected[i];
+    e.x+=e.vx; e.y+=e.vy; e.vx*=0.95; e.vy*=0.95; e.life--;
+    if(e.life<=0||e.x<0||e.x>WORLD||e.y<0||e.y>WORLD){ejected.splice(i,1);continue;}
+    ais.forEach(ai=>{
+      ai.blobs.forEach(b=>{
+        if(ejected[i]&&Math.hypot(e.x-b.x,e.y-b.y)<b.r){
+          b.mass+=e.mass; b.r=rFromMass(b.mass);
+          ejected.splice(i,1);
+        }
+      });
+    });
+  }
+}
+
+function cellCollisions(){
+  // player eat ai
+  player.forEach(pb=>{
+    ais.forEach(ai=>{
+      for(let i=ai.blobs.length-1;i>=0;i--){
+        const ab=ai.blobs[i];
+        const d=Math.hypot(pb.x-ab.x,pb.y-ab.y);
+        if(d<pb.r-ab.r*0.5 && pb.mass>ab.mass*1.15){
+          pb.mass+=ab.mass*0.8; pb.r=rFromMass(pb.mass);
+          ai.blobs.splice(i,1);
+          if(!ai.blobs.length){ respawnAI(ai); }
+        }
+      }
+    });
+  });
+  // ai eat player
+  ais.forEach(ai=>{
+    ai.blobs.forEach(ab=>{
+      for(let i=player.length-1;i>=0;i--){
+        const pb=player[i];
+        const d=Math.hypot(ab.x-pb.x,ab.y-pb.y);
+        if(d<ab.r-pb.r*0.5 && ab.mass>pb.mass*1.15){
+          ab.mass+=pb.mass*0.8; ab.r=rFromMass(ab.mass);
+          player.splice(i,1);
+          if(!player.length){ endGame(); return; }
+        }
+      }
+    });
+  });
+  // ai eat ai
+  ais.forEach(ai=>{
+    ais.forEach(ai2=>{
+      if(ai===ai2) return;
+      ai.blobs.forEach(a=>{
+        for(let i=ai2.blobs.length-1;i>=0;i--){
+          const b=ai2.blobs[i];
+          if(a.mass>b.mass*1.15&&Math.hypot(a.x-b.x,a.y-b.y)<a.r-b.r*0.5){
+            a.mass+=b.mass*0.8; a.r=rFromMass(a.mass);
+            ai2.blobs.splice(i,1);
+            if(!ai2.blobs.length) respawnAI(ai2);
+          }
+        }
+      });
+    });
+  });
+  // virus collision
+  viruses.forEach(v=>{
+    player.forEach(b=>{
+      if(b.mass>massFromR(v.r)*1.2 && Math.hypot(b.x-v.x,b.y-v.y)<b.r){
+        // pop player blob
+        if(player.length<16){
+          const pieces=Math.min(8,Math.floor(b.mass/MIN_SPLIT_MASS));
+          if(pieces>1){
+            const pieceMass=b.mass/pieces;
+            b.mass=pieceMass; b.r=rFromMass(pieceMass); b.mergeTimer=MERGE_TIME;
+            for(let k=1;k<pieces;k++){
+              const a=Math.random()*Math.PI*2;
+              const nb=mkBlob(b.x,b.y,pieceMass,b.color,b.name,true);
+              nb.splitVx=Math.cos(a)*6; nb.splitVy=Math.sin(a)*6;
+              nb.splitTimer=15; nb.mergeTimer=MERGE_TIME;
+              player.push(nb);
+            }
+          }
+        }
+      }
+    });
+  });
+}
+
+function respawnAI(ai){
+  const p=rndWorld();
+  ai.blobs=[mkBlob(p.x,p.y,20+Math.random()*20,ai.color,ai.name,false)];
+}
+
+// ══════════════════════════════════════════
+// CAMERA
+// ══════════════════════════════════════════
+function updateCamera(){
+  if(!player.length) return;
+  let tx=0,ty=0,tm=0;
+  player.forEach(b=>{tx+=b.x*b.mass;ty+=b.y*b.mass;tm+=b.mass;});
+  tx/=tm; ty/=tm;
+  camX+=(tx-camX)*0.08; camY+=(ty-camY)*0.08;
+  const avgR=player.reduce((s,b)=>s+b.r,0)/player.length;
+  targetScale=Math.max(0.25,Math.min(1.2,300/avgR));
+  camScale+=(targetScale-camScale)*0.05;
+}
+
+// ══════════════════════════════════════════
+// DRAW
+// ══════════════════════════════════════════
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(W/2,H/2);
+  ctx.scale(camScale,camScale);
+  ctx.translate(-camX,-camY);
+
+  // background grid
+  const gs=50;
+  const x0=Math.floor((camX-W/2/camScale)/gs)*gs;
+  const y0=Math.floor((camY-H/2/camScale)/gs)*gs;
+  ctx.strokeStyle='rgba(255,255,255,0.04)';
+  ctx.lineWidth=0.5;
+  for(let x=x0;x<camX+W/2/camScale+gs;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,WORLD);ctx.stroke();}
+  for(let y=y0;y<camY+H/2/camScale+gs;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(WORLD,y);ctx.stroke();}
+  // border
+  ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=6;
+  ctx.strokeRect(0,0,WORLD,WORLD);
+
+  // food
+  food.forEach(f=>{
+    ctx.fillStyle=f.color;
+    ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
+  });
+
+  // ejected
+  ejected.forEach(e=>{
+    ctx.fillStyle=e.color;
+    ctx.globalAlpha=0.8;
+    ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
+  });
+
+  // viruses
+  viruses.forEach(v=>{
+    ctx.fillStyle='rgba(50,180,50,0.6)';
+    ctx.strokeStyle='#2ecc71';ctx.lineWidth=3;
+    ctx.beginPath();
+    for(let i=0;i<v.spikes*2;i++){
+      const a=(i/v.spikes/2)*Math.PI*2;
+      const r2=i%2===0?v.r:v.r*0.75;
+      i===0?ctx.moveTo(v.x+Math.cos(a)*r2,v.y+Math.sin(a)*r2):ctx.lineTo(v.x+Math.cos(a)*r2,v.y+Math.sin(a)*r2);
+    }
+    ctx.closePath();ctx.fill();ctx.stroke();
+  });
+
+  // ai blobs
+  ais.forEach(ai=>{
+    ai.blobs.forEach(b=>drawBlob(b));
+  });
+
+  // player
+  player.forEach(b=>drawBlob(b, true));
+
+  ctx.restore();
+
+  // minimap
+  drawMinimap();
+}
+
+function drawBlob(b, isP){
+  // shadow
+  ctx.shadowBlur=isP?16:8;
+  ctx.shadowColor=b.color;
+  // fill
+  ctx.fillStyle=b.color;
+  ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
+  // border
+  ctx.strokeStyle=isP?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.3)';
+  ctx.lineWidth=Math.max(1.5,b.r*0.04);
+  ctx.stroke();
+  ctx.shadowBlur=0;
+  // name
+  if(b.r>12){
+    ctx.fillStyle='#fff';
+    ctx.font=`bold ${Math.max(8,Math.min(16,b.r*0.5))}px Segoe UI`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(b.name.length>10?b.name.slice(0,10):b.name,b.x,b.y);
+  }
+}
+
+function drawMinimap(){
+  const s=120/WORLD;
+  mctx.fillStyle='rgba(10,10,20,0.9)';
+  mctx.fillRect(0,0,120,120);
+  mctx.strokeStyle='#333';mctx.lineWidth=1;mctx.strokeRect(0,0,120,120);
+  // food dots
+  food.forEach(f=>{mctx.fillStyle=f.color;mctx.fillRect(f.x*s,f.y*s,1.5,1.5);});
+  // ai
+  ais.forEach(ai=>{
+    ai.blobs.forEach(b=>{
+      mctx.fillStyle=b.color;
+      const r=Math.max(2,b.r*s);
+      mctx.beginPath();mctx.arc(b.x*s,b.y*s,r,0,Math.PI*2);mctx.fill();
+    });
+  });
+  // player
+  player.forEach(b=>{
+    mctx.fillStyle='#fff';
+    const r=Math.max(3,b.r*s);
+    mctx.beginPath();mctx.arc(b.x*s,b.y*s,r,0,Math.PI*2);mctx.fill();
+  });
+  // viewport box
+  const vW=(W/camScale)*s, vH=(H/camScale)*s;
+  const vX=(camX-W/2/camScale)*s, vY=(camY-H/2/camScale)*s;
+  mctx.strokeStyle='rgba(255,255,255,0.4)';mctx.lineWidth=1;
+  mctx.strokeRect(vX,vY,vW,vH);
+}
+
+// ══════════════════════════════════════════
+// LEADERBOARD
+// ══════════════════════════════════════════
+function updateLeaderboard(){
+  const entries=[];
+  if(player.length) entries.push({name:playerName,mass:Math.floor(totalMass(player)),isYou:true});
+  ais.forEach(ai=>entries.push({name:ai.name,mass:Math.floor(totalMass(ai.blobs)),isYou:false}));
+  entries.sort((a,b)=>b.mass-a.mass);
+  const top=entries.slice(0,8);
+  document.getElementById('lb-list').innerHTML=top.map((e,i)=>
+    `<div class="lb-row${e.isYou?' you':''}">${i+1}. ${e.isYou?'<b>'+e.name+'</b>':e.name} <span>${e.mass}</span></div>`
+  ).join('');
+  if(player.length){
+    score=Math.floor(totalMass(player));
+    document.getElementById('s-mass').textContent=score;
+    if(score>best){best=score;localStorage.setItem('wod_best',best);document.getElementById('s-best').textContent=best;}
+  }
+}
+
+// ══════════════════════════════════════════
+// GAME LOOP
+// ══════════════════════════════════════════
+function loop(){
+  if(!running) return;
+  frame++;
+  updatePlayer();
+  ais.forEach(updateAI);
+  eatFood();
+  eatEjected();
+  cellCollisions();
+  updateCamera();
+  draw();
+  if(frame%10===0) updateLeaderboard();
+  requestAnimationFrame(loop);
+}
+
+function endGame(){
+  running=false;
+  const overlay=document.getElementById('overlay');
+  overlay.style.display='flex';
+  overlay.innerHTML=`
+    <h1>YOU WERE EATEN</h1>
+    <div class="sub">BETTER LUCK NEXT TIME</div>
+    <div class="score-final">MASS REACHED: <b style="color:#ffd700">${score}</b></div>
+    <div class="score-final">BEST: <b style="color:#ffd700">${best}</b></div>
+    <button class="play-btn" onclick="startGame()">PLAY AGAIN</button>
+    <div id="hints">WASD / Arrows / Mouse / Touch to move<br>SPACE or double-tap to Split · W to Eject</div>
+  `;
+}
+
+// ══════════════════════════════════════════
+// INPUT
+// ══════════════════════════════════════════
+canvas.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+let lastTap=0;
+canvas.addEventListener('touchmove',e=>{e.preventDefault();mx=e.touches[0].clientX;my=e.touches[0].clientY;},{passive:false});
+canvas.addEventListener('touchend',e=>{
+  const now=Date.now();
+  if(now-lastTap<300){ doSplit(); } lastTap=now;
+},{passive:false});
+canvas.addEventListener('touchstart',e=>{e.preventDefault();mx=e.touches[0].clientX;my=e.touches[0].clientY;},{passive:false});
+
+document.addEventListener('keydown',e=>{
+  if(!running) return;
+  if(e.code==='Space'||e.key===' '){ e.preventDefault(); doSplit(); }
+  if(e.key==='w'||e.key==='W') ejectMass();
+});
+
+function doSplit(){
+  if(player.length>=16) return;
+  const worldMX=camX+(mx-W/2)/camScale, worldMY=camY+(my-H/2)/camScale;
+  const dx=worldMX-player[0].x, dy=worldMY-player[0].y;
+  splitBlobs(player,dx,dy,16);
+}
+
+// ══════════════════════════════════════════
+// START
+// ══════════════════════════════════════════
+function startGame(){
+  playerName = document.getElementById('name-input')?.value||playerName||'Player';
+  if(!playerName.trim()) playerName='Player';
+  document.getElementById('overlay').style.display='none';
+  init();
+  running=true;
+  requestAnimationFrame(loop);
+}
+
+document.getElementById('play-btn').addEventListener('click', startGame);
+document.getElementById('name-input')?.addEventListener('keydown',e=>{if(e.key==='Enter')startGame();});
+</script>
+</body>
+</html>
