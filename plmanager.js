@@ -576,6 +576,10 @@ class PLManager {
         }
 
         this.state.xi = plmAutoPickXI(this.squads[playerTeamId], PLM_DEFAULT_FORMATION).map(p => p.id);
+        // Init cups
+        this.state.facup      = this._initFACup();
+        this.state.carabaocup = this._initCarabaoCup();
+        this.state.cupContext  = null;
         this.doAITransfers('summer');
         this.save();
     }
@@ -695,6 +699,7 @@ class PLManager {
     }
 
     playMatchDay() {
+        if (this.state.cupContext) return this.playCupMatch();
         const md = this.state.matchDay;
         let playerResult = null;
         for (const fx of this.currentFixtures()) {
@@ -1056,6 +1061,8 @@ class PLManager {
                     <div class="plm-next-sub">${isHome ? 'Home' : 'Away'} · ${opponent.name} (OVR ${opponent.rating})</div>
                 </section>` : ''}
 
+                ${this._cupStatusHtml()}
+
                 <section class="plm-grid">
                     <div class="plm-col">
                         <h3>League Table</h3>
@@ -1186,15 +1193,26 @@ class PLManager {
         };
         const squadRows = ['GK','DEF','MID','FWD'].flatMap(pos => squadByPos[pos].map(renderSquadRow)).join('');
 
-        const fx  = this.playerFixture();
-        const opp = fx ? PLM_ALL_TEAMS_BY_ID[fx.home === team.id ? fx.away : fx.home] : null;
-        const vsText = opp ? `${fx.home === team.id ? 'vs' : '@'} ${opp.name}` : '';
+        const cup = this.state.cupContext ? this.state[this.state.cupContext.cupName] : null;
+        let fx, opp, vsText, matchLabel;
+        if (this.state.cupContext) {
+            const cf = this.state.cupContext.fixture;
+            const isHome = cf.home === this.state.playerTeam;
+            opp = PLM_ALL_TEAMS_BY_ID[isHome ? cf.away : cf.home];
+            vsText = opp ? `${isHome ? 'vs' : '@'} ${opp.name}` : '';
+            matchLabel = `${cup?.name || 'Cup'} · ${this.state.cupContext.roundName}`;
+        } else {
+            fx  = this.playerFixture();
+            opp = fx ? PLM_ALL_TEAMS_BY_ID[fx.home === team.id ? fx.away : fx.home] : null;
+            vsText = opp ? `${fx.home === team.id ? 'vs' : '@'} ${opp.name}` : '';
+            matchLabel = `Match Day ${this.state.matchDay}`;
+        }
 
         this.rootEl.innerHTML = `
             <div class="plm-pickxi">
                 <header class="plm-pickxi-hdr" style="background:${team.color};color:${team.text}">
                     <div>
-                        <div class="plm-hdr-small">Match day ${this.state.matchDay} · ${vsText}</div>
+                        <div class="plm-hdr-small">${matchLabel} · ${vsText}</div>
                         <div class="plm-hdr-name">Pick Your XI</div>
                     </div>
                     <button class="plm-reset-btn" id="plm-back">← Back</button>
@@ -1252,33 +1270,54 @@ class PLManager {
         const lost = (res.home.id === team.id && res.homeScore < res.awayScore) || (res.away.id === team.id && res.awayScore < res.homeScore);
         const verdict = won ? '🎉 You won!' : lost ? '😞 You lost.' : '🤝 Draw.';
 
+        const isCupMatch = !!res.isCupMatch;
+        const matchTitle = isCupMatch
+            ? `${res.cupDisplayName || 'Cup'} · ${res.roundName}`
+            : `League — Match Day ${this.state.matchDay - 1}`;
+
         const janTrigger = this.divConfig().janTrigger;
-        const janHint = (this.state.matchDay === janTrigger && !this.state.janWindowDone)
+        const janHint = (!isCupMatch && this.state.matchDay === janTrigger && !this.state.janWindowDone)
             ? '<p class="plm-jan-hint">❄️ The January Transfer Window opens now — you can buy and sell players.</p>' : '';
+
+        const penLine = res.pens
+            ? `<p class="plm-match-verdict" style="font-size:0.9em">(${res.home.id === this.state.playerTeam || res.away.id === this.state.playerTeam ? (won ? 'Won' : 'Lost') : ''} on penalties)</p>` : '';
 
         this.rootEl.innerHTML = `
             <div class="plm-match">
+                <p style="font-size:0.8em;color:#888;margin:0 0 4px;text-align:center">${matchTitle}</p>
                 <h2 class="plm-match-title">
                     ${res.home.short} <span class="plm-score">${res.homeScore} - ${res.awayScore}</span> ${res.away.short}
                 </h2>
                 <p class="plm-match-verdict">${verdict}</p>
+                ${penLine}
                 ${janHint}
                 <ol class="plm-timeline">${events}</ol>
                 <button class="plm-play-btn" id="plm-continue">Continue ▶</button>
             </div>`;
 
         this.rootEl.querySelector('#plm-continue').addEventListener('click', () => {
-            if (this.state.matchDay === janTrigger && !this.state.janWindowDone) {
+            // January window (league matches only)
+            if (!isCupMatch && this.state.matchDay === janTrigger && !this.state.janWindowDone) {
                 const extra = plmGenerateFreeAgentPool(this.state.divisionId).slice(0, 20);
                 this.state.freeAgents = [...(this.state.freeAgents || []), ...extra];
                 this.doAITransfers('january');
                 this.state.transferWindowType = 'january';
                 this.state.screen = 'transferWindow';
-            } else {
-                this.state.screen = 'dashboard';
+                this.save(); this.render(); return;
             }
-            this.save();
-            this.render();
+            // Cup triggers (Carabao first — earlier in the season)
+            for (const cupName of ['carabaocup', 'facup']) {
+                if (this._shouldTriggerCup(cupName)) {
+                    const hasPlayerMatch = this.setupCupRound(cupName);
+                    if (hasPlayerMatch) {
+                        this.state.screen = 'pickxi';
+                        this.save(); this.render(); return;
+                    }
+                    // Round auto-simulated (player not involved), loop to check next
+                }
+            }
+            this.state.screen = 'dashboard';
+            this.save(); this.render();
         });
     }
 
@@ -1384,6 +1423,8 @@ class PLManager {
 
                 ${moveLines}
 
+                ${this._cupSeasonEndHtml()}
+
                 <details class="plm-prize-details">
                     <summary>Prize money breakdown</summary>
                     <table class="plm-table" style="margin-top:8px">
@@ -1473,6 +1514,290 @@ class PLManager {
             }
         }
         return `<table class="plm-squad">${rows.join('')}</table>`;
+    }
+
+    // ================================================================
+    // CUP COMPETITION METHODS
+    // ================================================================
+
+    _cupTriggers(totalMD) {
+        const facupFracs    = [0.28, 0.40, 0.55, 0.65, 0.75, 0.87, 0.97];
+        const carabaFracs   = [0.08, 0.18, 0.30, 0.45, 0.62, 0.80, 0.95];
+        return {
+            facup:      facupFracs.map(f  => Math.max(1, Math.round(totalMD * f))),
+            carabaocup: carabaFracs.map(f => Math.max(1, Math.round(totalMD * f))),
+        };
+    }
+
+    _initFACup() {
+        const divs    = this.state.currentDivisions;
+        const totalMD = this.divConfig().matchdays;
+        const triggers = this._cupTriggers(totalMD).facup;
+        const divId    = this.state.divisionId;
+        // L2 teams only in R1; L1 join R2; Championship+PL join R3.
+        const entryRound = { 'league-two': 0, 'league-one': 1, 'championship': 2, 'premier-league': 2 };
+        const l2 = divs['league-two'] || [];
+        return {
+            name: 'FA Cup',
+            survivors: [...l2],
+            roundIdx: 0,
+            roundNames: ['Round 1','Round 2','Round 3','Round 4','Quarter-Final','Semi-Final','Final'],
+            triggers,
+            playerIn: divId === 'league-two',
+            playerEntryRound: entryRound[divId] ?? 2,
+            roundInProgress: false,
+            winner: null, done: false, log: [],
+            pendingAISurvivors: null, pendingByeTeam: null, pendingRoundName: '',
+        };
+    }
+
+    _initCarabaoCup() {
+        const divs    = this.state.currentDivisions;
+        const totalMD = this.divConfig().matchdays;
+        const triggers = this._cupTriggers(totalMD).carabaocup;
+        const divId    = this.state.divisionId;
+        const ch = divs['championship'] || [];
+        const l1 = divs['league-one']   || [];
+        const l2 = divs['league-two']   || [];
+        // Championship + L1 + L2 enter R1; PL joins R2
+        return {
+            name: 'Carabao Cup',
+            survivors: [...ch, ...l1, ...l2],
+            roundIdx: 0,
+            roundNames: ['Round 1','Round 2','Round 3','Round 4','Quarter-Final','Semi-Final','Final'],
+            triggers,
+            playerIn: divId !== 'premier-league',
+            playerEntryRound: divId === 'premier-league' ? 1 : 0,
+            roundInProgress: false,
+            winner: null, done: false, log: [],
+            pendingAISurvivors: null, pendingByeTeam: null, pendingRoundName: '',
+        };
+    }
+
+    _shouldTriggerCup(cupName) {
+        const cup = this.state[cupName];
+        if (!cup || cup.done || cup.roundInProgress) return false;
+        if (cup.roundIdx >= cup.triggers.length) return false;
+        return (this.state.matchDay - 1) >= cup.triggers[cup.roundIdx];
+    }
+
+    _simulateSingleCupMatch(homeId, awayId) {
+        const home = PLM_ALL_TEAMS_BY_ID[homeId];
+        const away = PLM_ALL_TEAMS_BY_ID[awayId];
+        if (!home || !away) return { winner: homeId, hs: 0, as: 0, pens: false, home: homeId, away: awayId };
+        const homeXI = plmAutoPickXI(this.squads[homeId] || [], PLM_DEFAULT_FORMATION);
+        const awayXI = plmAutoPickXI(this.squads[awayId] || [], PLM_DEFAULT_FORMATION);
+        const sim = plmSimulateMatch(home, homeXI, away, awayXI, PLM_DEFAULT_FORMATION, PLM_DEFAULT_FORMATION);
+        let winner, pens = false;
+        if (sim.homeScore > sim.awayScore) winner = homeId;
+        else if (sim.awayScore > sim.homeScore) winner = awayId;
+        else { winner = Math.random() < 0.5 ? homeId : awayId; pens = true; }
+        return { winner, hs: sim.homeScore, as: sim.awayScore, pens, home: homeId, away: awayId };
+    }
+
+    setupCupRound(cupName) {
+        const cup = this.state[cupName];
+        if (!cup) return false;
+        const roundIdx  = cup.roundIdx;
+        const roundName = cup.roundNames[roundIdx] || `Round ${roundIdx + 1}`;
+        cup.roundInProgress = true;
+
+        // Add new entrants at the correct round
+        const divs = this.state.currentDivisions;
+        if (cupName === 'facup') {
+            if (roundIdx === 1) {
+                for (const id of (divs['league-one'] || []))
+                    if (!cup.survivors.includes(id)) cup.survivors.push(id);
+            } else if (roundIdx === 2) {
+                for (const id of [...(divs['championship'] || []), ...(divs['premier-league'] || [])])
+                    if (!cup.survivors.includes(id)) cup.survivors.push(id);
+            }
+        }
+        if (cupName === 'carabaocup' && roundIdx === 1) {
+            for (const id of (divs['premier-league'] || []))
+                if (!cup.survivors.includes(id)) cup.survivors.push(id);
+        }
+        // Add player's team if this is their entry round and they're not already in
+        if (roundIdx === cup.playerEntryRound && !cup.survivors.includes(this.state.playerTeam)) {
+            cup.survivors.push(this.state.playerTeam);
+        }
+        cup.playerIn = cup.survivors.includes(this.state.playerTeam);
+
+        if (!cup.playerIn) {
+            // Auto-simulate entire round
+            const pool = [...cup.survivors];
+            for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+            const bye = pool.length % 2 !== 0 ? pool.shift() : null;
+            const newSurvivors = bye ? [bye] : [];
+            for (let i = 0; i < pool.length; i += 2) {
+                const r = this._simulateSingleCupMatch(pool[i], pool[i + 1]);
+                newSurvivors.push(r.winner);
+                const h = PLM_ALL_TEAMS_BY_ID[pool[i]], a = PLM_ALL_TEAMS_BY_ID[pool[i + 1]];
+                cup.log.push(`${roundName}: ${h?.short || pool[i]} ${r.hs}–${r.as}${r.pens ? '(p)' : ''} ${a?.short || pool[i + 1]}`);
+            }
+            cup.survivors = newSurvivors;
+            cup.roundInProgress = false;
+            cup.roundIdx++;
+            if (cup.survivors.length <= 1) {
+                cup.winner = cup.survivors[0] || null;
+                cup.done = true;
+                if (cup.winner) this._awardCupPrize(cupName, cup.winner);
+            }
+            this.save();
+            return false;
+        }
+
+        // Draw fixtures with player in pool
+        const pool = [...cup.survivors];
+        for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+
+        // If odd, give bye to a non-player team
+        let byeTeam = null;
+        if (pool.length % 2 !== 0) {
+            const nonP = pool.filter(id => id !== this.state.playerTeam);
+            const idx  = Math.floor(Math.random() * nonP.length);
+            byeTeam    = nonP[idx];
+            pool.splice(pool.indexOf(byeTeam), 1);
+        }
+
+        // Find player's fixture index
+        let pIdx = -1;
+        for (let i = 0; i < pool.length; i += 2) {
+            if (pool[i] === this.state.playerTeam || pool[i + 1] === this.state.playerTeam) { pIdx = i; break; }
+        }
+        if (pIdx < 0) { cup.roundInProgress = false; return false; }
+
+        const oppId   = pool[pIdx] === this.state.playerTeam ? pool[pIdx + 1] : pool[pIdx];
+        const isHome  = Math.random() < 0.5;
+        const fixture = isHome ? { home: this.state.playerTeam, away: oppId } : { home: oppId, away: this.state.playerTeam };
+
+        // Simulate all AI matches for this round
+        const aiSurvivors = [];
+        for (let i = 0; i < pool.length; i += 2) {
+            if (i === pIdx) continue;
+            const r = this._simulateSingleCupMatch(pool[i], pool[i + 1]);
+            aiSurvivors.push(r.winner);
+            const h = PLM_ALL_TEAMS_BY_ID[pool[i]], a = PLM_ALL_TEAMS_BY_ID[pool[i + 1]];
+            cup.log.push(`${roundName}: ${h?.short || pool[i]} ${r.hs}–${r.as}${r.pens ? '(p)' : ''} ${a?.short || pool[i + 1]}`);
+        }
+
+        cup.pendingAISurvivors = aiSurvivors;
+        cup.pendingByeTeam     = byeTeam;
+        cup.pendingRoundName   = roundName;
+        this.state.cupContext  = { cupName, roundName, fixture };
+        this.save();
+        return true;
+    }
+
+    playCupMatch() {
+        if (!this.state.cupContext) return;
+        const { cupName, roundName, fixture } = this.state.cupContext;
+        const cup  = this.state[cupName];
+        const home = PLM_ALL_TEAMS_BY_ID[fixture.home];
+        const away = PLM_ALL_TEAMS_BY_ID[fixture.away];
+        if (!home || !away) { this.state.cupContext = null; this.render(); return; }
+
+        const homeXI = this.getXIFor(home.id);
+        const awayXI = this.getXIFor(away.id);
+        const sim = plmSimulateMatch(home, homeXI, away, awayXI,
+            this.getFormationFor(home.id), this.getFormationFor(away.id));
+
+        let playerWon, pens = false;
+        if (sim.homeScore !== sim.awayScore) {
+            playerWon = sim.homeScore > sim.awayScore
+                ? fixture.home === this.state.playerTeam
+                : fixture.away === this.state.playerTeam;
+        } else {
+            // Penalty shootout — slight bias toward higher-rated XI
+            const prob = (plmAvgRating(homeXI) + 2) / (plmAvgRating(homeXI) + plmAvgRating(awayXI) + 2);
+            const homeWins = Math.random() < prob;
+            playerWon = homeWins ? fixture.home === this.state.playerTeam : fixture.away === this.state.playerTeam;
+            pens = true;
+            const penWinner = homeWins ? home : away;
+            sim.timeline.push({ min: 121, type: 'ft',
+                text: `⚽ Goes to penalties! ${penWinner.name} win the shootout!` });
+        }
+
+        // Tick availability for both squads
+        for (const tid of [fixture.home, fixture.away]) {
+            for (const p of (this.squads[tid] || [])) {
+                if (p.suspended > 0) p.suspended--;
+                if (p.injured   > 0) p.injured--;
+            }
+        }
+
+        const winner     = playerWon ? this.state.playerTeam : (fixture.home === this.state.playerTeam ? fixture.away : fixture.home);
+        const aiSurvivors = cup.pendingAISurvivors || [];
+        const byeTeam     = cup.pendingByeTeam || null;
+        cup.survivors     = [...aiSurvivors, winner, ...(byeTeam ? [byeTeam] : [])];
+
+        cup.log.push(`${roundName}: ${home.short} ${sim.homeScore}–${sim.awayScore}${pens ? '(p)' : ''} ${away.short}${playerWon ? ' ← YOU ✓' : ''}`);
+        if (!playerWon) cup.playerIn = false;
+        cup.roundIdx++;
+        cup.roundInProgress    = false;
+        cup.pendingAISurvivors = null;
+        cup.pendingByeTeam     = null;
+
+        if (cup.survivors.length <= 1) {
+            cup.winner = cup.survivors[0] || null;
+            cup.done   = true;
+            if (cup.winner) this._awardCupPrize(cupName, cup.winner);
+        }
+
+        this.state.lastMatch  = { fixture, ...sim, home, away,
+            isCupMatch: true, cupName, roundName, cupDisplayName: cup.name, playerWon, pens };
+        this.state.screen     = 'matchResult';
+        this.state.cupContext = null;
+        this.save();
+        this.render();
+    }
+
+    _awardCupPrize(cupName, winnerId) {
+        const prize = cupName === 'facup' ? 75 : 50;
+        this.state.allBudgets[winnerId] = (this.state.allBudgets[winnerId] || 0) + prize;
+        const cup = this.state[cupName];
+        const t   = PLM_ALL_TEAMS_BY_ID[winnerId];
+        cup.log.push(`🏆 ${t?.name || winnerId} win the ${cup.name}! (+£${prize}m)`);
+    }
+
+    _cupStatusHtml() {
+        const cups = [
+            { key: 'facup', label: 'FA Cup', emoji: '🏆' },
+            { key: 'carabaocup', label: 'Carabao Cup', emoji: '🏆' },
+        ];
+        const parts = cups.map(({ key, label, emoji }) => {
+            const cup = this.state[key];
+            if (!cup) return '';
+            if (cup.done) {
+                const w = PLM_ALL_TEAMS_BY_ID[cup.winner];
+                const youWon = cup.winner === this.state.playerTeam;
+                return `<span class="${youWon ? 'plm-cup-you' : ''}">${emoji} <b>${label}</b>: ${w?.name || '?'}${youWon ? ' — YOU! 🎉' : ''}</span>`;
+            }
+            if (!cup.playerIn) return `<span style="opacity:.6">${emoji} <b>${label}</b>: Eliminated</span>`;
+            const next = cup.roundNames[cup.roundIdx] || 'Final';
+            return `<span>${emoji} <b>${label}</b>: Still in — ${next} next</span>`;
+        }).filter(Boolean).join(' &nbsp;|&nbsp; ');
+        return parts ? `<div class="plm-cup-status">${parts}</div>` : '';
+    }
+
+    _cupSeasonEndHtml() {
+        const cups = [
+            { key: 'facup', label: 'FA Cup', prize: 75 },
+            { key: 'carabaocup', label: 'Carabao Cup', prize: 50 },
+        ];
+        return cups.map(({ key, label, prize }) => {
+            const cup = this.state[key];
+            if (!cup) return '';
+            const w = PLM_ALL_TEAMS_BY_ID[cup.winner];
+            const youWon = cup.winner === this.state.playerTeam;
+            if (youWon) {
+                return `<div class="plm-cup-won-box">🏆 <b>${label} WINNER!</b> +£${prize}m prize money</div>`;
+            }
+            if (cup.winner) {
+                return `<div class="plm-cup-result-line">🏆 ${label}: Won by ${w?.name || cup.winner}</div>`;
+            }
+            return `<div class="plm-cup-result-line">🏆 ${label}: Season ongoing</div>`;
+        }).join('');
     }
 }
 
