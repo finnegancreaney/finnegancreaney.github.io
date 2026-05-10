@@ -356,7 +356,51 @@ const PLM_EUR_PRIZE_MONEY = {
     'ligue-1':    [40,32,27,22,18,14,11,9,7,6,6,5,4,4,3,3,2,2],
     'eur-other':  [30,24,20,16,12,9,7,6,5,4,4,3,3,2,2,2,1,1],
 };
-function plmEurBudget(rating) { return Math.max(5, Math.round((rating - 60) * 5)); }
+// Realistic transfer budgets (£M) for every European club
+const PLM_EUR_TEAM_BUDGETS = {
+    // La Liga — Real/Atletico huge, Barcelona constrained, rest modest
+    realmadrid: 200, barcelona: 80,  atletico: 90,   villarreal: 30,
+    athletic:    20, sevilla:   15,  girona:   20,   realsociedad: 15,
+    realbetis:   18, valencia:  10,  celta:     8,   osasuna:   6,
+    getafe:       5, mallorca:   6,  alaves:    4,   leganes:   3,
+    espanyol:     6, laspalmas:  3,  rayo:      5,   valladolid: 2,
+    // Bundesliga — Bayern/Leverkusen/Dortmund top, rest much smaller
+    bayernmunich: 150, leverkusen: 80,  dortmund: 70,   rbleipzig: 65,
+    vfbstuttgart:  35, frankfurt:  30,  gladbach:  25,  wolfsburg: 25,
+    hoffenheim:    20, freiburg:   15,  unionberlin: 12, werderbremen: 12,
+    mainz:         10, augsburg:    8,  heidenheim:  6,  bochum:    4,
+    stpauli:        4, holstein:    3,
+    // Serie A — Inter/Milan/Napoli/Juve top, mid-table modest, bottom very small
+    inter:   80, acmilan:  70,  juventus: 60,  napoli:    70,
+    atalanta: 50, roma:    45,  lazio:    30,  fiorentina: 25,
+    bologna:  20, torino:  15,  udinese:  10,  sassuolo:   8,
+    genoa:     8, lecce:    5,  cagliari:  5,  empoli:     5,
+    verona:    4, monza:   12,  parma:     5,  como:      15,
+    // Ligue 1 — PSG and Monaco enormous, rest very modest
+    psg:   200, monaco:  80,  marseille: 40,  lille:     25,
+    lyon:   30, nice:    30,  rennes:    20,  lens:      18,
+    brest:  12, strasbourg: 10, toulouse: 8,  reims:      6,
+    nantes:  6, montpellier: 5, havre:    3,  auxerre:    4,
+    angers:  3, saintetienne: 4,
+    // Portugal
+    benfica: 45, porto: 40, sporting: 35, braga: 12, guimaraes: 6,
+    // Netherlands
+    psv: 40, ajax: 30, feyenoord: 28, az: 12, twente: 8,
+    // Belgium
+    clubbrugge: 18, anderlecht: 12, genk: 8,
+    // Turkey
+    galatasaray: 30, fenerbahce: 25, besiktas: 10, trabzonspor: 8,
+    // Scotland — small budgets
+    celtic: 20, rangers: 15,
+    // Others
+    shakhtar: 15, redstar: 10, youngboys: 8, basel: 8,
+    sturmgraz: 5, rapidwien: 5, dinamozagreb: 8, slovan: 4,
+    sparta: 10, slavia: 8, olympiakos: 10, paok: 6,
+    ferencvaros: 5, rosenborg: 3,
+};
+function plmEurBudget(teamId) {
+    return PLM_EUR_TEAM_BUDGETS[teamId] ?? 5;
+}
 function plmIsEurTeam(id) { return !!PLM_EUR_TEAMS_BY_ID[id]; }
 
 // ---------- Player market value (£M) ----------
@@ -776,8 +820,8 @@ class PLManager {
         }
         for (const team of PLM_EUR_TEAMS) {
             allBudgets[team.id] = carryoverBudgets
-                ? (carryoverBudgets[team.id] ?? plmEurBudget(team.rating))
-                : plmEurBudget(team.rating);
+                ? (carryoverBudgets[team.id] ?? plmEurBudget(team.id))
+                : plmEurBudget(team.id);
         }
 
         this.state = {
@@ -1120,7 +1164,7 @@ class PLManager {
             { leagueId: 'ligue-1',    label: '🇫🇷 Ligue 1',     country: 'France'  },
         ].map(({ leagueId, label, country }) => {
             const teams = PLM_EUR_TEAMS.filter(t => t.country === country).sort((a, b) => b.rating - a.rating);
-            const cards = teams.map(t => _makeCard(t, plmEurBudget(t.rating), true)).join('');
+            const cards = teams.map(t => _makeCard(t, plmEurBudget(t.id), true)).join('');
             return `<div class="plm-div-section">
                 <h3 class="plm-div-header">${label}</h3>
                 <div class="plm-team-grid">${cards}</div>
@@ -1138,7 +1182,7 @@ class PLManager {
             .sort((a, b) => b.rating - a.rating)
             .slice(18);
         const eurOtherCards = [...eurOtherTeams, ...eurOtherRest]
-            .map(t => _makeCard(t, plmEurBudget(t.rating), true)).join('');
+            .map(t => _makeCard(t, plmEurBudget(t.id), true)).join('');
         const eurOtherSection = `<div class="plm-div-section">
             <h3 class="plm-div-header">🌍 European League <span style="font-size:.8em;font-weight:normal;opacity:.7">(Portugal · Netherlands · Belgium · Turkey · Scotland & more)</span></h3>
             <div class="plm-team-grid">${eurOtherCards}</div>
