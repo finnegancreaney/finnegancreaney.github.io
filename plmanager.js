@@ -925,26 +925,104 @@ class PLManager {
         this.state.transferLog = [...(this.state.transferLog || []), ...log];
     }
 
-    // ---- Player buys from another club ----
-    buyFromClub(playerId, sellingTeamId) {
+    // ---- Negotiation flow ----
+    startNegotiation(playerId, sellingTeamId) {
         const sellingSquad = this.squads[sellingTeamId];
         const idx = sellingSquad ? sellingSquad.findIndex(p => p.id === playerId) : -1;
         if (idx < 0) return;
         const player = sellingSquad[idx];
-        const value  = plmPlayerValue(player.rating);
-        const squad  = this.squads[this.state.playerTeam];
-        if (value > this.budget() || squad.length >= 25) return;
+        const fee = plmPlayerValue(player.rating);
+        const bonusDemand = Math.max(1, Math.round(fee * 0.4));
+        const wageDemand  = Math.max(5, Math.round(player.rating * 1.5));
+        this.state.pendingTransfer = {
+            playerId, sellingTeamId,
+            playerSnap: { name: player.name, pos: player.pos, rating: player.rating },
+            fee, bonusDemand, wageDemand,
+            offeredBonus: bonusDemand,
+            offeredWage:  wageDemand,
+            result: null,
+            attempts: 0,
+            message: null,
+        };
+        this.state.screen = 'negotiate';
+        this.save();
+        this.render();
+    }
+
+    submitOffer(offeredBonus, offeredWage) {
+        const pt = this.state.pendingTransfer;
+        if (!pt || pt.result === 'accepted') return;
+        pt.offeredBonus = Math.max(0, Math.round(offeredBonus));
+        pt.offeredWage  = Math.max(1, Math.round(offeredWage));
+        pt.attempts++;
+
+        const bonusRatio = pt.offeredBonus / Math.max(1, pt.bonusDemand);
+        const wageRatio  = pt.offeredWage  / Math.max(1, pt.wageDemand);
+        const totalRatio = (bonusRatio + wageRatio) / 2;
+
+        let acceptProb;
+        if      (totalRatio >= 1.0)  acceptProb = 0.97;
+        else if (totalRatio >= 0.9)  acceptProb = 0.78;
+        else if (totalRatio >= 0.8)  acceptProb = 0.50;
+        else if (totalRatio >= 0.7)  acceptProb = 0.25;
+        else if (totalRatio >= 0.55) acceptProb = 0.10;
+        else                          acceptProb = 0.02;
+        // Each repeated attempt nudges chance up slightly (negotiation fatigue)
+        acceptProb = Math.min(0.98, acceptProb + 0.05 * Math.max(0, pt.attempts - 1));
+
+        if (Math.random() < acceptProb) {
+            pt.result  = 'accepted';
+            pt.message = '✅ Deal agreed!';
+            this.completeTransfer();
+        } else {
+            pt.result  = 'rejected';
+            pt.message = totalRatio < 0.7
+                ? '❌ Player insulted. "I\'m worth far more than that."'
+                : '❌ Player rejected your offer. Try a better one.';
+        }
+        this.save();
+        this.renderNegotiation();
+    }
+
+    completeTransfer() {
+        const pt = this.state.pendingTransfer;
+        if (!pt || pt.result !== 'accepted') return;
+        const sellingSquad = this.squads[pt.sellingTeamId];
+        const idx = sellingSquad ? sellingSquad.findIndex(p => p.id === pt.playerId) : -1;
+        if (idx < 0) { pt.result = 'rejected'; pt.message = '❌ Player no longer available.'; return; }
+
+        const player = sellingSquad[idx];
+        const totalUpfront = pt.fee + pt.offeredBonus;
+        const squad = this.squads[this.state.playerTeam];
+        if (totalUpfront > this.budget() || squad.length >= 25) {
+            pt.result  = 'rejected';
+            pt.message = squad.length >= 25 ? '❌ Squad full (25 max).' : '❌ You cannot afford the upfront cost.';
+            return;
+        }
 
         sellingSquad.splice(idx, 1);
-        squad.push({ ...player });
+        squad.push({ ...player, wage: pt.offeredWage });
+        this.state.allBudgets[this.state.playerTeam] -= totalUpfront;
+        this.state.allBudgets[pt.sellingTeamId] = (this.state.allBudgets[pt.sellingTeamId] || 0) + Math.round(pt.fee * 0.9);
 
-        this.state.allBudgets[this.state.playerTeam] -= value;
-        this.state.allBudgets[sellingTeamId] = (this.state.allBudgets[sellingTeamId] || 0) + Math.round(value * 0.9);
+        const sellingTeam = plmGetTeam(pt.sellingTeamId);
+        this.state.transferLog.push(
+            `✍️ You sign ${player.name} from ${sellingTeam?.name || pt.sellingTeamId} — £${pt.fee}m fee + £${pt.offeredBonus}m bonus · £${pt.offeredWage}k/wk`
+        );
+    }
 
-        const sellingTeam = plmGetTeam(sellingTeamId);
-        this.state.transferLog.push(`✍️ You sign ${player.name} from ${sellingTeam?.name || sellingTeamId} for £${value}m`);
+    cancelNegotiation() {
+        this.state.pendingTransfer = null;
+        this.state.screen = 'transferWindow';
         this.save();
-        this.renderTransferWindow();
+        this.render();
+    }
+
+    returnFromTransfer() {
+        this.state.pendingTransfer = null;
+        this.state.screen = 'transferWindow';
+        this.save();
+        this.render();
     }
 
     // ---- Player sells ----
@@ -1123,6 +1201,7 @@ class PLManager {
         if (!this.state.transferLog)  this.state.transferLog  = [];
         switch (this.state.screen) {
             case 'transferWindow': return this.renderTransferWindow();
+            case 'negotiate':      return this.renderNegotiation();
             case 'pickxi':         return this.renderPickXI();
             case 'matchResult':    return this.renderMatchResult();
             case 'seasonEnd':      return this.renderSeasonEnd();
@@ -1215,9 +1294,22 @@ class PLManager {
         const tFilter = this._tFilter || 'all';
         const pFilter = this._pFilter || 'all';
 
-        // Market = other clubs in same division
+        // Market = all major-league clubs (top flight) OR same division (lower English leagues)
+        const isTopFlight = this.state.divisionId === 'premier-league' || !!PLM_EUR_LEAGUES[this.state.divisionId];
+        let marketTeamIds;
+        if (isTopFlight) {
+            // Cross-league market: PL + Championship + all European clubs
+            marketTeamIds = [
+                ...PLM_INITIAL_DIVISIONS['premier-league'],
+                ...PLM_INITIAL_DIVISIONS['championship'],
+                ...PLM_EUR_TEAMS.map(t => t.id),
+            ];
+        } else {
+            marketTeamIds = this.state.divisionTeamIds || [];
+        }
+
         const allMarket = [];
-        for (const id of (this.state.divisionTeamIds || [])) {
+        for (const id of marketTeamIds) {
             if (id === this.state.playerTeam) continue;
             const t = plmGetTeam(id);
             if (!t) continue;
@@ -1226,14 +1318,20 @@ class PLManager {
             }
         }
         allMarket.sort((a, b) => b.rating - a.rating);
-        const filtered = allMarket.filter(p =>
+        let filtered = allMarket.filter(p =>
             (tFilter === 'all' || p.sellingTeamId === tFilter) &&
             (pFilter === 'all' || p.pos === pFilter)
         );
+        // Cap display to avoid massive UI when no team filter
+        const totalFiltered = filtered.length;
+        if (tFilter === 'all' && filtered.length > 250) {
+            filtered = filtered.slice(0, 250);
+        }
 
-        const divTeams = (this.state.divisionTeamIds || [])
+        const divTeams = marketTeamIds
             .filter(id => id !== this.state.playerTeam)
-            .map(id => plmGetTeam(id)).filter(Boolean);
+            .map(id => plmGetTeam(id)).filter(Boolean)
+            .sort((a, b) => b.rating - a.rating);
 
         const teamOpts = [{ id: 'all', name: 'All Clubs' }, ...divTeams]
             .map(t => `<option value="${t.id}" ${t.id === tFilter ? 'selected' : ''}>${t.name}</option>`)
@@ -1277,7 +1375,7 @@ class PLManager {
             <div class="plm-transfer">
                 <header class="plm-header" style="background:${team.color};color:${team.text}">
                     <div>
-                        <div class="plm-hdr-small">${windowLabel} · Season ${this.state.season} · ${PLM_DIVISIONS[this.state.divisionId].name}</div>
+                        <div class="plm-hdr-small">${windowLabel} · Season ${this.state.season} · ${(PLM_DIVISIONS[this.state.divisionId] || PLM_EUR_LEAGUES[this.state.divisionId] || {}).name || this.state.divisionId}</div>
                         <div class="plm-hdr-name">${team.name}</div>
                     </div>
                     <div class="plm-hdr-right">
@@ -1334,7 +1432,7 @@ class PLManager {
         });
         this.rootEl.querySelectorAll('.plm-buy-btn').forEach(btn =>
             btn.addEventListener('click', () =>
-                this.buyFromClub(btn.getAttribute('data-pid'), btn.getAttribute('data-tid')))
+                this.startNegotiation(btn.getAttribute('data-pid'), btn.getAttribute('data-tid')))
         );
         this.rootEl.querySelectorAll('.plm-sell-btn').forEach(btn =>
             btn.addEventListener('click', () => this.sellPlayer(btn.getAttribute('data-pid')))
@@ -1347,6 +1445,92 @@ class PLManager {
             this.save();
             this.render();
         });
+    }
+
+    // ---- Salary negotiation ----
+    renderNegotiation() {
+        const pt = this.state.pendingTransfer;
+        if (!pt) { this.state.screen = 'transferWindow'; return this.render(); }
+
+        const sellingTeam = plmGetTeam(pt.sellingTeamId);
+        const team        = this.playerTeam();
+        const budget      = this.budget();
+        const budgetDisp  = budget < 1 ? `£${(budget * 1000).toFixed(0)}k` : `£${Math.round(budget)}m`;
+        const totalUpfront = pt.fee + pt.offeredBonus;
+        const canAfford    = totalUpfront <= budget;
+        const acceptedView = pt.result === 'accepted';
+
+        this.rootEl.innerHTML = `
+            <div class="plm-transfer">
+                <header class="plm-header" style="background:${team.color};color:${team.text}">
+                    <div>
+                        <div class="plm-hdr-small">💬 Salary Negotiation · Budget ${budgetDisp}</div>
+                        <div class="plm-hdr-name">${pt.playerSnap.name}</div>
+                    </div>
+                    <div class="plm-hdr-right">
+                        <div class="plm-hdr-small">${pt.playerSnap.pos} · OVR ${pt.playerSnap.rating}</div>
+                        <div class="plm-hdr-name">from ${sellingTeam?.name || pt.sellingTeamId}</div>
+                    </div>
+                </header>
+                <div class="plm-transfer-body">
+                    <section class="plm-transfer-section">
+                        <h3>📋 The Deal</h3>
+                        <table class="plm-squad" style="margin-bottom:12px">
+                            <tr><td><b>Transfer fee</b> (to ${sellingTeam?.short || 'club'})</td><td style="text-align:right"><b>£${pt.fee}m</b> <span style="opacity:.6;font-size:.85em">(fixed)</span></td></tr>
+                            <tr><td>Player demands signing bonus</td><td style="text-align:right">£${pt.bonusDemand}m</td></tr>
+                            <tr><td>Player demands weekly wage</td><td style="text-align:right">£${pt.wageDemand}k/wk</td></tr>
+                        </table>
+                        <h3 style="margin-top:18px">💰 Your Offer</h3>
+                        <div style="display:flex;flex-direction:column;gap:10px;max-width:420px">
+                            <label style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+                                <span>Signing bonus (£m)</span>
+                                <input type="number" id="plm-offer-bonus" value="${pt.offeredBonus}" min="0" max="${pt.bonusDemand * 2}" step="1"
+                                    style="width:100px;padding:6px;border:1px solid #ccc;border-radius:4px" />
+                            </label>
+                            <label style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+                                <span>Weekly wage (£k/wk)</span>
+                                <input type="number" id="plm-offer-wage" value="${pt.offeredWage}" min="1" max="${pt.wageDemand * 2}" step="5"
+                                    style="width:100px;padding:6px;border:1px solid #ccc;border-radius:4px" />
+                            </label>
+                        </div>
+                        <p style="margin-top:14px;font-weight:bold;font-size:1.05em">
+                            Total upfront cost: £${totalUpfront}m
+                            ${canAfford ? '' : ' <span style="color:#c00">⚠️ Over budget!</span>'}
+                        </p>
+                        ${pt.message ? `
+                            <div style="margin-top:14px;padding:12px;border-radius:6px;font-weight:bold;
+                                background:${acceptedView ? '#e6f9e6' : '#fee'};color:${acceptedView ? '#080' : '#c00'}">
+                                ${pt.message}
+                            </div>
+                        ` : ''}
+                    </section>
+                </div>
+                <div class="plm-transfer-footer" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+                    ${acceptedView ? `
+                        <button class="plm-play-btn" id="plm-back-market">← Back to Transfer Market</button>
+                    ` : `
+                        <button class="plm-reset-btn" id="plm-walk-away">🚶 Walk Away</button>
+                        <button class="plm-play-btn" id="plm-make-offer" ${canAfford ? '' : 'disabled'} style="background:#0066cc">💬 Make Offer</button>
+                        <button class="plm-play-btn" id="plm-accept-demand" ${(pt.fee + pt.bonusDemand) <= budget ? '' : 'disabled'} style="background:#0a8a00">💰 Accept Demands</button>
+                    `}
+                </div>
+            </div>`;
+
+        if (acceptedView) {
+            this.rootEl.querySelector('#plm-back-market').addEventListener('click', () => this.returnFromTransfer());
+        } else {
+            this.rootEl.querySelector('#plm-walk-away').addEventListener('click', () => this.cancelNegotiation());
+            const offerBtn  = this.rootEl.querySelector('#plm-make-offer');
+            const acceptBtn = this.rootEl.querySelector('#plm-accept-demand');
+            if (offerBtn && !offerBtn.disabled) offerBtn.addEventListener('click', () => {
+                const b = parseFloat(this.rootEl.querySelector('#plm-offer-bonus').value) || 0;
+                const w = parseFloat(this.rootEl.querySelector('#plm-offer-wage').value) || 0;
+                this.submitOffer(b, w);
+            });
+            if (acceptBtn && !acceptBtn.disabled) acceptBtn.addEventListener('click', () => {
+                this.submitOffer(pt.bonusDemand, pt.wageDemand);
+            });
+        }
     }
 
     // ---- Dashboard ----
