@@ -606,7 +606,8 @@ function plmPoissonSample(lambda) {
 function plmAvgRating(xi) { return xi.reduce((s, p) => s + p.rating, 0) / xi.length; }
 function plmPickGoalscorer(xi) {
     const weights = { FWD: 6, MID: 3, DEF: 1, GK: 0.05 };
-    const pool = xi.map(p => ({ p, w: (weights[p.pos] || 1) * (p.rating / 75) }));
+    // Strong rating-based weighting: cube of (rating/70) so an 85 scores ~2x more than a 65
+    const pool = xi.map(p => ({ p, w: (weights[p.pos] || 1) * Math.pow(Math.max(40, p.rating) / 70, 3) }));
     const total = pool.reduce((s, x) => s + x.w, 0);
     let r = Math.random() * total;
     for (const x of pool) { r -= x.w; if (r <= 0) return x.p; }
@@ -624,10 +625,15 @@ function plmPickBookedPlayer(xi) {
 function plmSimulateMatch(homeTeam, homeXI, awayTeam, awayXI, homeFormation, awayFormation) {
     const hForm = PLM_FORMATIONS[homeFormation] || PLM_FORMATIONS[PLM_DEFAULT_FORMATION];
     const aForm = PLM_FORMATIONS[awayFormation] || PLM_FORMATIONS[PLM_DEFAULT_FORMATION];
-    const homeRating = plmAvgRating(homeXI) + 3;
+    // Rating-driven expected goals: an 85 vs 60 should be a stomp, an 85 vs 80 a tight game
+    const HOME_BONUS = 3;
+    const homeRating = plmAvgRating(homeXI) + HOME_BONUS;
     const awayRating = plmAvgRating(awayXI);
-    const lambdaHome = Math.max(0.2, (homeRating / 40) * (1 + hForm.atk) * (1 - aForm.defMod));
-    const lambdaAway = Math.max(0.2, (awayRating / 40) * (1 + aForm.atk) * (1 - hForm.defMod));
+    const diff = homeRating - awayRating;
+    const BASE_GOALS = 1.45;
+    const RATING_COEF = 0.07; // each rating-point gap shifts expected goals by 0.07 each side
+    const lambdaHome = Math.max(0.08, (BASE_GOALS + diff * RATING_COEF) * (1 + hForm.atk) * (1 - aForm.defMod));
+    const lambdaAway = Math.max(0.08, (BASE_GOALS - diff * RATING_COEF) * (1 + aForm.atk) * (1 - hForm.defMod));
     const hs = plmPoissonSample(lambdaHome);
     const as = plmPoissonSample(lambdaAway);
 
@@ -1533,6 +1539,18 @@ class PLManager {
         }
     }
 
+    // ---- Rating helpers ----
+    squadAvg(teamId) {
+        const s = this.squads[teamId] || [];
+        if (!s.length) return 0;
+        return s.reduce((a, p) => a + p.rating, 0) / s.length;
+    }
+    xiAvg(teamId) {
+        const xi = this.getXIFor(teamId);
+        if (!xi.length) return 0;
+        return xi.reduce((a, p) => a + p.rating, 0) / xi.length;
+    }
+
     // ---- Dashboard ----
     renderDashboard() {
         const team     = this.playerTeam();
@@ -1544,6 +1562,11 @@ class PLManager {
         const budgetDisplay = budget < 1 ? `£${(budget * 1000).toFixed(0)}k` : `£${Math.round(budget)}m`;
         const totalMD  = this.divConfig().matchdays;
         const divName  = this.divConfig().name;
+
+        const yourSquadAvg = this.squadAvg(team.id).toFixed(1);
+        const yourXIAvg    = this.xiAvg(team.id).toFixed(1);
+        const oppSquadAvg  = opponent ? this.squadAvg(opponent.id).toFixed(1) : '0.0';
+        const oppXIAvg     = opponent ? this.xiAvg(opponent.id).toFixed(1)    : '0.0';
 
         this.rootEl.innerHTML = `
             <div class="plm-dashboard">
@@ -1566,7 +1589,12 @@ class PLManager {
                         <span class="plm-big" style="color:${opponent.color}">${opponent.short}</span>
                         <button class="plm-play-btn" id="plm-play">▶ Play Match</button>
                     </div>
-                    <div class="plm-next-sub">${isHome ? 'Home' : 'Away'} · ${opponent.name} (OVR ${opponent.rating})</div>
+                    <div class="plm-next-sub">${isHome ? 'Home' : 'Away'} · ${opponent.name}</div>
+                    <div class="plm-next-ratings" style="display:flex;justify-content:center;gap:18px;margin-top:8px;font-size:.92em;flex-wrap:wrap">
+                        <span><b>${team.short}</b> · Squad ${yourSquadAvg} · <b>XI ${yourXIAvg}</b></span>
+                        <span style="opacity:.7">vs</span>
+                        <span><b>${opponent.short}</b> · Squad ${oppSquadAvg} · <b>XI ${oppXIAvg}</b></span>
+                    </div>
                 </section>` : ''}
 
                 ${this._cupStatusHtml()}
@@ -1747,7 +1775,12 @@ class PLManager {
                 </div>
                 <section class="plm-pickxi-grid">
                     <div class="plm-col">
-                        <h3>Your XI — ${this.state.formation}</h3>
+                        <h3>Your XI — ${this.state.formation}
+                            <span style="font-size:.7em;opacity:.7;font-weight:normal">
+                                · Avg ${xi.length ? (xi.reduce((s,p)=>s+p.rating,0)/xi.length).toFixed(1) : '-'}
+                                · Squad ${(squad.reduce((s,p)=>s+p.rating,0)/squad.length).toFixed(1)}
+                            </span>
+                        </h3>
                         ${renderPosRow('GK')}${renderPosRow('DEF')}${renderPosRow('MID')}${renderPosRow('FWD')}
                     </div>
                     <div class="plm-col">
