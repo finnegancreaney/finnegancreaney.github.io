@@ -4826,6 +4826,7 @@ class PLManager {
     playMatchDay() {
         if (this.state.eurContext) return this.playEurMatch();
         if (this.state.cupContext) return this.playCupMatch();
+        if (this.state.playoffContext) return this.playPlayoffMatch();
         const md = this.state.matchDay;
         let playerResult = null;
         for (const fx of this.currentFixtures()) {
@@ -4865,13 +4866,8 @@ class PLManager {
 
         this.state.lastMatch = playerResult;
         this.state.matchDay++;
-
-        const totalMD = this.divConfig().matchdays;
-        if (this.state.matchDay > totalMD) {
-            this.state.screen = 'seasonEnd';
-        } else {
-            this.state.screen = 'matchResult';
-        }
+        // Always show match result first — the continue handler decides next screen
+        this.state.screen = 'matchResult';
         this.save();
         this.render();
     }
@@ -4909,13 +4905,17 @@ class PLManager {
             return candidates[0];
         };
 
+        // If the player ran an actual playoff this season, use its winner.
+        const po = this.state.playoff;
+        const playoffDiv = po && po.done ? po.division : null;
+
         // Promotion from lower divisions
         const l2AutoUp   = l2.slice(0, 3);
-        const l2Playoff  = playoffWinner(l2, 3, 6);
+        const l2Playoff  = playoffDiv === 'league-two'   ? po.winner : playoffWinner(l2, 3, 6);
         const l1AutoUp   = l1.slice(0, 2);
-        const l1Playoff  = playoffWinner(l1, 2, 5);
+        const l1Playoff  = playoffDiv === 'league-one'   ? po.winner : playoffWinner(l1, 2, 5);
         const chAutoUp   = ch.slice(0, 2);
-        const chPlayoff  = playoffWinner(ch, 2, 5);
+        const chPlayoff  = playoffDiv === 'championship' ? po.winner : playoffWinner(ch, 2, 5);
 
         // Relegation
         const plRel  = pl.slice(-3);
@@ -4969,6 +4969,7 @@ class PLManager {
             case 'negotiate':      return this.renderNegotiation();
             case 'pickxi':         return this.renderPickXI();
             case 'matchResult':    return this.renderMatchResult();
+            case 'playoffIntro':   return this.renderPlayoffIntro();
             case 'seasonEnd':      return this.renderSeasonEnd();
             default:               return this.renderDashboard();
         }
@@ -5492,7 +5493,13 @@ class PLManager {
         const cup = this.state.cupContext ? this.state[this.state.cupContext.cupName]
                   : this.state.eurContext  ? this.state[this.state.eurContext.comp] : null;
         let fx, opp, vsText, matchLabel;
-        if (this.state.eurContext) {
+        if (this.state.playoffContext) {
+            const pf = this.state.playoffContext.fixture;
+            const isHome = pf.home === this.state.playerTeam;
+            opp = plmGetTeam(isHome ? pf.away : pf.home);
+            vsText = opp ? `${this.state.playoffContext.isFinal ? 'vs' : (isHome ? 'vs' : '@')} ${opp.name}` : '';
+            matchLabel = `🏆 ${this.divConfig().name} Playoffs · ${this.state.playoffContext.matchName}`;
+        } else if (this.state.eurContext) {
             const cf = this.state.eurContext.fixture;
             const isHome = cf.home === this.state.playerTeam;
             opp = plmGetTeam(isHome ? cf.away : cf.home);
@@ -5506,7 +5513,7 @@ class PLManager {
             matchLabel = `${cup?.name || 'Cup'} · ${this.state.cupContext.roundName}`;
         } else {
             fx  = this.playerFixture();
-            opp = fx ? PLM_ALL_TEAMS_BY_ID[fx.home === team.id ? fx.away : fx.home] : null;
+            opp = fx ? plmGetTeam(fx.home === team.id ? fx.away : fx.home) : null;
             vsText = opp ? `${fx.home === team.id ? 'vs' : '@'} ${opp.name}` : '';
             matchLabel = `Match Day ${this.state.matchDay}`;
         }
@@ -5554,7 +5561,8 @@ class PLManager {
         this.rootEl.querySelector('#plm-autopick').addEventListener('click', () => this.autoPickXI());
         const kickoff = this.rootEl.querySelector('#plm-kickoff');
         if (kickoff && !kickoff.disabled) kickoff.addEventListener('click', () => {
-            if (this.state.eurContext) this.playEurMatch();
+            if (this.state.playoffContext) this.playPlayoffMatch();
+            else if (this.state.eurContext) this.playEurMatch();
             else this.playMatchDay();
         });
         this.rootEl.querySelectorAll('.plm-xi-btn').forEach(btn => btn.addEventListener('click', () => {
@@ -5607,6 +5615,22 @@ class PLManager {
             </div>`;
 
         this.rootEl.querySelector('#plm-continue').addEventListener('click', () => {
+            // PLAYOFF: continue progression
+            if (res.isPlayoffMatch) {
+                this._advancePlayoff();
+                return;
+            }
+            // End of season — check for playoffs
+            const totalMD = this.divConfig().matchdays;
+            if (!isCupMatch && this.state.matchDay > totalMD) {
+                if (this._needsPlayoffs()) {
+                    this._setupPlayoffs();
+                    this.state.screen = 'playoffIntro';
+                    this.save(); this.render(); return;
+                }
+                this.state.screen = 'seasonEnd';
+                this.save(); this.render(); return;
+            }
             // January window (league matches only)
             if (!isCupMatch && this.state.matchDay === janTrigger && !this.state.janWindowDone) {
                 const extra = plmGenerateFreeAgentPool(this.state.divisionId).slice(0, 20);
@@ -5697,8 +5721,17 @@ class PLManager {
         const ordinal = n => { const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
 
         const isEurTeamManaged = plmIsEurTeam(this.state.playerTeam);
+        const po = this.state.playoff;
         let verdict;
-        if (isEurTeamManaged) {
+        if (po && po.done) {
+            if (po.promoted) {
+                verdict = `🏆 PROMOTED VIA PLAYOFFS! Wembley winners!`;
+            } else if (po.eliminated) {
+                verdict = `😞 Lost in playoff semi-final. Another season in ${divName}.`;
+            } else {
+                verdict = `💔 Lost the Wembley final. So close, so far.`;
+            }
+        } else if (isEurTeamManaged) {
             // European club — verdict based on domestic finish and UEFA spots
             const _eurT  = PLM_EUR_TEAMS_BY_ID[this.state.playerTeam];
             const _spots = PLM_COUNTRY_SPOTS[_eurT?.country] || { ucl: 0, uel: 0, uecl: 0 };
@@ -6480,6 +6513,286 @@ class PLManager {
         if (wonFACup)   return 'uel';
         if (wonCarabao) return 'uecl';
         return null;
+    }
+
+    // ============================================================
+    // PROMOTION PLAYOFFS (English Championship / League One / League Two)
+    // ============================================================
+
+    _playoffZoneIndices() {
+        const divId = this.state.divisionId;
+        if (divId === 'championship' || divId === 'league-one') return [2, 3, 4, 5]; // positions 3-6
+        if (divId === 'league-two') return [3, 4, 5, 6]; // positions 4-7
+        return null;
+    }
+
+    _needsPlayoffs() {
+        const zone = this._playoffZoneIndices();
+        if (!zone) return false;
+        const sorted = plmSortedTable(this.state.table);
+        const playerPos = sorted.findIndex(r => r.id === this.state.playerTeam);
+        return zone.includes(playerPos);
+    }
+
+    _setupPlayoffs() {
+        const zone = this._playoffZoneIndices();
+        if (!zone) return null;
+        const sorted = plmSortedTable(this.state.table);
+        const teams = zone.map(i => sorted[i]?.id).filter(Boolean);
+        if (teams.length < 4) return null;
+        const playerId = this.state.playerTeam;
+        const playerIdx = teams.indexOf(playerId);
+        if (playerIdx < 0) return null;
+
+        // Pairings: teams[0] vs teams[3], teams[1] vs teams[2]
+        let playerSemiTeams, otherSemiTeams;
+        if (playerIdx === 0 || playerIdx === 3) {
+            playerSemiTeams = [teams[0], teams[3]];
+            otherSemiTeams  = [teams[1], teams[2]];
+        } else {
+            playerSemiTeams = [teams[1], teams[2]];
+            otherSemiTeams  = [teams[0], teams[3]];
+        }
+        const playerOppId = playerSemiTeams[0] === playerId ? playerSemiTeams[1] : playerSemiTeams[0];
+
+        // Higher seed (lower index in teams[]) hosts 2nd leg
+        const playerHigherSeed = teams.indexOf(playerId) < teams.indexOf(playerOppId);
+
+        this.state.playoff = {
+            division: this.state.divisionId,
+            teams,
+            playerOppId,
+            playerSemi: {
+                leg1: {
+                    home: playerHigherSeed ? playerOppId : playerId,
+                    away: playerHigherSeed ? playerId : playerOppId,
+                    hs: null, as: null, done: false,
+                },
+                leg2: {
+                    home: playerHigherSeed ? playerId : playerOppId,
+                    away: playerHigherSeed ? playerOppId : playerId,
+                    hs: null, as: null, done: false,
+                },
+                aggFor: 0,
+                aggAgainst: 0,
+                winner: null,
+            },
+            otherSemi: {
+                teams: otherSemiTeams,
+                played: false,
+                winner: null,
+                scoreLine: '',
+            },
+            final: { home: null, away: null, hs: null, as: null, done: false, winner: null },
+            currentMatch: 'semiLeg1',
+            eliminated: false,
+            promoted: false,
+            done: false,
+            winner: null,
+            log: [],
+        };
+        return this.state.playoff;
+    }
+
+    _setupPlayoffContext() {
+        const po = this.state.playoff;
+        if (!po || po.done) return;
+        const labels = {
+            semiLeg1: 'Semi-Final · 1st Leg',
+            semiLeg2: 'Semi-Final · 2nd Leg',
+            final:    '🏟️ Wembley Final',
+        };
+        let fixture;
+        if (po.currentMatch === 'semiLeg1')      fixture = { home: po.playerSemi.leg1.home, away: po.playerSemi.leg1.away };
+        else if (po.currentMatch === 'semiLeg2') fixture = { home: po.playerSemi.leg2.home, away: po.playerSemi.leg2.away };
+        else if (po.currentMatch === 'final')    fixture = { home: po.final.home, away: po.final.away };
+        else return;
+        this.state.playoffContext = {
+            matchName: labels[po.currentMatch] || po.currentMatch,
+            fixture,
+            isFinal: po.currentMatch === 'final',
+        };
+    }
+
+    _simulateOtherSemi() {
+        const po = this.state.playoff;
+        if (!po || po.otherSemi.played) return;
+        const [tA, tB] = po.otherSemi.teams;
+        const teamA = plmGetTeam(tA);
+        const teamB = plmGetTeam(tB);
+        if (!this.squads[tA]) this.squads[tA] = plmFallbackSquad(teamA);
+        if (!this.squads[tB]) this.squads[tB] = plmFallbackSquad(teamB);
+        const xiA = plmAutoPickXI(this.squads[tA], PLM_DEFAULT_FORMATION);
+        const xiB = plmAutoPickXI(this.squads[tB], PLM_DEFAULT_FORMATION);
+        // 2-leg aggregate
+        const leg1 = plmSimulateMatch(teamB, xiB, teamA, xiA, PLM_DEFAULT_FORMATION, PLM_DEFAULT_FORMATION);
+        const leg2 = plmSimulateMatch(teamA, xiA, teamB, xiB, PLM_DEFAULT_FORMATION, PLM_DEFAULT_FORMATION);
+        const aggA = leg1.awayScore + leg2.homeScore;
+        const aggB = leg1.homeScore + leg2.awayScore;
+        let winner;
+        if (aggA > aggB)      winner = tA;
+        else if (aggB > aggA) winner = tB;
+        else                  winner = Math.random() < 0.5 ? tA : tB;
+        po.otherSemi.winner    = winner;
+        po.otherSemi.played    = true;
+        po.otherSemi.scoreLine = `${teamA.short} ${aggA}–${aggB} ${teamB.short} (agg)`;
+        po.log.push(`Other semi: ${po.otherSemi.scoreLine}`);
+    }
+
+    playPlayoffMatch() {
+        const ctx = this.state.playoffContext;
+        if (!ctx) return;
+        const po = this.state.playoff;
+        const { fixture } = ctx;
+        const home = plmGetTeam(fixture.home);
+        const away = plmGetTeam(fixture.away);
+        if (!home || !away) { this.state.playoffContext = null; return this.render(); }
+        if (!this.squads[fixture.home]) this.squads[fixture.home] = plmFallbackSquad(home);
+        if (!this.squads[fixture.away]) this.squads[fixture.away] = plmFallbackSquad(away);
+
+        const homeXI = this.getXIFor(fixture.home);
+        const awayXI = this.getXIFor(fixture.away);
+        const sim = plmSimulateMatch(home, homeXI, away, awayXI,
+            this.getFormationFor(fixture.home), this.getFormationFor(fixture.away));
+
+        // Tick availability
+        for (const tid of [fixture.home, fixture.away])
+            for (const p of (this.squads[tid] || [])) {
+                if (p.suspended > 0) p.suspended--;
+                if (p.injured > 0) p.injured--;
+            }
+
+        const playerId = this.state.playerTeam;
+        const playerFor   = fixture.home === playerId ? sim.homeScore : sim.awayScore;
+        const playerAg    = fixture.home === playerId ? sim.awayScore : sim.homeScore;
+        let pens = false;
+
+        if (po.currentMatch === 'semiLeg1') {
+            po.playerSemi.leg1 = { ...po.playerSemi.leg1, hs: sim.homeScore, as: sim.awayScore, done: true };
+            po.playerSemi.aggFor += playerFor;
+            po.playerSemi.aggAgainst += playerAg;
+            po.currentMatch = 'semiLeg2';
+        } else if (po.currentMatch === 'semiLeg2') {
+            po.playerSemi.leg2 = { ...po.playerSemi.leg2, hs: sim.homeScore, as: sim.awayScore, done: true };
+            po.playerSemi.aggFor += playerFor;
+            po.playerSemi.aggAgainst += playerAg;
+            if (po.playerSemi.aggFor > po.playerSemi.aggAgainst) {
+                po.playerSemi.winner = playerId;
+            } else if (po.playerSemi.aggFor < po.playerSemi.aggAgainst) {
+                po.playerSemi.winner = po.playerOppId;
+            } else {
+                pens = true;
+                const hR = plmAvgRating(homeXI), aR = plmAvgRating(awayXI);
+                const playerXIRating = fixture.home === playerId ? hR : aR;
+                const oppXIRating    = fixture.home === playerId ? aR : hR;
+                const playerWinProb  = (playerXIRating + 2) / (playerXIRating + oppXIRating + 2);
+                const playerWins = Math.random() < playerWinProb;
+                po.playerSemi.winner = playerWins ? playerId : po.playerOppId;
+                sim.timeline.push({ min: 121, type: 'ft',
+                    text: `⚽ Penalty shootout! ${(playerWins ? home : away).name} win the shootout!` });
+            }
+            this._simulateOtherSemi();
+            if (po.playerSemi.winner === playerId) {
+                po.final.home = playerId;
+                po.final.away = po.otherSemi.winner;
+                po.currentMatch = 'final';
+            } else {
+                po.eliminated = true;
+                po.done = true;
+                po.winner = po.otherSemi.winner;
+                po.currentMatch = 'done';
+            }
+        } else if (po.currentMatch === 'final') {
+            po.final.hs = sim.homeScore;
+            po.final.as = sim.awayScore;
+            po.final.done = true;
+            if (sim.homeScore !== sim.awayScore) {
+                po.final.winner = sim.homeScore > sim.awayScore ? fixture.home : fixture.away;
+            } else {
+                pens = true;
+                const hR = plmAvgRating(homeXI), aR = plmAvgRating(awayXI);
+                const homeWinProb = (hR + 2) / (hR + aR + 2);
+                const homeWins = Math.random() < homeWinProb;
+                po.final.winner = homeWins ? fixture.home : fixture.away;
+                sim.timeline.push({ min: 121, type: 'ft',
+                    text: `⚽ Penalty shootout at Wembley! ${(homeWins ? home : away).name} win!` });
+            }
+            po.promoted = po.final.winner === playerId;
+            po.winner = po.final.winner;
+            po.done = true;
+            po.currentMatch = 'done';
+        }
+
+        this.state.lastMatch = {
+            fixture, ...sim, home, away,
+            isCupMatch: true, cupName: 'playoff',
+            roundName: ctx.matchName,
+            cupDisplayName: '🏆 Playoff',
+            pens,
+            isPlayoffMatch: true,
+        };
+        this.state.screen = 'matchResult';
+        this.state.playoffContext = null;
+        this.save();
+        this.render();
+    }
+
+    _advancePlayoff() {
+        const po = this.state.playoff;
+        if (!po) { this.state.screen = 'seasonEnd'; this.save(); return this.render(); }
+        if (po.done) {
+            this.state.screen = 'seasonEnd';
+            this.save(); return this.render();
+        }
+        // More matches to play
+        this._setupPlayoffContext();
+        this.state.screen = 'pickxi';
+        this.save();
+        this.render();
+    }
+
+    renderPlayoffIntro() {
+        const po = this.state.playoff;
+        if (!po) { this.state.screen = 'seasonEnd'; return this.render(); }
+        const team = this.playerTeam();
+        const divName = this.divConfig().name;
+        const opp = plmGetTeam(po.playerOppId);
+        const sorted = plmSortedTable(this.state.table);
+        const positionOf = id => sorted.findIndex(r => r.id === id) + 1;
+        const ordinal = n => { const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
+        const yourPos = positionOf(team.id);
+        const oppPos = positionOf(po.playerOppId);
+        const [oA, oB] = po.otherSemi.teams;
+        const oAt = plmGetTeam(oA), oBt = plmGetTeam(oB);
+
+        this.rootEl.innerHTML = `
+            <div class="plm-season-end">
+                <h2>🏆 ${divName} Promotion Playoffs</h2>
+                <p class="plm-verdict-big">You finished ${ordinal(yourPos)}! Win 2 matches to reach Wembley, then 1 more to get promoted.</p>
+
+                <div class="plm-prize-box">
+                    <h3 style="margin-top:0">🎯 Your Semi-Final</h3>
+                    <p style="font-size:1.15em"><b>${team.name}</b> (${ordinal(yourPos)}) vs <b>${opp?.name || po.playerOppId}</b> (${ordinal(oppPos)})</p>
+                    <p style="opacity:.8">Two legs: ${plmGetTeam(po.playerSemi.leg1.home)?.short} hosts the first leg, ${plmGetTeam(po.playerSemi.leg2.home)?.short} hosts the second.</p>
+                </div>
+
+                <div class="plm-promo-box">
+                    <h3 style="margin-top:0">Other Semi-Final</h3>
+                    <p><b>${oAt?.name || oA}</b> (${ordinal(positionOf(oA))}) vs <b>${oBt?.name || oB}</b> (${ordinal(positionOf(oB))})</p>
+                    <p style="opacity:.7;font-size:.9em">Played behind the scenes — the winner faces you at Wembley if you make it.</p>
+                </div>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
+                    <button class="plm-play-btn" id="plm-start-playoffs">▶ Begin Playoffs</button>
+                </div>
+            </div>`;
+
+        this.rootEl.querySelector('#plm-start-playoffs').addEventListener('click', () => {
+            this._setupPlayoffContext();
+            this.state.screen = 'pickxi';
+            this.save();
+            this.render();
+        });
     }
 }
 
