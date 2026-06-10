@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finnegan's Interests</title>
     <link rel="stylesheet" href="index-style.css?v=3">
+    <link rel="stylesheet" href="football.css?v=1">
 </head>
 <body>
     <div class="hub-wrapper">
@@ -716,8 +717,30 @@
                     <button class="back-btn" onclick="switchTab('home')">← Back</button>
                 </div>
                 <div class="game-content info-content">
+
+                    <div class="fb-subnav">
+                        <button class="fb-nav-btn active" onclick="document.getElementById('spurs-section').scrollIntoView({behavior:'smooth'})">📰 Spurs News</button>
+                        <button class="fb-nav-btn" onclick="switchTab('wc2026')">🏆 World Cup 2026</button>
+                    </div>
+
+                    <section id="spurs-section" class="fb-card">
+                        <div class="fb-card-head">
+                            <h3>📰 Tottenham Hotspur — Latest News</h3>
+                            <button class="fb-refresh" id="spurs-refresh" title="Refresh news">🔄</button>
+                        </div>
+                        <div class="news-legend">
+                            <span class="news-badge tier-trusted">🟢 Trusted</span>
+                            <span class="news-badge tier-reputable">🟡 Reputable</span>
+                            <span class="news-badge tier-rumour">🔴 Rumour</span>
+                            <span class="news-disclaimer">🔴 Rumour items are unverified transfer speculation — enjoy with a pinch of salt!</span>
+                        </div>
+                        <div id="spurs-news-list" class="news-list">
+                            <p class="fb-loading">Loading the latest Spurs news…</p>
+                        </div>
+                    </section>
+
                     <div class="info-section">
-                        <h3>⚽ Football Information Hub</h3>
+                        <h3>⚽ Football Facts</h3>
                         <div class="info-grid">
                             <div class="info-card">
                                 <div class="info-icon">🏆</div>
@@ -764,6 +787,37 @@
                                 </ul>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- World Cup 2026 (live results & tables) -->
+            <div id="wc2026" class="game-page">
+                <div class="game-header-inline">
+                    <h2>🏆 World Cup 2026</h2>
+                    <button class="fb-back" onclick="switchTab('football')">← Back to Football</button>
+                </div>
+                <div class="game-content info-content">
+                    <div class="fb-card">
+                        <div class="fb-card-head">
+                            <h3>🏆 FIFA World Cup 2026 · Canada · Mexico · USA</h3>
+                            <button class="fb-refresh" id="wc-refresh" title="Refresh">🔄</button>
+                        </div>
+                        <p id="wc-status" class="wc-status">Loading live fixtures &amp; results…</p>
+
+                        <div class="wc-tabs">
+                            <button class="wc-tab active" data-wc="tables">Group Tables</button>
+                            <button class="wc-tab" data-wc="results">Results</button>
+                            <button class="wc-tab" data-wc="fixtures">Fixtures</button>
+                            <button class="wc-tab" data-wc="knockout">Knockouts</button>
+                        </div>
+
+                        <div id="wc-tables" class="wc-pane active"></div>
+                        <div id="wc-results" class="wc-pane"></div>
+                        <div id="wc-fixtures" class="wc-pane"></div>
+                        <div id="wc-knockout" class="wc-pane"></div>
+
+                        <p class="wc-credit">Live data from <a href="https://www.thesportsdb.com" target="_blank" rel="noopener">TheSportsDB</a> — refreshes on each visit.</p>
                     </div>
                 </div>
             </div>
@@ -870,6 +924,7 @@
             });
             document.getElementById(tabName).classList.add('active');
             window.scrollTo(0, 0);
+            document.dispatchEvent(new CustomEvent('tabchange', { detail: tabName }));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -898,6 +953,8 @@
     <script src="tracker.js"></script>
     <script src="trains.js"></script>
     <script src="worldcup.js"></script>
+    <script src="spurs-news.js"></script>
+    <script src="worldcup2026.js"></script>
     <script src="cannon.js"></script>
     <script src="g2048.js"></script>
     <script src="snake.js"></script>

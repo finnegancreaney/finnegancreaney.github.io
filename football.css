@@ -1,0 +1,205 @@
+/* Football enhancements: Spurs news feed + World Cup 2026.
+   Reuses the hub design tokens (--primary, --surface, --border, ...). */
+
+/* ---- shared cards / sub-nav ---- */
+.fb-subnav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.fb-nav-btn,
+.fb-back {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 16px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, color .2s;
+}
+.fb-nav-btn:hover,
+.fb-back:hover { background: var(--border); }
+.fb-nav-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.fb-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
+    margin-bottom: 22px;
+}
+.fb-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.fb-card-head h3 { color: var(--primary-dark); font-size: 1.2em; }
+.fb-refresh {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 1em;
+    cursor: pointer;
+    line-height: 1;
+}
+.fb-refresh:hover { background: var(--border); }
+.fb-refresh:active { transform: rotate(90deg); }
+.fb-loading { color: var(--muted); padding: 12px 4px; }
+
+/* ---- reliability badges (shared) ---- */
+.news-badge {
+    display: inline-block;
+    font-size: .72em;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    letter-spacing: .2px;
+}
+.tier-trusted   { background: #dcfce7; color: #166534; }
+.tier-reputable { background: #fef3c7; color: #92400e; }
+.tier-rumour    { background: #fee2e2; color: #991b1b; }
+
+/* ---- Spurs news ---- */
+.news-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 14px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+.news-disclaimer {
+    flex-basis: 100%;
+    color: var(--muted);
+    font-size: .85em;
+    margin-top: 4px;
+}
+.news-list { display: flex; flex-direction: column; }
+.news-item {
+    display: block;
+    text-decoration: none;
+    color: var(--text);
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+}
+.news-item:last-child { border-bottom: 0; }
+.news-item:hover { background: var(--bg); }
+.news-item-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.news-source { font-size: .82em; font-weight: 600; color: var(--muted); }
+.news-time { font-size: .82em; color: var(--muted); margin-left: auto; }
+.news-title { font-size: 1.02em; line-height: 1.4; font-weight: 600; }
+.news-item:hover .news-title { color: var(--primary-dark); }
+
+/* ---- World Cup ---- */
+.wc-status {
+    color: var(--muted);
+    font-size: .9em;
+    margin-bottom: 14px;
+}
+.wc-status--error { color: var(--danger); font-weight: 600; }
+.wc-credit { color: var(--muted); font-size: .82em; margin-top: 16px; }
+.wc-credit a { color: var(--primary-dark); }
+
+.wc-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+.wc-tab {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.wc-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+.wc-pane { display: none; }
+.wc-pane.active { display: block; }
+
+/* group tables grid */
+#wc-tables {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+.wc-group {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+.wc-group-title {
+    background: var(--primary);
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 1em;
+}
+.wc-table { width: 100%; border-collapse: collapse; font-size: .9em; }
+.wc-table th, .wc-table td {
+    padding: 7px 6px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+.wc-table thead th { background: var(--bg); color: var(--muted); font-size: .82em; font-weight: 700; }
+.wc-th-pos { width: 22px; color: var(--muted); }
+.wc-th-team { text-align: left; }
+.wc-th-team span { vertical-align: middle; }
+.wc-pts { font-weight: 800; }
+.wc-table tbody tr:last-child td { border-bottom: 0; }
+.wc-qual  { background: rgba(16, 185, 129, .10); }   /* top 2 — qualify */
+.wc-third { background: rgba(245, 158, 11, .10); }   /* 3rd — possible best-third */
+.wc-badge {
+    width: 20px; height: 20px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin: 0 6px;
+}
+.wc-badge--blank { display: inline-block; }
+
+/* match rows (results / fixtures / knockout) */
+.wc-match {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 6px;
+    border-bottom: 1px solid var(--border);
+}
+.wc-match:last-child { border-bottom: 0; }
+.wc-team { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.wc-team span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.wc-team--home { justify-content: flex-end; text-align: right; }
+.wc-team--away { justify-content: flex-start; text-align: left; }
+.wc-mid { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 88px; }
+.wc-score { font-weight: 800; font-size: 1.05em; }
+.wc-kotime { color: var(--muted); font-size: .82em; text-align: center; }
+.wc-grouptag { font-size: .68em; color: var(--muted); }
+.wc-empty { color: var(--muted); padding: 14px 4px; line-height: 1.5; }
+
+@media (max-width: 520px) {
+    .wc-team span { font-size: .9em; }
+    .wc-mid { min-width: 70px; }
+    #wc-tables { grid-template-columns: 1fr; }
+}
