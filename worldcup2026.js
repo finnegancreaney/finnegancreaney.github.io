@@ -1,21 +1,29 @@
 /* World Cup 2026 — live fixtures, results and group tables.
  * Data: TheSportsDB free public key "3" (no account needed).
- * The group stage is rounds 1-3 (72 matches); knockout rounds populate later.
- * Group letters are the official 2026 draw, with names aligned to TheSportsDB's
- * exact spellings (verified against the live fixture list). */
+ *
+ * NOTE on data strategy (changed 2026-06-15):
+ * The free key now caps the bulk endpoints (eventsround / eventsseason /
+ * eventspastleague) at ~5 events, so most fixtures — including Scotland's —
+ * never arrived and tables stayed blank/stale. Instead we now fetch each of
+ * the 48 nations individually via eventslast.php + eventsnext.php (which are
+ * NOT capped), then merge + dedupe by idEvent. To respect the free key's
+ * rate limit (~24 req/min before HTTP 429) every request is throttled and
+ * every team is cached in localStorage, so warm loads are instant and only
+ * stale teams are refetched. Featured teams (Scotland, England) load first. */
 (function () {
     'use strict';
 
     const KEY = '3';
-    const LEAGUE = 4429;            // FIFA World Cup
-    const SEASON = '2026';
-    const GROUP_ROUNDS = [1, 2, 3];
-    // Candidate knockout round codes — silently ignored until TheSportsDB fills them in.
-    const KO_ROUNDS = [125, 150, 160, 170, 180, 200];
-    const CACHE_KEY = 'wc2026_cache_v1';
-    const CACHE_MS = 10 * 60 * 1000; // 10 minutes
+    const BASE = 'https://www.thesportsdb.com/api/v1/json/' + KEY;
+    const WC_LEAGUE = '4429';           // FIFA World Cup (string — matches idLeague in payloads)
+    const FRIENDLY_FILTER = true;       // keep only WC_LEAGUE events, drop friendlies/qualifiers
 
-    // Official 2026 group draw (TheSportsDB spellings).
+    const CACHE_KEY = 'wc2026_team_cache_v2';
+    const TEAM_TTL_MS = 15 * 60 * 1000; // a team is "fresh" for 15 min
+    const REQ_GAP_MS = 2500;            // min gap between HTTP requests (~24/min, under the 429 wall)
+    const FEATURED = ['Scotland', 'England']; // loaded first so Finn's teams appear soonest
+
+    // Official 2026 group draw (names match TheSportsDB's exact spellings).
     const GROUPS = {
         A: ['Mexico', 'South Africa', 'South Korea', 'Czech Republic'],
         B: ['Canada', 'Bosnia-Herzegovina', 'Qatar', 'Switzerland'],
@@ -30,42 +38,86 @@
         K: ['Portugal', 'DR Congo', 'Uzbekistan', 'Colombia'],
         L: ['England', 'Croatia', 'Ghana', 'Panama']
     };
+
+    // TheSportsDB team ids (resolved & verified 2026-06-15). Used by the
+    // per-team event endpoints — searchteams is capped/ambiguous at runtime,
+    // so these are hardcoded.
+    const TEAM_ID = {
+        'Mexico': '134497', 'South Africa': '136482', 'South Korea': '134517', 'Czech Republic': '133904',
+        'Canada': '140073', 'Bosnia-Herzegovina': '134510', 'Qatar': '136472', 'Switzerland': '134506',
+        'Brazil': '134496', 'Morocco': '136139', 'Haiti': '140175', 'Scotland': '136450',
+        'USA': '134514', 'Paraguay': '136471', 'Australia': '134500', 'Turkey': '135985',
+        'Germany': '133907', 'Curaçao': '140271', 'Ivory Coast': '134502', 'Ecuador': '134507',
+        'Netherlands': '133905', 'Japan': '134503', 'Sweden': '133916', 'Tunisia': '136142',
+        'Belgium': '134515', 'Egypt': '136138', 'Iran': '134511', 'New Zealand': '137449',
+        'Spain': '133909', 'Cape Verde': '136477', 'Saudi Arabia': '136137', 'Uruguay': '134504',
+        'France': '133913', 'Senegal': '136143', 'Iraq': '140148', 'Norway': '136516',
+        'Argentina': '134509', 'Algeria': '134516', 'Austria': '135986', 'Jordan': '140145',
+        'Portugal': '133908', 'DR Congo': '136475', 'Uzbekistan': '140151', 'Colombia': '134501',
+        'England': '133914', 'Croatia': '133912', 'Ghana': '134513', 'Panama': '136141'
+    };
+
     const TEAM_GROUP = {};
     Object.keys(GROUPS).forEach(function (g) {
         GROUPS[g].forEach(function (t) { TEAM_GROUP[t] = g; });
     });
 
     let loaded = false;
+    let refreshing = false;
     let badgeCache = {}; // team name -> badge url
 
-    /* ---------- data ---------- */
+    /* ---------- throttled fetch (rate-limit friendly) ---------- */
 
-    function fetchRound(round) {
-        const url = 'https://www.thesportsdb.com/api/v1/json/' + KEY +
-            '/eventsround.php?id=' + LEAGUE + '&r=' + round + '&s=' + SEASON;
-        return fetch(url)
-            .then(function (r) { return r.ok ? r.json() : { events: null }; })
-            .then(function (d) { return (d && d.events) || []; })
-            .catch(function () { return []; });
+    let lastReqAt = 0;
+    function throttledFetch(url, retries) {
+        retries = retries == null ? 2 : retries;
+        return new Promise(function (resolve) {
+            const wait = Math.max(0, REQ_GAP_MS - (Date.now() - lastReqAt));
+            setTimeout(function () {
+                lastReqAt = Date.now();
+                fetch(url).then(function (r) {
+                    if (r.status === 429 && retries > 0) {
+                        // backed off the rate limiter — wait extra and retry
+                        return new Promise(function (res) {
+                            setTimeout(function () { res(throttledFetch(url, retries - 1)); }, REQ_GAP_MS * 2);
+                        });
+                    }
+                    return r.ok ? r.json() : null;
+                }).then(resolve).catch(function () { resolve(null); });
+            }, wait);
+        });
     }
 
-    function fetchAll(force) {
-        if (!force) {
-            try {
-                const c = JSON.parse(localStorage.getItem(CACHE_KEY));
-                if (c && (Date.now() - c.t) < CACHE_MS && c.events && c.events.length) {
-                    return Promise.resolve(c.events);
-                }
-            } catch (e) { /* ignore */ }
-        }
-        const rounds = GROUP_ROUNDS.concat(KO_ROUNDS);
-        return Promise.all(rounds.map(fetchRound)).then(function (lists) {
-            const events = [].concat.apply([], lists);
-            try {
-                localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), events: events }));
-            } catch (e) { /* quota */ }
-            return events;
+    function fetchTeam(id) {
+        // eventslast → {results:[...]}, eventsnext → {events:[...]}; run sequentially (throttle).
+        return throttledFetch(BASE + '/eventslast.php?id=' + id).then(function (d) {
+            const past = (d && d.results) || [];
+            return throttledFetch(BASE + '/eventsnext.php?id=' + id).then(function (d2) {
+                const next = (d2 && d2.events) || [];
+                let evs = past.concat(next);
+                if (FRIENDLY_FILTER) evs = evs.filter(function (e) { return e.idLeague === WC_LEAGUE; });
+                return evs;
+            });
         });
+    }
+
+    /* ---------- cache + merge ---------- */
+
+    function loadCache() {
+        try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; }
+        catch (e) { return {}; }
+    }
+    function saveCache(c) {
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch (e) { /* quota */ }
+    }
+    function mergeEvents(cache) {
+        const seen = {}, out = [];
+        Object.keys(cache).forEach(function (id) {
+            (cache[id].events || []).forEach(function (e) {
+                if (e && e.idEvent && !seen[e.idEvent]) { seen[e.idEvent] = 1; out.push(e); }
+            });
+        });
+        return out;
     }
 
     /* ---------- helpers ---------- */
@@ -220,6 +272,12 @@
         }
     }
 
+    function setLiveStatus(events) {
+        const played = events.filter(isFinished).length;
+        setStatus('✅ Live · ' + events.length + ' matches loaded · ' + played + ' played · updated ' +
+            new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }));
+    }
+
     function paint(events) {
         const t = document.getElementById('wc-tables');
         const r = document.getElementById('wc-results');
@@ -230,22 +288,63 @@
         if (r) r.innerHTML = renderResults(events);
         if (f) f.innerHTML = renderFixtures(events);
         if (k) k.innerHTML = renderKnockout(events);
-        const played = events.filter(isFinished).length;
-        setStatus('✅ Live · ' + events.length + ' matches loaded · ' + played + ' played · updated ' +
-            new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }));
     }
 
-    function load(force) {
-        setStatus('Loading live fixtures & results…');
-        fetchAll(force).then(function (events) {
-            if (!events.length) {
-                setStatus('⚠️ Couldn’t reach the live data right now. Please try Refresh in a moment.', true);
+    // Team ids in group order, but with featured teams first.
+    function teamQueueOrder() {
+        const all = Object.keys(TEAM_ID);
+        const feat = FEATURED.filter(function (n) { return TEAM_ID[n]; });
+        const rest = all.filter(function (n) { return feat.indexOf(n) === -1; });
+        return feat.concat(rest).map(function (n) { return TEAM_ID[n]; });
+    }
+
+    function refresh(force) {
+        if (refreshing) return;
+        const cache = loadCache();
+
+        // 1) paint whatever we already have, instantly.
+        const initial = mergeEvents(cache);
+        if (initial.length) paint(initial);
+
+        // 2) work out which teams are stale (or all, if forced).
+        const now = Date.now();
+        const queue = teamQueueOrder().filter(function (id) {
+            const c = cache[id];
+            return force || !c || !c.events || (now - c.t) > TEAM_TTL_MS;
+        });
+
+        if (!queue.length) {
+            setLiveStatus(initial);
+            return;
+        }
+
+        // 3) fetch stale teams one at a time, repainting as data arrives.
+        refreshing = true;
+        const total = queue.length;
+        let done = 0;
+        if (!initial.length) setStatus('Loading live fixtures & results… (this first load takes a minute)');
+        else setStatus('Refreshing live data… 0/' + total + ' teams');
+
+        (function step(i) {
+            if (i >= queue.length) {
+                refreshing = false;
+                const merged = mergeEvents(cache);
+                paint(merged);
+                setLiveStatus(merged);
                 return;
             }
-            paint(events);
-        }).catch(function () {
-            setStatus('⚠️ Couldn’t load World Cup data right now. Please try Refresh in a moment.', true);
-        });
+            const id = queue[i];
+            fetchTeam(id).then(function (evts) {
+                // keep previously cached events if this fetch came back empty (e.g. transient 429)
+                const prev = (cache[id] && cache[id].events) || [];
+                cache[id] = { t: Date.now(), events: (evts && evts.length) ? evts : prev };
+                saveCache(cache);
+                done++;
+                if (done % 4 === 0 || i === queue.length - 1) paint(mergeEvents(cache));
+                setStatus('Refreshing live data… ' + done + '/' + total + ' teams');
+                step(i + 1);
+            });
+        })(0);
     }
 
     /* ---------- wiring ---------- */
@@ -262,8 +361,8 @@
                 });
             });
         });
-        const refresh = document.getElementById('wc-refresh');
-        if (refresh) refresh.addEventListener('click', function () { load(true); });
+        const refreshBtn = document.getElementById('wc-refresh');
+        if (refreshBtn) refreshBtn.addEventListener('click', function () { refresh(true); });
     }
 
     function init() {
@@ -271,7 +370,7 @@
         document.addEventListener('tabchange', function (e) {
             if (e.detail === 'wc2026' && !loaded) {
                 loaded = true;
-                load(false);
+                refresh(false);
             }
         });
     }
