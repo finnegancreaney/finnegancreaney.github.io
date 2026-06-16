@@ -19,9 +19,18 @@
     const FRIENDLY_FILTER = true;       // keep only WC_LEAGUE events, drop friendlies/qualifiers
 
     const CACHE_KEY = 'wc2026_team_cache_v2';
-    const TEAM_TTL_MS = 15 * 60 * 1000; // a team is "fresh" for 15 min
     const REQ_GAP_MS = 2500;            // min gap between HTTP requests (~24/min, under the 429 wall)
     const FEATURED = ['Scotland', 'England']; // loaded first so Finn's teams appear soonest
+
+    // How long a team's cached data stays "fresh" depends on how soon it next
+    // plays — a team kicking off now needs frequent refreshes; one with no match
+    // for days barely changes. This stops every visit re-crawling all 48 teams.
+    const MINUTE = 60 * 1000, HOUR = 60 * MINUTE;
+    const TTL_LIVE = 2 * MINUTE;        // match in progress → near-live scores
+    const TTL_SOON = 10 * MINUTE;       // kicks off within 6h
+    const TTL_NEAR = 6 * HOUR;          // plays within ~36h
+    const TTL_IDLE = 24 * HOUR;         // no match imminent (or tournament over)
+    const LIVE_WINDOW = 2.5 * HOUR;     // a kicked-off, unfinished match is treated as live for this long
 
     // Official 2026 group draw (names match TheSportsDB's exact spellings).
     const GROUPS = {
@@ -110,6 +119,23 @@
     function saveCache(c) {
         try { localStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch (e) { /* quota */ }
     }
+    // How long this team's cache stays fresh, from its own fixtures.
+    function teamTtl(events, now) {
+        let live = false, nextMs = Infinity;
+        (events || []).forEach(function (e) {
+            if (isFinished(e)) return;
+            const ms = whenMs(e);
+            if (!ms) return;
+            if (ms <= now) { if (now - ms < LIVE_WINDOW) live = true; }   // kicked off, not yet final
+            else if (ms < nextMs) { nextMs = ms; }                       // soonest upcoming
+        });
+        if (live) return TTL_LIVE;
+        const until = nextMs - now;
+        if (until < 6 * HOUR) return TTL_SOON;
+        if (until < 36 * HOUR) return TTL_NEAR;
+        return TTL_IDLE;
+    }
+
     function mergeEvents(cache) {
         const seen = {}, out = [];
         Object.keys(cache).forEach(function (id) {
@@ -310,7 +336,8 @@
         const now = Date.now();
         const queue = teamQueueOrder().filter(function (id) {
             const c = cache[id];
-            return force || !c || !c.events || (now - c.t) > TEAM_TTL_MS;
+            if (force || !c || !c.events) return true;
+            return (now - c.t) > teamTtl(c.events, now);
         });
 
         if (!queue.length) {
