@@ -2396,6 +2396,93 @@ body {
     .sol-suit { font-size: 1.2rem; }
 }
 
+/* ---- Blackjack ---- */
+.blackjack-content { align-items: stretch; gap: 14px; }
+.bj-hud {
+    display: flex; gap: 10px; justify-content: center; align-items: center;
+    background: var(--bg); padding: 12px; border-radius: var(--radius);
+}
+.bj-stat { display: flex; flex-direction: column; align-items: center; padding: 0 18px; min-width: 80px; }
+.bj-stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+.bj-stat-value { font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); }
+
+.bj-table {
+    display: flex; flex-direction: column; gap: 18px; align-items: center;
+    background: radial-gradient(ellipse at center, #157347 0%, #0f5132 75%);
+    padding: 22px 16px; border-radius: 14px; min-height: 340px;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.35);
+}
+.bj-seat { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.bj-seat-head { display: flex; align-items: center; gap: 10px; }
+.bj-seat-label {
+    color: #d1fae5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+}
+.bj-seat-score {
+    background: rgba(0,0,0,0.35); color: #fff; font-weight: 800;
+    min-width: 36px; text-align: center; padding: 2px 10px; border-radius: 20px; font-size: 0.95rem;
+}
+.bj-cards { display: flex; gap: 8px; min-height: 96px; flex-wrap: wrap; justify-content: center; }
+
+.bj-card {
+    width: 64px; height: 96px; border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 6px 8px; font-weight: 800; user-select: none; flex-shrink: 0;
+    animation: bj-deal 0.25s ease;
+}
+@keyframes bj-deal { from { transform: translateY(-14px) scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
+.bj-card.back {
+    background: repeating-linear-gradient(45deg, #1e3a8a, #1e3a8a 6px, #1e40af 6px, #1e40af 12px);
+    border: 2px solid #fff;
+}
+.bj-card.face { background: #fff; border: 1px solid #ccc; }
+.bj-card.face.red { color: #dc2626; }
+.bj-card.face.black { color: #111827; }
+.bj-rank { font-size: 1rem; line-height: 1; }
+.bj-rank-b { align-self: flex-end; transform: rotate(180deg); }
+.bj-suit { font-size: 1.7rem; text-align: center; }
+
+.bj-message {
+    min-height: 24px; text-align: center; font-weight: 700; font-size: 1rem;
+    color: #f0fdf4; padding: 4px 12px; border-radius: 8px;
+}
+.bj-message.win  { color: #052e16; background: #4ade80; }
+.bj-message.lose { color: #fff;    background: #dc2626; }
+.bj-message.push { color: #1c1917; background: #fbbf24; }
+
+.bj-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.bj-chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.bj-chip {
+    width: 52px; height: 52px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.85);
+    font-weight: 800; font-size: 0.95rem; color: #fff; cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: transform 0.1s;
+}
+.bj-chip:hover { transform: translateY(-3px); }
+.bj-chip.chip-5   { background: #6b7280; }
+.bj-chip.chip-25  { background: #16a34a; }
+.bj-chip.chip-50  { background: #2563eb; }
+.bj-chip.chip-100 { background: #1f2937; }
+
+.bj-btn-row, .bj-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.bj-btn {
+    background: var(--primary); color: #fff; border: none; border-radius: var(--radius);
+    padding: 10px 22px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+}
+.bj-btn:hover { background: var(--primary-dark); }
+.bj-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.bj-clear-btn { background: var(--muted); }
+.bj-clear-btn:hover { background: #6b7280; }
+.bj-deal-btn { background: #d97706; }
+.bj-deal-btn:hover { background: #b45309; }
+
+@media (max-width: 520px) {
+    .bj-card { width: 50px; height: 74px; padding: 5px 6px; }
+    .bj-suit { font-size: 1.3rem; }
+    .bj-rank { font-size: 0.85rem; }
+    .bj-chip { width: 46px; height: 46px; }
+}
+
 /* ==============================
    Europe 1939 (WW2 grand strategy)
    ============================== */

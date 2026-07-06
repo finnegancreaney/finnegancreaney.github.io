@@ -114,6 +114,12 @@
                         <p>Classic Klondike. Click to move cards.</p>
                         <button class="play-btn">Play Now</button>
                     </div>
+                    <div class="game-card" onclick="switchTab('blackjack')">
+                        <div class="game-card-icon">🂡</div>
+                        <h3>Blackjack</h3>
+                        <p>Beat the dealer to 21. Bet chips, hit, stand, double down.</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
                     <div class="game-card" onclick="switchTab('plmanager')">
                         <div class="game-card-icon">⚽</div>
                         <h3>The Boss</h3>
@@ -498,6 +504,44 @@
                     </div>
                     <div class="sol-table" id="sol-table"></div>
                     <p class="sol-hint">Click a card to select it, then click its destination. Build foundations up (A→K) by suit; build tableau down, alternating colours.</p>
+                </div>
+            </div>
+
+            <!-- Blackjack -->
+            <div id="blackjack" class="game-page">
+                <div class="game-header-inline">
+                    <h2>🂡 Blackjack (21)</h2>
+                    <button class="back-btn" onclick="switchTab('games')">← Back</button>
+                </div>
+                <div class="game-content blackjack-content">
+                    <div class="bj-hud">
+                        <div class="bj-stat"><span class="bj-stat-label">Chips</span><span class="bj-stat-value" id="bj-bank">500</span></div>
+                        <div class="bj-stat"><span class="bj-stat-label">Bet</span><span class="bj-stat-value" id="bj-bet">0</span></div>
+                    </div>
+                    <div class="bj-table" id="bj-table">
+                        <div class="bj-seat">
+                            <div class="bj-seat-head"><span class="bj-seat-label">Dealer</span><span class="bj-seat-score" id="bj-dealer-score">–</span></div>
+                            <div class="bj-cards" id="bj-dealer-cards"></div>
+                        </div>
+                        <div class="bj-message" id="bj-message">Place your bet, then Deal.</div>
+                        <div class="bj-seat">
+                            <div class="bj-seat-head"><span class="bj-seat-label">You</span><span class="bj-seat-score" id="bj-player-score">–</span></div>
+                            <div class="bj-cards" id="bj-player-cards"></div>
+                        </div>
+                    </div>
+                    <div class="bj-controls">
+                        <div class="bj-chips" id="bj-chips"></div>
+                        <div class="bj-btn-row">
+                            <button class="bj-btn bj-deal-btn" id="bj-deal">Deal</button>
+                            <button class="bj-btn bj-clear-btn" id="bj-clear">Clear Bet</button>
+                        </div>
+                        <div class="bj-actions" id="bj-actions">
+                            <button class="bj-btn" id="bj-hit">Hit</button>
+                            <button class="bj-btn" id="bj-stand">Stand</button>
+                            <button class="bj-btn" id="bj-double">Double</button>
+                        </div>
+                    </div>
+                    <p class="sol-hint">Dealer stands on 17. Blackjack pays 3:2. Aces count 11 or 1. Get closer to 21 than the dealer without going over.</p>
                 </div>
             </div>
 
@@ -960,6 +1004,7 @@
     <script src="snake.js"></script>
     <script src="minesweeper.js"></script>
     <script src="solitaire.js"></script>
+    <script src="blackjack.js"></script>
 
     <!-- Chess deps (MIT). chessboard.js needs jQuery. -->
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
