@@ -2458,6 +2458,7 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: transform 0.1s;
 }
 .bj-chip:hover { transform: translateY(-3px); }
+.bj-chip.chip-1   { background: #be123c; }
 .bj-chip.chip-5   { background: #6b7280; }
 .bj-chip.chip-25  { background: #16a34a; }
 .bj-chip.chip-50  { background: #2563eb; }

@@ -12,7 +12,7 @@ const BJ_SUITS = {
 const BJ_RANK_NAMES = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 const BJ_START_BANK = 500;
 const BJ_BANK_KEY = 'bj_bankroll_v1';
-const BJ_CHIPS = [5, 25, 50, 100];
+const BJ_CHIPS = [1, 5, 25, 50, 100];
 
 class Blackjack {
     constructor() {
