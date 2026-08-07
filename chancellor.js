@@ -36,6 +36,62 @@ const CH_TAXES = [
 
 const CH_OTHER_RECEIPTS = 140;  // council tax, licences, dividends — not yours to set
 
+// Regions. Seats total 650, roughly matching the real Commons. `drift` is the
+// pull of agglomeration: left alone, the South keeps pulling away from the rest,
+// which is the problem every levelling-up fund has been aimed at.
+const CH_REGIONS = [
+    { key: 'nw',  name: 'North West',            seats: 75,  prosperity: 48, approval: 44, drift: -0.35 },
+    { key: 'ney', name: 'North East & Yorkshire', seats: 81,  prosperity: 42, approval: 42, drift: -0.40 },
+    { key: 'mid', name: 'Midlands',              seats: 106, prosperity: 50, approval: 45, drift: -0.25 },
+    { key: 'se',  name: 'London, South & East',  seats: 281, prosperity: 68, approval: 48, drift: +0.30 },
+    { key: 'sc',  name: 'Scotland',              seats: 57,  prosperity: 52, approval: 41, drift: -0.20 },
+    { key: 'wni', name: 'Wales & N. Ireland',    seats: 50,  prosperity: 44, approval: 44, drift: -0.30 }
+];
+const CH_SEATS_TOTAL = CH_REGIONS.reduce((n, r) => n + r.seats, 0);
+const CH_MAJORITY = Math.floor(CH_SEATS_TOTAL / 2) + 1;
+
+// Capital projects: multi-year commitments that keep costing whether you like it
+// or not, then pay off after they open. `overrun` is the annual chance of a
+// cost blowout — the bigger and more tunnel-heavy the scheme, the likelier it is.
+const CH_PROJECTS = [
+    { id: 'hsr', icon: '🚄', name: 'High-speed rail to the North', regions: ['nw', 'ney'],
+      cost: 9, years: 8, prosperity: 16, quality: { transport: 8 }, growth: 0.20, overrun: 0.30,
+      blurb: 'London to Manchester in an hour. Vast, slow, and historically impossible to keep on budget.' },
+    { id: 'npr', icon: '🌉', name: 'Northern Powerhouse Rail', regions: ['ney', 'nw'],
+      cost: 5, years: 6, prosperity: 11, quality: { transport: 5 }, growth: 0.12, overrun: 0.25,
+      blurb: 'Joins up Liverpool, Manchester, Leeds and Hull so the North works as one economy.' },
+    { id: 'metro', icon: '🚇', name: 'Metro extensions: Manchester & Leeds', regions: ['nw', 'ney'],
+      cost: 3, years: 5, prosperity: 9, quality: { transport: 3 }, overrun: 0.20,
+      blurb: 'Trams and light rail. Unglamorous, cheap, and it changes daily life quickly.' },
+    { id: 'm6', icon: '🛣️', name: 'Midlands motorway upgrade', regions: ['mid'],
+      cost: 3, years: 4, prosperity: 8, quality: { transport: 4 }, overrun: 0.20,
+      blurb: 'Freight moves faster through the middle of the country.' },
+    { id: 'sizewell', icon: '⚛️', name: 'Sizewell C nuclear plant', regions: ['se'],
+      cost: 4, years: 9, prosperity: 6, quality: { energy: 12 }, inflation: -0.30, overrun: 0.30,
+      blurb: 'A decade to build, then decades of cheap power. Bills fall once it opens.' },
+    { id: 'wind', icon: '🌬️', name: 'North Sea wind farms', regions: ['sc'],
+      cost: 3, years: 6, prosperity: 9, quality: { energy: 9 }, inflation: -0.20, overrun: 0.15,
+      blurb: 'Turbines off the Scottish coast, and the supply chain jobs that come with them.' },
+    { id: 'steel', icon: '🏭', name: 'Green steel plant, Port Talbot', regions: ['wni'],
+      cost: 2, years: 5, prosperity: 10, quality: { energy: 3 }, overrun: 0.20,
+      blurb: 'Saves a town built around one industry, and cleans it up at the same time.' },
+    { id: 'heathrow', icon: '✈️', name: 'Third runway at Heathrow', regions: ['se'],
+      cost: 3, years: 6, prosperity: 7, growth: 0.18, quality: { energy: -7 }, overrun: 0.25,
+      blurb: 'Good for trade and the South East. Your green record will not survive it.' },
+    { id: 'broadband', icon: '📡', name: 'National gigabit broadband', regions: 'all',
+      cost: 2, years: 5, prosperity: 2, growth: 0.15, overrun: 0.15,
+      blurb: 'Fibre to every village. Helps everywhere, but helps remote places most.' },
+    { id: 'hospitals', icon: '🏥', name: 'Forty new hospitals', regions: 'all',
+      cost: 6, years: 6, prosperity: 1, quality: { nhs: 12 }, overrun: 0.35,
+      blurb: 'Announced easily, built slowly. The NHS quality gain is permanent.' },
+    { id: 'newtowns', icon: '🏘️', name: 'New towns housing programme', regions: 'all',
+      cost: 5, years: 7, prosperity: 2, growth: 0.12, overrun: 0.25,
+      blurb: 'Somewhere for people to live. Pays back over a generation, not a term.' },
+    { id: 'colleges', icon: '🎓', name: 'Technical colleges network', regions: 'all',
+      cost: 2, years: 4, prosperity: 2, quality: { education: 7 }, overrun: 0.10,
+      blurb: 'Cheap, quick, and the skills feed straight back into growth.' }
+];
+
 const chClamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const chMoney = v => (v < 0 ? '−' : '') + '£' + Math.abs(Math.round(v)) + 'bn';
 const chPct = (v, dp = 1) => v.toFixed(dp) + '%';
@@ -195,6 +251,36 @@ const CH_EVENTS = [
         apply: s => { s.approval -= 2; s.shockGrowth += 0.2; }
     },
     {
+        id: 'factory', headline: 'Car plant closure threatens 4,000 jobs', weight: 2,
+        body: 'A major employer in the North East says it will move production abroad unless the government helps.',
+        choices: [
+            { label: 'Bail out the plant (£4bn)', detail: 'Keeps the jobs, for now.',
+              apply: s => { s.oneOffCost += 4; s.regions.ney.approval += 6; s.regions.ney.glow += 3; } },
+            { label: 'Let the market decide', detail: 'Saves the money. The town will not forgive it.',
+              apply: s => { s.regions.ney.prosperity -= 5; s.regions.ney.approval -= 10; } }
+        ]
+    },
+    {
+        id: 'gap', headline: 'Watchdog: regional divide is the widest on record', weight: 2,
+        when: s => s.regions.se.prosperity - Math.min(s.regions.nw.prosperity, s.regions.ney.prosperity,
+                                                      s.regions.wni.prosperity) > 26,
+        body: 'A damning report says the gap between London and the rest of the country has never been wider.',
+        apply: s => {
+            ['nw', 'ney', 'mid', 'wni', 'sc'].forEach(k => { s.regions[k].approval -= 5; });
+            s.regions.se.approval -= 1;
+        }
+    },
+    {
+        id: 'barnett', headline: 'Row over Scotland\'s funding settlement',
+        body: 'Holyrood says the Barnett formula has short-changed Scotland and wants more.',
+        choices: [
+            { label: 'Top up the settlement (£5bn)', detail: 'Buys peace in Scotland. Wales and NI will want the same.',
+              apply: s => { s.oneOffCost += 5; s.regions.sc.approval += 8; s.regions.wni.approval -= 4; } },
+            { label: 'The formula is the formula', detail: 'Defend the existing settlement.',
+              apply: s => { s.regions.sc.approval -= 9; } }
+        ]
+    },
+    {
         id: 'scandal', headline: 'Your Budget speech leaks the night before',
         body: 'Every measure is on the front pages before you stand up. The Speaker is not impressed.',
         apply: s => { s.approval -= 4; }
@@ -229,10 +315,13 @@ class Chancellor {
 
     // ------------------------------------------------------------ state
     newGame() {
-        const spending = {}, need = {}, quality = {}, taxes = {};
+        const spending = {}, need = {}, quality = {}, taxes = {}, regions = {};
         CH_DEPTS.forEach(d => { spending[d.key] = d.start; need[d.key] = d.start; quality[d.key] = d.quality; });
         CH_TAXES.forEach(t => { taxes[t.key] = t.start; });
+        CH_REGIONS.forEach(r => { regions[r.key] = { prosperity: r.prosperity, approval: r.approval, glow: 0, built: 0 }; });
 
+        this.view = 'budget';
+        this.lastResult = 0;
         this.state = {
             year: CH_START_YEAR,
             gdp: 2800,
@@ -244,7 +333,11 @@ class Chancellor {
             approval: 45,
             extraRevenue: 0,       // permanent gains, e.g. the HMRC crackdown
             lastDeficit: 100,
-            spending, need, quality, taxes,
+            spending, need, quality, taxes, regions,
+            active: [],            // projects under construction
+            completed: [],         // ids of projects that have opened
+            projectGrowth: 0,      // permanent growth won from finished projects
+            projectInflation: 0,   // permanent price effect (cheap energy, mostly)
             history: [],
             seenEvents: []
         };
@@ -278,9 +371,10 @@ class Chancellor {
         const revenue = (taxRevenue + CH_OTHER_RECEIPTS * this.gdpFactor() + s.extraRevenue) * s.revenueMultiplier
                         + s.oneOffRevenue;
         const departments = CH_DEPTS.reduce((sum, d) => sum + s.spending[d.key], 0);
+        const projects = s.active.reduce((sum, p) => sum + p.cost, 0);
         const interest = s.debt * s.gilt / 100;
-        const spending = departments + interest + s.oneOffCost;
-        return { revenue, departments, interest, spending, deficit: spending - revenue };
+        const spending = departments + projects + interest + s.oneOffCost;
+        return { revenue, departments, projects, interest, spending, deficit: spending - revenue };
     }
 
     // ------------------------------------------------------------ screens
@@ -296,6 +390,11 @@ class Chancellor {
                 stand up in the Commons and deliver a Budget: how much each department gets, and how much tax people pay.</p>
                 <p>Spend too little and hospitals, schools and the army fall apart. Spend too much and the debt spirals
                 and the markets turn on you. Tax too hard and growth stalls and voters revolt.</p>
+                <p>You also decide <strong>where</strong> the money goes. Six regions each have their own prosperity
+                and their own opinion of you, and elections are won on ${CH_SEATS_TOTAL} seats rather than a national
+                average — so you can be popular in the South and still lose. Big building projects are the only way to
+                close the gap, but they cost money every year for up to a decade before they open, and they go over
+                budget more often than not.</p>
                 <p>There is a general election every ${CH_TERM_LENGTH} years. Lose it and you are finished.
                 Survive ${CH_MAX_YEARS} years and you become the longest-serving Chancellor in history.</p>
                 ${b}
@@ -332,41 +431,184 @@ class Chancellor {
                 ${this.statCard('🏥', 'Public services', Math.round(this.avgQuality()) + '/100', this.avgQuality() >= 60 ? 'good' : this.avgQuality() >= 45 ? 'mid' : 'bad')}
             </div>
 
-            <div class="ch-cols">
-                <section class="ch-col">
-                    <h3 class="ch-col-title">Departmental spending</h3>
-                    ${CH_DEPTS.map(d => this.deptRow(d)).join('')}
-                </section>
-                <section class="ch-col">
-                    <h3 class="ch-col-title">Taxes</h3>
-                    ${CH_TAXES.map(t => this.taxRow(t)).join('')}
-                    <div class="ch-note">Other receipts (council tax, licences, fines):
-                        <strong>${chMoney(CH_OTHER_RECEIPTS * this.gdpFactor() + s.extraRevenue)}</strong></div>
-                </section>
+            <div class="ch-viewtabs">
+                <button class="ch-viewtab" data-view="budget">💷 Spending &amp; Taxes</button>
+                <button class="ch-viewtab" data-view="regions">🗺️ Regions</button>
+                <button class="ch-viewtab" data-view="projects">🏗️ Projects${s.active.length ? ` <span class="ch-tab-badge">${s.active.length}</span>` : ''}</button>
             </div>
 
-            <div class="ch-summary" id="ch-summary"></div>
-            <p class="ch-hint">Departments need more money every year just to stand still — inflation and an ageing
-            population see to that. A frozen budget is a cut.</p>`;
+            <div id="ch-view"></div>
+            <div class="ch-summary" id="ch-summary"></div>`;
 
-        CH_DEPTS.forEach(d => {
-            const sl = this.root.querySelector('#ch-sl-' + d.key);
-            sl.addEventListener('input', () => {
-                s.spending[d.key] = parseInt(sl.value, 10);
-                this.root.querySelector('#ch-val-' + d.key).textContent = chMoney(s.spending[d.key]);
-                this.updateSummary();
-            });
+        this.root.querySelectorAll('.ch-viewtab').forEach(btn => {
+            btn.addEventListener('click', () => { this.view = btn.dataset.view; this.renderView(); });
         });
-        CH_TAXES.forEach(t => {
-            const sl = this.root.querySelector('#ch-sl-' + t.key);
-            sl.addEventListener('input', () => {
-                s.taxes[t.key] = parseInt(sl.value, 10);
-                this.root.querySelector('#ch-val-' + t.key).textContent = s.taxes[t.key] + t.unit;
-                this.root.querySelector('#ch-yield-' + t.key).textContent = 'raises ' + chMoney(this.taxYield(t));
-                this.updateSummary();
-            });
+        this.renderView();
+    }
+
+    // Swaps the middle of the Budget screen without disturbing the header or
+    // the running totals underneath it.
+    renderView() {
+        const s = this.state;
+        this.root.querySelectorAll('.ch-viewtab').forEach(b => {
+            b.classList.toggle('active', b.dataset.view === this.view);
         });
+        const el = this.root.querySelector('#ch-view');
+
+        if (this.view === 'regions') {
+            el.innerHTML = this.regionsView();
+        } else if (this.view === 'projects') {
+            el.innerHTML = this.projectsView();
+            el.querySelectorAll('[data-start]').forEach(btn => {
+                btn.addEventListener('click', () => this.startProject(btn.dataset.start));
+            });
+            el.querySelectorAll('[data-cancel]').forEach(btn => {
+                btn.addEventListener('click', () => this.cancelProject(btn.dataset.cancel));
+            });
+        } else {
+            el.innerHTML = `
+                <div class="ch-cols">
+                    <section class="ch-col">
+                        <h3 class="ch-col-title">Departmental spending</h3>
+                        ${CH_DEPTS.map(d => this.deptRow(d)).join('')}
+                    </section>
+                    <section class="ch-col">
+                        <h3 class="ch-col-title">Taxes</h3>
+                        ${CH_TAXES.map(t => this.taxRow(t)).join('')}
+                        <div class="ch-note">Other receipts (council tax, licences, fines):
+                            <strong>${chMoney(CH_OTHER_RECEIPTS * this.gdpFactor() + s.extraRevenue)}</strong></div>
+                    </section>
+                </div>
+                <p class="ch-hint">Departments need more money every year just to stand still — inflation and an ageing
+                population see to that. A frozen budget is a cut.</p>`;
+
+            CH_DEPTS.forEach(d => {
+                const sl = el.querySelector('#ch-sl-' + d.key);
+                sl.addEventListener('input', () => {
+                    s.spending[d.key] = parseInt(sl.value, 10);
+                    el.querySelector('#ch-val-' + d.key).textContent = chMoney(s.spending[d.key]);
+                    this.updateSummary();
+                });
+            });
+            CH_TAXES.forEach(t => {
+                const sl = el.querySelector('#ch-sl-' + t.key);
+                sl.addEventListener('input', () => {
+                    s.taxes[t.key] = parseInt(sl.value, 10);
+                    el.querySelector('#ch-val-' + t.key).textContent = s.taxes[t.key] + t.unit;
+                    el.querySelector('#ch-yield-' + t.key).textContent = 'raises ' + chMoney(this.taxYield(t));
+                    this.updateSummary();
+                });
+            });
+        }
         this.updateSummary();
+    }
+
+    regionsView() {
+        const s = this.state;
+        const gap = Math.round(s.regions.se.prosperity - this.poorestRegion().prosperity);
+        return `
+            <section class="ch-col">
+                <h3 class="ch-col-title">The country, region by region</h3>
+                <div class="ch-region-head">
+                    <span>Region</span><span>Prosperity</span><span>Approval</span><span>Seats</span><span>Built</span>
+                </div>
+                ${CH_REGIONS.map(r => {
+                    const reg = s.regions[r.key];
+                    const seats = this.seatsFor(r, reg.approval);
+                    return `<div class="ch-region-row">
+                        <span class="ch-region-name">${r.name}</span>
+                        <span class="ch-region-prosp">
+                            <span class="ch-qbar"><span class="ch-qfill ${this.qualityClass(reg.prosperity)}"
+                                style="width:${chClamp(reg.prosperity, 0, 100)}%"></span></span>
+                            ${Math.round(reg.prosperity)}
+                        </span>
+                        <span class="ch-region-app ${this.approvalClass(reg.approval)}">${Math.round(reg.approval)}%</span>
+                        <span class="ch-region-seats">${seats}<small>/${r.seats}</small></span>
+                        <span class="ch-region-built">${reg.built || '–'}</span>
+                    </div>`;
+                }).join('')}
+                <div class="ch-region-total">
+                    Projected: <strong>${this.projectedSeats()}</strong> of ${CH_SEATS_TOTAL} seats
+                    — ${this.projectedSeats() >= CH_MAJORITY
+                        ? '<span class="ch-win">you would win the election</span>'
+                        : `<span class="ch-lose">you would lose (${CH_MAJORITY} needed)</span>`}
+                </div>
+                <p class="ch-hint">Elections are won on seats, not on the national average. London and the South
+                hold ${s.regions.se ? Math.round(281 / CH_SEATS_TOTAL * 100) : 43}% of them, so you can be popular
+                there and still lose. The prosperity gap between the South and the poorest region is
+                <strong>${gap} points</strong>, and it widens on its own unless you build something.</p>
+            </section>`;
+    }
+
+    projectsView() {
+        const s = this.state;
+        const active = s.active.map(p => {
+            const def = CH_PROJECTS.find(d => d.id === p.id);
+            const pct = Math.round(p.done / p.years * 100);
+            return `<div class="ch-proj ch-proj-active">
+                <div class="ch-proj-head">
+                    <span class="ch-proj-name">${def.icon} ${def.name}</span>
+                    <span class="ch-proj-cost">${chMoney(p.cost)}/yr</span>
+                </div>
+                <div class="ch-proj-bar"><span class="ch-proj-fill" style="width:${pct}%"></span></div>
+                <div class="ch-proj-foot">
+                    <span>${p.done} of ${p.years} years${p.overran ? ' · <span class="ch-lose">over budget</span>' : ''}</span>
+                    <button class="ch-mini-btn" data-cancel="${p.id}">Cancel</button>
+                </div>
+            </div>`;
+        }).join('');
+
+        const available = CH_PROJECTS.filter(p => !s.completed.includes(p.id) && !s.active.some(a => a.id === p.id))
+            .map(p => `<div class="ch-proj">
+                <div class="ch-proj-head">
+                    <span class="ch-proj-name">${p.icon} ${p.name}</span>
+                    <span class="ch-proj-cost">${chMoney(p.cost)}/yr × ${p.years}</span>
+                </div>
+                <p class="ch-proj-blurb">${p.blurb}</p>
+                <div class="ch-proj-foot">
+                    <span class="ch-proj-where">${this.regionLabel(p.regions)} · +${p.prosperity} prosperity${
+                        p.overrun >= 0.3 ? ' · <span class="ch-lose">high overrun risk</span>' : ''}</span>
+                    <button class="ch-mini-btn ch-mini-go" data-start="${p.id}">Start</button>
+                </div>
+            </div>`).join('');
+
+        return `
+            <div class="ch-cols">
+                <section class="ch-col">
+                    <h3 class="ch-col-title">Under construction</h3>
+                    ${active || '<p class="ch-hint" style="text-align:left">Nothing being built. The regions notice.</p>'}
+                    ${s.completed.length ? `<div class="ch-note">Opened so far: ${s.completed.map(id => {
+                        const d = CH_PROJECTS.find(p => p.id === id); return d.icon + ' ' + d.name;
+                    }).join(', ')}</div>` : ''}
+                </section>
+                <section class="ch-col">
+                    <h3 class="ch-col-title">Available to start</h3>
+                    ${available || '<p class="ch-hint" style="text-align:left">You have built everything there is to build.</p>'}
+                </section>
+            </div>
+            <p class="ch-hint">Projects cost money every year until they open, whether you can afford them or not.
+            Cancelling wastes everything already spent and the region will not forget it.</p>`;
+    }
+
+    startProject(id) {
+        const def = CH_PROJECTS.find(p => p.id === id);
+        if (!def || this.state.active.some(a => a.id === id) || this.state.completed.includes(id)) return;
+        this.state.active.push({ id, cost: def.cost, years: def.years, done: 0, overran: false });
+        this.renderBudget();
+    }
+
+    cancelProject(id) {
+        const s = this.state;
+        const i = s.active.findIndex(a => a.id === id);
+        if (i < 0) return;
+        const def = CH_PROJECTS.find(p => p.id === id);
+        s.active.splice(i, 1);
+        this.regionsOf(def).forEach(key => {
+            s.regions[key].approval = chClamp(s.regions[key].approval - 9, 0, 100);
+            s.regions[key].glow -= 4;
+        });
+        this.syncApproval();
+        this.renderBudget();
     }
 
     statCard(icon, label, value, tone) {
@@ -422,6 +664,7 @@ class Chancellor {
             <div class="ch-sum-grid">
                 <div class="ch-sum"><span class="ch-sum-label">Money in</span><span class="ch-sum-value in">${chMoney(t.revenue)}</span></div>
                 <div class="ch-sum"><span class="ch-sum-label">Departments</span><span class="ch-sum-value out">${chMoney(t.departments)}</span></div>
+                <div class="ch-sum"><span class="ch-sum-label">Projects</span><span class="ch-sum-value out">${chMoney(t.projects)}</span></div>
                 <div class="ch-sum"><span class="ch-sum-label">Debt interest</span><span class="ch-sum-value out">${chMoney(t.interest)}</span></div>
                 <div class="ch-sum"><span class="ch-sum-label">${surplus ? 'Surplus' : 'Borrowing'}</span>
                     <span class="ch-sum-value ${surplus ? 'in' : 'out'}">${chMoney(Math.abs(t.deficit))}</span></div>
@@ -437,9 +680,10 @@ class Chancellor {
         const s = this.state;
         this.report = { headlines: [], notes: [], before: this.snapshot() };
 
-        // Pick this year's news, then let any decisions resolve before we
-        // simulate — the player's answers change the numbers.
-        this.pendingEvents = this.pickEvents();
+        // Cost blowouts come first — they are decisions about money you have
+        // already committed — then the year's news. Both resolve before we
+        // simulate, because the player's answers change the numbers.
+        this.pendingEvents = this.pickOverruns().concat(this.pickEvents());
         this.resolveNextEvent();
     }
 
@@ -465,6 +709,43 @@ class Chancellor {
             if (pool.every(p => picked.includes(p))) break;
         }
         return picked;
+    }
+
+    // A project that has started can blow its budget. Bigger, tunnel-heavier
+    // schemes do it more often — which is why the cheap ones are often the
+    // better buy even though they sound less impressive.
+    pickOverruns() {
+        const s = this.state;
+        const out = [];
+        s.active.forEach(p => {
+            if (p.overran || p.done === 0) return;     // no blowout before a spade goes in
+            const def = CH_PROJECTS.find(d => d.id === p.id);
+            if (Math.random() > def.overrun * 0.55) return;
+            p.overran = true;
+            const extra = Math.round(p.cost * 0.4);
+            out.push({
+                id: 'overrun_' + p.id,
+                headline: `${def.name} is over budget`,
+                body: `The contractors say it cannot be finished at the agreed price. ${Math.round(p.done)} years
+                       and ${chMoney(p.done * p.cost)} have already gone into it.`,
+                choices: [
+                    { label: 'Fund the overrun',
+                      detail: `Costs rise to ${chMoney(p.cost + extra)} a year and it opens two years late.`,
+                      apply: st => { p.cost += extra; p.years += 2; st.approval -= 2; } },
+                    { label: 'Cancel it',
+                      detail: 'Everything spent so far is wasted, and the region will not forget.',
+                      apply: st => {
+                          st.active = st.active.filter(a => a.id !== p.id);
+                          this.regionsOf(def).forEach(key => {
+                              st.regions[key].approval = chClamp(st.regions[key].approval - 12, 0, 100);
+                              st.regions[key].glow -= 6;
+                          });
+                          this.syncApproval();
+                      } }
+                ]
+            });
+        });
+        return out;
     }
 
     resolveNextEvent() {
@@ -511,7 +792,7 @@ class Chancellor {
         const t = this.totals();
 
         // --- growth: infrastructure and schools help, taxes and debt drag ---
-        let growth = 1.6 + s.shockGrowth;
+        let growth = 1.6 + s.shockGrowth + s.projectGrowth;
         growth += (s.quality.transport - 55) / 55 * 0.7;
         growth += (s.quality.education - 60) / 60 * 0.5;
         growth += (s.quality.energy - 52) / 60 * 0.2;
@@ -524,7 +805,7 @@ class Chancellor {
         // Borrowing heats prices faster than a surplus cools them, so you cannot
         // simply hoard a surplus and deflate the debt away. ---
         const deficitPressure = t.deficit / s.gdp * 100 - 3.0;
-        let inflation = 2.0 + s.shockInflation;
+        let inflation = 2.0 + s.shockInflation + s.projectInflation;
         inflation += deficitPressure > 0 ? deficitPressure * 0.30 : deficitPressure * 0.12;
         inflation += (s.taxes.vat - 20) * 0.15;
         inflation += growth * 0.15;
@@ -549,6 +830,29 @@ class Chancellor {
             qChanges[d.key] = s.quality[d.key] - before;
         });
 
+        // --- projects: another year of building, and anything that opens now ---
+        s.active.forEach(p => { p.done++; });
+        s.active.filter(p => p.done >= p.years).forEach(p => {
+            const def = CH_PROJECTS.find(d => d.id === p.id);
+            s.completed.push(def.id);
+            this.regionsOf(def).forEach(key => {
+                const reg = s.regions[key];
+                reg.prosperity = chClamp(reg.prosperity + def.prosperity, 0, 100);
+                reg.glow += 9;
+                reg.built++;
+            });
+            if (def.quality) {
+                Object.keys(def.quality).forEach(k => {
+                    s.quality[k] = chClamp(s.quality[k] + def.quality[k], 0, 100);
+                });
+            }
+            if (def.growth) s.projectGrowth += def.growth;
+            if (def.inflation) s.projectInflation += def.inflation;
+            this.report.headlines.push(`${def.name} opens`);
+            this.report.notes.push(`After ${p.years} years of building, ${def.name.toLowerCase()} is finally open.`);
+        });
+        s.active = s.active.filter(p => p.done < p.years);
+
         // --- the books ---
         s.debt += t.deficit;
         s.lastDeficit = t.deficit;
@@ -571,7 +875,30 @@ class Chancellor {
         target -= Math.max(0, unemployment - 4.5) * 2.2;
         target -= Math.max(0, inflation - 3) * 2.6;
         target -= Math.max(0, debtRatio - 1.1) * 12;
-        s.approval = chClamp(s.approval + (chClamp(target, 0, 100) - s.approval) * 0.45, 0, 100);
+        // A visibly divided country costs you votes everywhere, including in the
+        // rich part — which is why building only where you are already popular
+        // is not the easy win it looks like.
+        const gap = s.regions.se.prosperity - this.poorestRegion().prosperity;
+        target -= Math.max(0, gap - 24) * 0.20;
+        target = chClamp(target, 0, 100);
+
+        // --- regions: national mood, then how it lands locally ---
+        const rChanges = {};
+        CH_REGIONS.forEach(r => {
+            const reg = s.regions[r.key];
+            const before = reg.prosperity;
+            let p = before + (growth - 1.5) * 0.35 + r.drift + (s.quality.transport - 55) / 90;
+            p += s.active.filter(a => this.regionsOf(CH_PROJECTS.find(d => d.id === a.id)).includes(r.key)).length * 0.3;
+            reg.prosperity = chClamp(p, 5, 100);
+            rChanges[r.key] = reg.prosperity - before;
+
+            // A region judges you on how it is doing, not on the national average.
+            const rTarget = target + (reg.prosperity - 50) * 0.30 + rChanges[r.key] * 2.5 + reg.glow;
+            reg.approval = chClamp(reg.approval + (chClamp(rTarget, 0, 100) - reg.approval) * 0.45, 0, 100);
+            reg.glow *= 0.5;    // the goodwill from opening something fades
+        });
+        this.syncApproval();
+        this.report.rChanges = rChanges;
 
         s.growth = growth;
         s.inflation = inflation;
@@ -629,6 +956,18 @@ class Chancellor {
                 }).join('')}
             </div>
 
+            <div class="ch-dept-changes">
+                ${CH_REGIONS.map(r => {
+                    const c = (this.report.rChanges || {})[r.key] || 0;
+                    const cls = c > 0.05 ? 'up' : c < -0.05 ? 'down' : 'flat';
+                    return `<span class="ch-chip ${cls}">🗺️ ${r.name} ${c > 0 ? '+' : ''}${c.toFixed(1)}</span>`;
+                }).join('')}
+            </div>
+
+            <p class="ch-seatline">If an election were held now you would win
+                <strong>${this.projectedSeats()}</strong> of ${CH_SEATS_TOTAL} seats
+                (${CH_MAJORITY} needed for a majority).</p>
+
             <button class="ch-btn ch-btn-primary" id="ch-next">Continue →</button>`;
 
         this.root.querySelector('#ch-next').addEventListener('click', () => this.endYear());
@@ -660,8 +999,10 @@ class Chancellor {
 
     renderElection() {
         const s = this.state;
-        const won = s.approval >= 40;
+        const seats = this.projectedSeats();
+        const won = seats >= CH_MAJORITY;
         const years = s.year - CH_START_YEAR;
+        this.lastResult = seats;
         if (!won) return this.renderGameOver('defeated');
         if (years >= CH_MAX_YEARS) return this.renderGameOver('legend');
 
@@ -669,13 +1010,31 @@ class Chancellor {
             <div class="ch-endcard win">
                 <div class="ch-end-icon">🗳️</div>
                 <h3>General Election: your party wins</h3>
-                <p>On ${Math.round(s.approval)}% approval the country has given you another
-                ${CH_TERM_LENGTH} years. The Prime Minister keeps you at the Treasury.</p>
+                <p>You take <strong>${seats}</strong> of ${CH_SEATS_TOTAL} seats on ${Math.round(s.approval)}%
+                approval — a majority of ${seats - (CH_SEATS_TOTAL - seats)}. The Prime Minister keeps you
+                at the Treasury for another ${CH_TERM_LENGTH} years.</p>
+                ${this.seatChart()}
                 <p class="ch-end-sub">${years} years served · debt ${Math.round(s.debt / s.gdp * 100)}% of GDP ·
                 services ${Math.round(this.avgQuality())}/100</p>
                 <button class="ch-btn ch-btn-primary" id="ch-next-term">Back to work 📕</button>
             </div>`;
         this.root.querySelector('#ch-next-term').addEventListener('click', () => this.renderBudget());
+    }
+
+    seatChart() {
+        const s = this.state;
+        return `<div class="ch-seatchart">
+            ${CH_REGIONS.map(r => {
+                const won = this.seatsFor(r, s.regions[r.key].approval);
+                const pct = Math.round(won / r.seats * 100);
+                return `<div class="ch-seatrow">
+                    <span class="ch-seatname">${r.name}</span>
+                    <span class="ch-seatbar"><span class="ch-seatfill ${pct >= 50 ? 'win' : 'lose'}"
+                        style="width:${pct}%"></span></span>
+                    <span class="ch-seatnum">${won}/${r.seats}</span>
+                </div>`;
+            }).join('')}
+        </div>`;
     }
 
     renderGameOver(reason) {
@@ -686,7 +1045,8 @@ class Chancellor {
             sacked:    { icon: '📦', title: 'You have been sacked', win: false,
                          text: `With approval at ${Math.round(s.approval)}% the Prime Minister needed a scapegoat. You were it.` },
             defeated:  { icon: '🗳️', title: 'Voted out', win: false,
-                         text: `Your party lost the general election on ${Math.round(s.approval)}% approval. The new government has other plans.` },
+                         text: `Your party took only ${this.lastResult} of ${CH_SEATS_TOTAL} seats — ${CH_MAJORITY} were
+                                needed. ${this.weakestRegionName()} turned against you. The new government has other plans.` },
             bankrupt:  { icon: '📉', title: 'The markets have revolted', win: false,
                          text: `Debt reached ${Math.round(s.debt / s.gdp * 100)}% of GDP. Nobody will lend to Britain at any price, and you are out.` },
             legend:    { icon: '🏆', title: 'The longest-serving Chancellor in history', win: true,
@@ -717,6 +1077,43 @@ class Chancellor {
     avgQuality() {
         const s = this.state;
         return CH_DEPTS.reduce((sum, d) => sum + s.quality[d.key], 0) / CH_DEPTS.length;
+    }
+
+    regionsOf(def) {
+        return def.regions === 'all' ? CH_REGIONS.map(r => r.key) : def.regions;
+    }
+
+    regionLabel(regions) {
+        if (regions === 'all') return 'Nationwide';
+        return regions.map(k => CH_REGIONS.find(r => r.key === k).name).join(' & ');
+    }
+
+    // First past the post amplifies swing: a few points of approval either side
+    // of the mid-forties decides far more seats than it looks like it should.
+    seatsFor(r, approval) {
+        return Math.round(r.seats * chClamp(0.5 + (approval - 40) * 0.022, 0, 1));
+    }
+
+    projectedSeats() {
+        return CH_REGIONS.reduce((n, r) => n + this.seatsFor(r, this.state.regions[r.key].approval), 0);
+    }
+
+    // The headline approval figure is the seat-weighted national mood.
+    syncApproval() {
+        const s = this.state;
+        const total = CH_REGIONS.reduce((n, r) => n + r.seats * s.regions[r.key].approval, 0);
+        s.approval = chClamp(total / CH_SEATS_TOTAL, 0, 100);
+    }
+
+    weakestRegionName() {
+        const s = this.state;
+        return CH_REGIONS.reduce((a, b) =>
+            s.regions[a.key].approval <= s.regions[b.key].approval ? a : b).name;
+    }
+
+    poorestRegion() {
+        const s = this.state;
+        return CH_REGIONS.map(r => s.regions[r.key]).reduce((a, b) => a.prosperity <= b.prosperity ? a : b);
     }
     qualityClass(q) { return q >= 65 ? 'good' : q >= 45 ? 'mid' : 'bad'; }
     approvalClass(a) { return a >= 45 ? 'good' : a >= 30 ? 'mid' : 'bad'; }
