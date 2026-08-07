@@ -126,6 +126,12 @@
                         <p>Manage any club from England or Europe's top leagues. Cups, Champions League, multi-season dynasty.</p>
                         <button class="play-btn">Play Now</button>
                     </div>
+                    <div class="game-card" onclick="switchTab('chancellor')">
+                        <div class="game-card-icon">🏛️</div>
+                        <h3>Chancellor Simulator</h3>
+                        <p>Run the UK Budget. Fund the NHS, defence and schools, set the taxes, win the election.</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
                     <div class="game-card" onclick="switchTab('warodots')">
                         <div class="game-card-icon">🔵</div>
                         <h3>War of Dots</h3>
@@ -554,6 +560,15 @@
                 <div class="game-content plm-content" id="plm-root">
                     <p class="plm-loading">Loading…</p>
                 </div>
+            </div>
+
+            <!-- Chancellor Simulator -->
+            <div id="chancellor" class="game-page">
+                <div class="game-header-inline">
+                    <h2>🏛️ Chancellor Simulator</h2>
+                    <button class="back-btn" onclick="switchTab('games')">← Back</button>
+                </div>
+                <div class="game-content ch-content" id="ch-root"></div>
             </div>
 
             <!-- History Page -->
@@ -1005,6 +1020,7 @@
     <script src="minesweeper.js"></script>
     <script src="solitaire.js"></script>
     <script src="blackjack.js"></script>
+    <script src="chancellor.js"></script>
 
     <!-- Chess deps (MIT). chessboard.js needs jQuery. -->
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
