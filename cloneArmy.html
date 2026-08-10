@@ -58,6 +58,27 @@ canvas { display:block; background:#3c5a2e; cursor:default; }
 .btn:hover { background:#f0c850; }
 .btn.ghost { background:transparent; color:var(--accent); border:2px solid var(--accent); }
 .hidden { display:none !important; }
+
+/* How-to-play tutorial */
+#tutorial {
+  position:absolute; inset:0; z-index:30; display:flex; align-items:center; justify-content:center;
+  background:rgba(8,5,3,.80); padding:20px; overflow:auto;
+}
+.tut-card {
+  background:var(--panel); border:3px solid var(--accent); border-radius:12px;
+  max-width:580px; width:100%; padding:24px 26px; box-shadow:0 14px 44px rgba(0,0,0,.6);
+}
+.tut-card h2 { color:var(--accent); font-size:25px; text-align:center; margin-bottom:6px; }
+.tut-intro { text-align:center; font-size:14px; opacity:.85; margin-bottom:18px; line-height:1.5; }
+.tut-step { display:flex; gap:12px; align-items:flex-start; margin-bottom:13px; }
+.tut-step .num { flex:0 0 30px; width:30px; height:30px; border-radius:50%; background:var(--accent); color:#1b1410;
+  font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px; }
+.tut-step .txt { font-size:14px; line-height:1.55; }
+.tut-step .txt b { color:var(--accent); }
+.tut-key { display:inline-block; background:#111; border:1px solid #666; border-radius:4px; padding:0 7px; font-size:12px; font-weight:700; margin:0 1px; }
+.tut-tip { font-size:12.5px; opacity:.9; background:rgba(0,0,0,.25); border-left:3px solid var(--accent);
+  padding:9px 12px; border-radius:0 6px 6px 0; margin-top:8px; line-height:1.55; }
+.tut-actions { display:flex; justify-content:center; margin-top:18px; }
 </style>
 </head>
 <body>
@@ -85,6 +106,7 @@ canvas { display:block; background:#3c5a2e; cursor:default; }
       <div style="background:rgba(20,14,10,.85);padding:4px 10px;border-radius:6px;font-size:13px">
         🗡️ Kills: <b id="kills">0</b>
       </div>
+      <button class="btn ghost" id="howBtn" style="padding:4px 12px;font-size:12px;pointer-events:auto">❔ How to play</button>
       <button class="btn ghost" id="quitBtn" style="padding:4px 12px;font-size:12px;pointer-events:auto">Quit</button>
     </div>
     <div class="army-panel" style="text-align:right">
@@ -99,6 +121,34 @@ canvas { display:block; background:#3c5a2e; cursor:default; }
 
   <div id="help" class="hidden">
     <b>Left-drag</b> select troops · <b>1</b>/<b>2</b>/<b>3</b> Infantry/Archers/Cavalry · <b>4</b> Commander · <b>Space</b> whole army · <b>Right-click</b> move / attack there · <b>H</b> hold position
+  </div>
+
+  <!-- How-to-play tutorial (shown on the very first battle only) -->
+  <div id="tutorial" class="hidden">
+    <div class="tut-card">
+      <h2>⚔️ How to Command Your Army</h2>
+      <p class="tut-intro">You're the general — you don't fight, you give the orders. Here's all you need to know:</p>
+      <div class="tut-step">
+        <div class="num">1</div>
+        <div class="txt"><b>Choose your troops.</b> <b>Hold left-click and drag</b> a box around them — or tap a key:
+          <span class="tut-key">1</span> Infantry 🛡️ &nbsp; <span class="tut-key">2</span> Archers 🏹 &nbsp;
+          <span class="tut-key">3</span> Cavalry 🐎 &nbsp; <span class="tut-key">4</span> Commander 👑 &nbsp;
+          <span class="tut-key">Space</span> whole army. Chosen troops get a <b>blue ring</b>.</div>
+      </div>
+      <div class="tut-step">
+        <div class="num">2</div>
+        <div class="txt"><b>Move them.</b> <b>Right-click</b> anywhere on the field and your selected troops march there
+          and fight any enemy they meet. Press <span class="tut-key">H</span> to make them stop and hold the ground.</div>
+      </div>
+      <div class="tut-step">
+        <div class="num">3</div>
+        <div class="txt"><b>Win the battle.</b> Grind the enemy army down until it breaks and runs. Keep your
+          <b>Commander 👑</b> alive and near your troops — everyone inside his <b>golden ring</b> hits harder.</div>
+      </div>
+      <p class="tut-tip">💡 Try this: put your <b>archers behind</b> your infantry so they shoot in safety, and send your
+        <b>cavalry round the side</b> to smash the enemy from behind.</p>
+      <div class="tut-actions"><button class="btn" id="tutStart">⚔️ Start Battle</button></div>
+    </div>
   </div>
 
   <!-- End Screen -->
@@ -179,8 +229,24 @@ const STATE = {
   drag: null,               // { x0,y0,x1,y1 } while box-selecting
   routSide: null, routTimer: 0,
   floaters: [],             // floating text (e.g. "Commander fallen!")
+  paused: false,            // frozen while the how-to-play card is open
   mouse: { x:0, y:0 },
 };
+
+// Remembers that the player has seen the tutorial, so it only ever pops up once.
+const CLONE_TUT_KEY = 'clone_army_tutorial_seen_v1';
+function tutorialSeen() {
+  try { return localStorage.getItem(CLONE_TUT_KEY) === '1'; } catch (e) { return false; }
+}
+function openTutorial() {
+  STATE.paused = true;
+  document.getElementById('tutorial').classList.remove('hidden');
+}
+function closeTutorial() {
+  document.getElementById('tutorial').classList.add('hidden');
+  STATE.paused = false;
+  try { localStorage.setItem(CLONE_TUT_KEY, '1'); } catch (e) { /* storage blocked — no worries */ }
+}
 
 // ============================================================
 // Input
@@ -528,6 +594,9 @@ function startBattle(playerFactionId) {
   document.getElementById('enemyName').textContent  = STATE.enemy.name;
 
   STATE.phase = 'battle';
+  STATE.paused = false;
+  // First battle ever? Show the how-to card (frozen) until they hit Start.
+  if (!tutorialSeen()) openTutorial();
 }
 
 // Lay an army out in blocks: infantry front and centre, archers behind them,
@@ -585,7 +654,9 @@ function loop(now) {
   const dt = Math.min((now - lastTime) / 1000, 0.05);
   lastTime = now;
   if (STATE.phase === 'battle') {
-    tick(dt); render(); updateHUD(); checkEnd(dt);
+    if (!STATE.paused) tick(dt);
+    render(); updateHUD();
+    if (!STATE.paused) checkEnd(dt);
   } else if (STATE.phase === 'menu') {
     renderMenuBackground();
   }
@@ -875,10 +946,14 @@ document.getElementById('backToMenu').addEventListener('click', () => {
 });
 document.getElementById('quitBtn').addEventListener('click', () => {
   STATE.phase = 'menu';
+  STATE.paused = false;
+  document.getElementById('tutorial').classList.add('hidden');
   document.getElementById('hud').classList.add('hidden');
   document.getElementById('help').classList.add('hidden');
   document.getElementById('menu').classList.remove('hidden');
 });
+document.getElementById('tutStart').addEventListener('click', closeTutorial);
+document.getElementById('howBtn').addEventListener('click', openTutorial);
 
 requestAnimationFrame(loop);
 </script>
