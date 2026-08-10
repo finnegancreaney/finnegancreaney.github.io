@@ -324,6 +324,7 @@ class Chancellor {
         this.lastResult = 0;
         this.state = {
             year: CH_START_YEAR,
+            endless: false,        // set once the player chooses to carry on past 20 years
             gdp: 2800,
             debt: 2600,
             gilt: 4.0,
@@ -396,7 +397,8 @@ class Chancellor {
                 close the gap, but they cost money every year for up to a decade before they open, and they go over
                 budget more often than not.</p>
                 <p>There is a general election every ${CH_TERM_LENGTH} years. Lose it and you are finished.
-                Survive ${CH_MAX_YEARS} years and you become the longest-serving Chancellor in history.</p>
+                Survive ${CH_MAX_YEARS} years and you become the longest-serving Chancellor in history — then carry
+                on as long as you can and set your own record.</p>
                 ${b}
                 <button class="ch-btn ch-btn-primary" id="ch-start">Take the red box 📕</button>
             </div>`;
@@ -992,7 +994,7 @@ class Chancellor {
         if (s.debt / s.gdp > 2.0) return this.renderGameOver('bankrupt');
         if (s.approval < 20) return this.renderGameOver('sacked');
         if (years % CH_TERM_LENGTH === 0) return this.renderElection();
-        if (years >= CH_MAX_YEARS) return this.renderGameOver('legend');
+        if (!s.endless && years >= CH_MAX_YEARS) return this.renderMilestone();
 
         this.renderBudget();
     }
@@ -1004,7 +1006,7 @@ class Chancellor {
         const years = s.year - CH_START_YEAR;
         this.lastResult = seats;
         if (!won) return this.renderGameOver('defeated');
-        if (years >= CH_MAX_YEARS) return this.renderGameOver('legend');
+        if (!s.endless && years >= CH_MAX_YEARS) return this.renderMilestone();
 
         this.root.innerHTML = `
             <div class="ch-endcard win">
@@ -1035,6 +1037,42 @@ class Chancellor {
                 </div>`;
             }).join('')}
         </div>`;
+    }
+
+    // Reaching CH_MAX_YEARS is the win — but instead of ending the game, we
+    // celebrate it and let the player carry on into endless mode to see how
+    // long they can really last. Elections and disasters still apply; there is
+    // just no finish line any more.
+    renderMilestone() {
+        const s = this.state;
+        const years = s.year - CH_START_YEAR;
+        this.saveBest();
+        this.root.innerHTML = `
+            <div class="ch-endcard win">
+                <div class="ch-end-icon">🏆</div>
+                <h3>${years} years — you've done it!</h3>
+                <p>You are the <strong>longest-serving Chancellor in history</strong>. Four elections won and you are
+                still standing at the Treasury. They will name a room after you.</p>
+                <p>But the red box is still on your desk. You can retire a legend right now — or stay in office and see
+                just how long you can keep the country running. There is no finish line from here: the job only ends
+                when the voters, the markets, or the Prime Minister decide it does.</p>
+                <div class="ch-final">
+                    <div><span>Years in office</span><strong>${years}</strong></div>
+                    <div><span>Approval</span><strong>${Math.round(s.approval)}%</strong></div>
+                    <div><span>Debt</span><strong>${Math.round(s.debt / s.gdp * 100)}%</strong></div>
+                    <div><span>Services</span><strong>${Math.round(this.avgQuality())}/100</strong></div>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:6px;">
+                    <button class="ch-btn ch-btn-primary" id="ch-carry">Carry on in office →</button>
+                    <button class="ch-btn" id="ch-retire"
+                        style="background:transparent; color:var(--muted); border:1px solid var(--border);">Retire a legend 🏆</button>
+                </div>
+            </div>`;
+        this.root.querySelector('#ch-carry').addEventListener('click', () => {
+            s.endless = true;
+            this.renderBudget();
+        });
+        this.root.querySelector('#ch-retire').addEventListener('click', () => this.renderGameOver('legend'));
     }
 
     renderGameOver(reason) {

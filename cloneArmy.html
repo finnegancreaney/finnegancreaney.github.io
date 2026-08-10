@@ -10,28 +10,28 @@
 html, body { width:100%; height:100%; overflow:hidden; }
 body { font-family:'Segoe UI', system-ui, sans-serif; background:#1b1410; color:#f5e6c8; user-select:none; -webkit-user-select:none; }
 #root { width:100%; height:100%; position:relative; }
-canvas { display:block; background:#3c5a2e; cursor:crosshair; }
+canvas { display:block; background:#3c5a2e; cursor:default; }
 
 /* Menu */
 #menu, #endScreen {
   position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  background:radial-gradient(circle at center, #2a1d12 0%, #0d0805 100%); padding:24px; gap:20px;
+  background:radial-gradient(circle at center, #2a1d12 0%, #0d0805 100%); padding:24px; gap:18px; overflow:auto;
 }
-#menu h1 { font-size:42px; color:var(--accent); text-shadow:0 4px 0 #000, 0 0 30px rgba(212,175,55,.5); letter-spacing:2px; text-align:center; }
-#menu .sub { color:#caa46e; font-size:15px; max-width:700px; text-align:center; margin-bottom:6px; }
-.factions { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; max-width:1100px; }
+#menu h1 { font-size:40px; color:var(--accent); text-shadow:0 4px 0 #000, 0 0 30px rgba(212,175,55,.5); letter-spacing:2px; text-align:center; }
+#menu .sub { color:#caa46e; font-size:15px; max-width:760px; text-align:center; line-height:1.5; }
+.factions { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; max-width:1120px; }
 .faction-card {
   background:var(--panel); border:3px solid #444; border-radius:10px;
-  padding:18px; width:280px; cursor:pointer; transition:transform .15s, border-color .15s, box-shadow .15s;
+  padding:18px; width:300px; cursor:pointer; transition:transform .15s, border-color .15s, box-shadow .15s;
   display:flex; flex-direction:column; gap:8px; text-align:left;
 }
 .faction-card:hover { transform:translateY(-4px); border-color:var(--accent); box-shadow:0 8px 24px rgba(0,0,0,.5); }
-.faction-banner { height:60px; border-radius:6px; display:flex; align-items:center; justify-content:center;
-  font-size:32px; font-weight:700; letter-spacing:2px; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,.6); }
+.faction-banner { height:56px; border-radius:6px; display:flex; align-items:center; justify-content:center;
+  font-size:30px; font-weight:700; letter-spacing:2px; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,.6); }
 .faction-name { font-size:20px; font-weight:700; color:var(--accent); }
-.faction-desc { font-size:13px; opacity:.85; line-height:1.4; }
-.faction-stats { font-size:12px; opacity:.7; padding-top:6px; border-top:1px solid #3a2a1c; }
-.faction-stats span { display:inline-block; margin-right:10px; }
+.faction-desc { font-size:13px; opacity:.85; line-height:1.45; min-height:74px; }
+.faction-comp { font-size:13px; display:flex; gap:12px; padding-top:8px; border-top:1px solid #3a2a1c; }
+.faction-comp b { color:var(--accent); }
 
 /* HUD */
 #hud {
@@ -40,18 +40,20 @@ canvas { display:block; background:#3c5a2e; cursor:crosshair; }
 }
 .army-panel {
   background:rgba(20,14,10,.85); border:2px solid #3a2a1c; border-radius:8px;
-  padding:8px 12px; min-width:200px; pointer-events:auto;
+  padding:8px 12px; min-width:220px; pointer-events:auto;
 }
-.army-panel .name { font-weight:700; font-size:14px; color:var(--accent); margin-bottom:4px; }
-.army-panel .counts { font-size:13px; }
-.hp-bar {
-  height:8px; background:#2a1d12; border-radius:4px; overflow:hidden; margin-top:6px;
-}
-.hp-bar > div { height:100%; background:linear-gradient(90deg,#3da100,#7fe000); transition:width .12s; }
-#help { position:absolute; bottom:12px; left:12px; background:rgba(20,14,10,.85); padding:8px 14px; border-radius:8px; font-size:12px; pointer-events:none; }
+.army-panel .name { font-weight:700; font-size:14px; color:var(--accent); margin-bottom:2px; }
+.army-panel .comp { font-size:12px; opacity:.85; margin-bottom:5px; }
+.army-panel .label { font-size:10px; opacity:.6; margin:5px 0 2px; letter-spacing:.5px; text-transform:uppercase; }
+.bar { height:8px; background:#2a1d12; border-radius:4px; overflow:hidden; }
+.bar > div { height:100%; transition:width .15s; }
+.bar.strength > div { background:linear-gradient(90deg,#3da100,#7fe000); }
+.bar.cmd > div { background:linear-gradient(90deg,#b8860b,#ffd700); }
+#help { position:absolute; bottom:12px; left:12px; right:12px; background:rgba(20,14,10,.85); padding:8px 14px; border-radius:8px; font-size:12.5px; pointer-events:none; text-align:center; line-height:1.5; }
+#help b { color:var(--accent); }
 
 #endScreen h2 { font-size:48px; color:var(--accent); text-shadow:0 4px 0 #000; }
-#endScreen .result-sub { font-size:18px; opacity:.85; }
+#endScreen .result-sub { font-size:18px; opacity:.85; max-width:640px; text-align:center; line-height:1.5; }
 .btn { background:var(--accent); color:#1b1410; padding:12px 24px; border:none; border-radius:6px; font-weight:700; font-size:15px; cursor:pointer; letter-spacing:1px; }
 .btn:hover { background:#f0c850; }
 .btn.ghost { background:transparent; color:var(--accent); border:2px solid var(--accent); }
@@ -65,7 +67,7 @@ canvas { display:block; background:#3c5a2e; cursor:crosshair; }
   <!-- Menu -->
   <div id="menu">
     <h1>⚔️ COMMAND YOUR CLONE ARMY ⚔️</h1>
-    <p class="sub">Choose your empire. Lead your clone army into battle. Use WASD to move, click to focus-fire on an enemy. Defeat the enemy commander and wipe out their forces.</p>
+    <p class="sub">Pick an empire, then <b>command your army</b> — infantry, archers and cavalry. Position your troops, hold the line or send in the horse. Your commander leads from wherever you place him; he doesn't have to fight, and if he falls your army fights on. Win by wiping out the enemy army.</p>
     <div class="factions" id="factionList"></div>
   </div>
 
@@ -73,9 +75,11 @@ canvas { display:block; background:#3c5a2e; cursor:crosshair; }
   <div id="hud" class="hidden">
     <div class="army-panel">
       <div class="name" id="playerName">You</div>
-      <div class="counts" id="playerCounts">25 / 25</div>
-      <div class="hp-bar"><div id="playerHpFill" style="width:100%"></div></div>
-      <div style="font-size:11px;opacity:.7;margin-top:4px">Your Commander HP</div>
+      <div class="comp" id="playerComp"></div>
+      <div class="label">Army strength</div>
+      <div class="bar strength"><div id="playerStrFill" style="width:100%"></div></div>
+      <div class="label">Commander</div>
+      <div class="bar cmd"><div id="playerCmdFill" style="width:100%"></div></div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div style="background:rgba(20,14,10,.85);padding:4px 10px;border-radius:6px;font-size:13px">
@@ -85,13 +89,17 @@ canvas { display:block; background:#3c5a2e; cursor:crosshair; }
     </div>
     <div class="army-panel" style="text-align:right">
       <div class="name" id="enemyName">Enemy</div>
-      <div class="counts" id="enemyCounts">25 / 25</div>
-      <div class="hp-bar"><div id="enemyHpFill" style="width:100%"></div></div>
-      <div style="font-size:11px;opacity:.7;margin-top:4px">Enemy Commander HP</div>
+      <div class="comp" id="enemyComp"></div>
+      <div class="label">Army strength</div>
+      <div class="bar strength"><div id="enemyStrFill" style="width:100%"></div></div>
+      <div class="label">Commander</div>
+      <div class="bar cmd"><div id="enemyCmdFill" style="width:100%"></div></div>
     </div>
   </div>
 
-  <div id="help" class="hidden">WASD = Move · Mouse Click = Target enemy</div>
+  <div id="help" class="hidden">
+    <b>Left-drag</b> select troops · <b>1</b>/<b>2</b>/<b>3</b> Infantry/Archers/Cavalry · <b>4</b> Commander · <b>Space</b> whole army · <b>Right-click</b> move / attack there · <b>H</b> hold position
+  </div>
 
   <!-- End Screen -->
   <div id="endScreen" class="hidden">
@@ -107,125 +115,209 @@ canvas { display:block; background:#3c5a2e; cursor:crosshair; }
 <script>
 'use strict';
 
-// ------------------------------------------------------------
-// Faction configs
-// ------------------------------------------------------------
-const FACTIONS = {
-  roman: {
-    id: 'roman',
-    name: 'Roman Empire',
-    short: 'SPQR',
-    color: '#cc1b22',
-    accent: '#ffcc00',
-    desc: 'Disciplined legionaries with strong shields. High HP, balanced damage. Slowest of the three but the hardest to kill.',
-    clone:     { hp: 90,  dmg: 14, speed: 1.5, range: 32,  attackRate: 1.0, ranged: false, radius: 8 },
-    commander: { hp: 320, dmg: 38, speed: 1.7, range: 38,  attackRate: 1.2, ranged: false, radius: 14 },
-    cloneCount: 24,
-  },
-  persian: {
-    id: 'persian',
-    name: 'Persian Empire',
-    short: 'PER',
-    color: '#5a1a8c',
-    accent: '#ffd700',
-    desc: 'Master archers. Largest army but fragile. Devastating from range — keep enemies at arrow\'s length.',
-    clone:     { hp: 55,  dmg: 16, speed: 1.5, range: 210, attackRate: 1.4, ranged: true, projectileSpeed: 7, radius: 7 },
-    commander: { hp: 240, dmg: 42, speed: 1.8, range: 240, attackRate: 1.6, ranged: true, projectileSpeed: 8, radius: 14 },
-    cloneCount: 30,
-  },
-  mongol: {
-    id: 'mongol',
-    name: 'Mongol Horde',
-    short: 'MGL',
-    color: '#3a6a1c',
-    accent: '#d4b06a',
-    desc: 'Lightning cavalry. Smaller force but blistering speed and brutal damage. Strike fast, overwhelm and route.',
-    clone:     { hp: 70,  dmg: 18, speed: 2.6, range: 36,  attackRate: 1.3, ranged: false, radius: 9 },
-    commander: { hp: 280, dmg: 44, speed: 3.0, range: 42,  attackRate: 1.5, ranged: false, radius: 14 },
-    cloneCount: 20,
-  },
+// ============================================================
+// Unit types — the three arms of every army, plus the commander.
+// Factions below tweak the numbers and the mix, but the roles are shared.
+// ============================================================
+const UNIT_TYPES = {
+  infantry:  { key:'infantry',  label:'Infantry',  icon:'🛡️', hp:115, dmg:12, speed:1.35, range:26,  attackRate:1.0,  ranged:false, radius:8 },
+  archer:    { key:'archer',    label:'Archers',   icon:'🏹', hp:55,  dmg:15, speed:1.30, range:205, attackRate:1.1,  ranged:true,  projectileSpeed:7, radius:7 },
+  cavalry:   { key:'cavalry',   label:'Cavalry',   icon:'🐎', hp:95,  dmg:18, speed:3.00, range:30,  attackRate:1.05, ranged:false, radius:9, charge:true },
+  commander: { key:'commander', label:'Commander', icon:'👑', hp:430, dmg:40, speed:2.10, range:34,  attackRate:1.2,  ranged:false, radius:15, aura:175 },
 };
 
-// ------------------------------------------------------------
+// ============================================================
+// Faction configs — each is a different mix of the three arms.
+// `comp` is how many of each troop type; `mod` scales chosen stats.
+// ============================================================
+const FACTIONS = {
+  roman: {
+    id:'roman', name:'Roman Empire', short:'SPQR', color:'#cc1b22', accent:'#ffcc00',
+    desc:'Disciplined heavy infantry behind a wall of shields. Tough and steady — they hold the line while the archers and cavalry do the killing.',
+    comp:{ infantry:20, archer:6, cavalry:4 },
+    mod:{ infantry:{ hp:1.25 } },
+    commanderRanged:false,
+  },
+  persian: {
+    id:'persian', name:'Persian Empire', short:'PER', color:'#5a1a8c', accent:'#ffd700',
+    desc:'Masters of the bow. Vast ranks of archers that darken the sky, screened by a thin line of spearmen. Deadly at range, fragile up close.',
+    comp:{ infantry:8, archer:22, cavalry:4 },
+    mod:{ archer:{ range:1.15, dmg:1.05 } },
+    commanderRanged:true,
+  },
+  mongol: {
+    id:'mongol', name:'Mongol Horde', short:'MGL', color:'#3a6a1c', accent:'#d4b06a',
+    desc:'Thundering horse-lords. Wave after wave of fast cavalry that flank and shatter a line before it can form. Strike first or be ridden down.',
+    comp:{ infantry:6, archer:8, cavalry:18 },
+    mod:{ cavalry:{ speed:1.12, dmg:1.10 } },
+    commanderRanged:false,
+  },
+};
+function armySize(f){ return f.comp.infantry + f.comp.archer + f.comp.cavalry; }
+
+// ============================================================
 // Canvas + state
-// ------------------------------------------------------------
+// ============================================================
 const canvas = document.getElementById('game');
 const ctx    = canvas.getContext('2d');
 let W = 0, H = 0;
 function fitCanvas() {
-  W = window.innerWidth;
-  H = window.innerHeight;
-  canvas.width  = W;
-  canvas.height = H;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W; canvas.height = H;
 }
 fitCanvas();
 window.addEventListener('resize', fitCanvas);
 
 const STATE = {
-  phase: 'menu', // 'menu', 'battle', 'end'
-  player: null,
-  enemy: null,
-  units: [],       // all units (player + enemy)
-  projectiles: [],
-  particles: [],
+  phase: 'menu',            // 'menu' | 'battle' | 'end'
+  player: null, enemy: null,
+  units: [], projectiles: [], particles: [], markers: [], decor: [],
   kills: 0,
-  focusTarget: null,
-  mouse: { x: 0, y: 0 },
+  selected: [],
+  pInit: 1, eInit: 1,
+  playerCommander: null, enemyCommander: null,
+  drag: null,               // { x0,y0,x1,y1 } while box-selecting
+  routSide: null, routTimer: 0,
+  floaters: [],             // floating text (e.g. "Commander fallen!")
+  mouse: { x:0, y:0 },
 };
 
+// ============================================================
+// Input
+// ============================================================
 const keys = {};
 window.addEventListener('keydown', e => {
-  keys[e.key.toLowerCase()] = true;
-  // Prevent page scroll on space/arrows
-  if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase())) e.preventDefault();
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
+  if (STATE.phase !== 'battle') return;
+  if (k === '1') selectType('infantry');
+  else if (k === '2') selectType('archer');
+  else if (k === '3') selectType('cavalry');
+  else if (k === '4') selectCommander();
+  else if (k === ' ') selectAll();
+  else if (k === 'h') holdPosition();
 });
 window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-canvas.addEventListener('mousemove', e => {
+
+function canvasPos(e) {
   const r = canvas.getBoundingClientRect();
-  STATE.mouse.x = e.clientX - r.left;
-  STATE.mouse.y = e.clientY - r.top;
-});
-canvas.addEventListener('click', e => {
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+canvas.addEventListener('mousedown', e => {
   if (STATE.phase !== 'battle') return;
-  // Find closest enemy unit to click position
-  const r = canvas.getBoundingClientRect();
-  const cx = e.clientX - r.left;
-  const cy = e.clientY - r.top;
-  let best = null, bestD = 60 * 60;
-  for (const u of STATE.units) {
-    if (u.side === 'enemy' && !u.dead) {
-      const d = (u.x - cx) * (u.x - cx) + (u.y - cy) * (u.y - cy);
-      if (d < bestD) { bestD = d; best = u; }
-    }
+  const p = canvasPos(e);
+  STATE.mouse = p;
+  if (e.button === 0) STATE.drag = { x0:p.x, y0:p.y, x1:p.x, y1:p.y };
+});
+window.addEventListener('mousemove', e => {
+  const p = canvasPos(e);
+  STATE.mouse = p;
+  if (STATE.drag) { STATE.drag.x1 = p.x; STATE.drag.y1 = p.y; }
+});
+window.addEventListener('mouseup', e => {
+  if (STATE.phase !== 'battle' || e.button !== 0 || !STATE.drag) return;
+  const d = STATE.drag; STATE.drag = null;
+  const moved = Math.hypot(d.x1 - d.x0, d.y1 - d.y0);
+  if (moved < 6) {
+    // Single click: pick the unit under the cursor, else clear
+    const u = playerUnitAt(d.x1, d.y1);
+    setSelection(u ? [u] : []);
+  } else {
+    const minx = Math.min(d.x0,d.x1), maxx = Math.max(d.x0,d.x1);
+    const miny = Math.min(d.y0,d.y1), maxy = Math.max(d.y0,d.y1);
+    const inBox = STATE.units.filter(u =>
+      u.side==='player' && !u.dead && u.x>=minx && u.x<=maxx && u.y>=miny && u.y<=maxy);
+    setSelection(inBox);
   }
-  STATE.focusTarget = best;
+});
+// Right-click = order selected troops to move / attack there
+canvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  if (STATE.phase !== 'battle') return;
+  const p = canvasPos(e);
+  issueMoveOrder(p.x, p.y);
 });
 
-// ------------------------------------------------------------
-// Unit class
-// ------------------------------------------------------------
+function playerUnitAt(x, y) {
+  let best = null, bestD = Infinity;
+  for (const u of STATE.units) {
+    if (u.side !== 'player' || u.dead) continue;
+    const d = (u.x-x)*(u.x-x) + (u.y-y)*(u.y-y);
+    const r = u.radius + 12;
+    if (d < r*r && d < bestD) { bestD = d; best = u; }
+  }
+  return best;
+}
+function setSelection(list) {
+  STATE.units.forEach(u => { if (u.side==='player') u.selected = false; });
+  list.forEach(u => u.selected = true);
+  STATE.selected = list.slice();
+}
+function selectType(type) {
+  setSelection(STATE.units.filter(u => u.side==='player' && !u.dead && u.type===type));
+}
+function selectCommander() {
+  const c = STATE.playerCommander;
+  setSelection(c && !c.dead ? [c] : []);
+}
+function selectAll() {
+  setSelection(STATE.units.filter(u => u.side==='player' && !u.dead));
+}
+function holdPosition() {
+  STATE.selected.forEach(u => { if (!u.dead) u.anchor = { x:u.x, y:u.y }; });
+}
+
+// Right-click order: arrange the selected troops into a block on the target.
+function issueMoveOrder(tx, ty) {
+  const sel = STATE.selected.filter(u => !u.dead);
+  if (!sel.length) return;
+  const n = sel.length;
+  const cols = Math.max(1, Math.round(Math.sqrt(n)));
+  const rows = Math.ceil(n / cols);
+  const sx = 30, sy = 28;
+  const slots = [];
+  for (let i = 0; i < n; i++) {
+    const c = i % cols, r = Math.floor(i / cols);
+    slots.push({ x: tx + (c - (cols-1)/2) * sx, y: ty + (r - (rows-1)/2) * sy });
+  }
+  // Keep formation stable: nearest units take nearest slots (top-to-bottom).
+  sel.sort((a, b) => a.y - b.y);
+  sel.forEach((u, i) => { u.anchor = slots[i]; });
+  STATE.markers.push({ x: tx, y: ty, life: 0.7, max: 0.7 });
+}
+
+// ============================================================
+// Unit
+// ============================================================
 class Unit {
-  constructor({ faction, isCommander, side, x, y }) {
+  constructor({ faction, type, side, x, y }) {
     this.faction = faction;
-    this.isCommander = isCommander;
-    this.side = side; // 'player' or 'enemy'
+    this.type = type;
+    this.isCommander = type === 'commander';
+    this.side = side;
     this.x = x; this.y = y;
-    const cfg = FACTIONS[faction.id][isCommander ? 'commander' : 'clone'];
-    this.cfg = cfg;
-    this.maxHp = cfg.hp;
-    this.hp = cfg.hp;
-    this.dmg = cfg.dmg;
-    this.speed = cfg.speed;
-    this.range = cfg.range;
-    this.attackRate = cfg.attackRate;
-    this.ranged = !!cfg.ranged;
-    this.projectileSpeed = cfg.projectileSpeed || 0;
-    this.radius = cfg.radius;
+    this.anchor = { x, y };
+
+    const base = UNIT_TYPES[type];
+    const mod = (faction.mod && faction.mod[type]) || {};
+    const g = (k, d=1) => (base[k] !== undefined ? base[k] : d) * (mod[k] || 1);
+
+    this.maxHp = g('hp'); this.hp = this.maxHp;
+    this.dmg = g('dmg');
+    this.speed = g('speed');
+    this.range = g('range');
+    this.attackRate = base.attackRate;
+    this.ranged = this.isCommander ? !!faction.commanderRanged : !!base.ranged;
+    this.projectileSpeed = base.projectileSpeed || 8;
+    this.radius = base.radius;
+    this.aura = base.aura || 0;
+
     this.attackCD = Math.random() * 0.6;
-    this.dead = false;
-    this.fade = 1;
-    this.hitFlash = 0;
-    this.target = null;
+    this.dead = false; this.fade = 1; this.hitFlash = 0;
+    this.charging = false; this.routing = false; this.selected = false;
+    this.fleeY = null;
   }
 
   takeDamage(dmg) {
@@ -233,224 +325,201 @@ class Unit {
     this.hp -= dmg;
     this.hitFlash = 0.18;
     if (this.hp <= 0) {
-      this.hp = 0;
-      this.dead = true;
+      this.hp = 0; this.dead = true;
       if (this.side === 'enemy') STATE.kills++;
-      spawnParticles(this.x, this.y, this.faction.color, this.isCommander ? 30 : 10);
+      spawnParticles(this.x, this.y, this.faction.color, this.isCommander ? 34 : 10);
+      if (this.isCommander) onCommanderFall(this.side);
     }
   }
 
-  findNearestEnemy() {
-    let best = null, bestD = Infinity;
+  findNearestEnemyWithin(range) {
+    let best = null, bestD = range === Infinity ? Infinity : range * range;
     for (const u of STATE.units) {
       if (u.dead || u.side === this.side) continue;
-      const d = (u.x - this.x) * (u.x - this.x) + (u.y - this.y) * (u.y - this.y);
+      const d = (u.x-this.x)*(u.x-this.x) + (u.y-this.y)*(u.y-this.y);
       if (d < bestD) { bestD = d; best = u; }
     }
     return best;
   }
 
   update(dt) {
-    if (this.dead) {
-      this.fade -= dt * 1.4;
-      return;
-    }
+    if (this.dead) { this.fade -= dt * 1.4; return; }
     if (this.hitFlash > 0) this.hitFlash -= dt;
     this.attackCD -= dt;
+    this.charging = false;
 
-    // Player commander is moved by input, not AI
-    if (this.side === 'player' && this.isCommander) {
-      this.aiAttack(dt);
+    // Routing: broken troops flee for their own edge and don't fight.
+    if (this.routing) {
+      if (this.fleeY == null) this.fleeY = this.y + (Math.random()-0.5) * 60;
+      const homeX = this.side === 'player' ? -60 : W + 60;
+      const dx = homeX - this.x, dy = this.fleeY - this.y;
+      const d = Math.hypot(dx, dy) || 1;
+      this.x += (dx/d) * this.speed * 1.7;
+      this.y += (dy/d) * this.speed * 1.7;
       return;
     }
 
-    // Pick target: focus target overrides for player-side clones
-    let target = null;
-    if (this.side === 'player' && STATE.focusTarget && !STATE.focusTarget.dead) {
-      target = STATE.focusTarget;
-    } else {
-      // Re-use cached target if still valid
-      if (this.target && !this.target.dead) target = this.target;
-      else target = this.findNearestEnemy();
-    }
-    this.target = target;
-    if (!target) return;
+    const isPlayer = this.side === 'player';
+    // How far a unit will look for a fight. Player troops hold near where you
+    // put them; the enemy advances across the field to bring the battle to you.
+    const detect = this.isCommander ? 150 : (isPlayer ? (this.ranged ? this.range + 40 : 165) : Infinity);
 
-    const dx = target.x - this.x;
-    const dy = target.y - this.y;
-    const dist = Math.hypot(dx, dy);
-
-    // For ranged units, prefer staying near range; melee units rush in
-    const desiredRange = this.ranged ? this.range * 0.85 : 0;
-
-    if (this.ranged) {
-      // Kite: if too close, back off; if too far, advance
-      if (dist > this.range) {
-        this.x += (dx / dist) * this.speed;
-        this.y += (dy / dist) * this.speed;
-      } else if (dist < this.range * 0.55) {
-        this.x -= (dx / dist) * this.speed * 0.4;
-        this.y -= (dy / dist) * this.speed * 0.4;
-      }
-    } else {
-      // Melee: charge
-      if (dist > this.range * 0.7) {
-        this.x += (dx / dist) * this.speed;
-        this.y += (dy / dist) * this.speed;
-      }
+    // Player troops won't chase far from the spot you ordered — they return.
+    let strayed = false;
+    if (isPlayer && this.anchor) {
+      const ax = this.x - this.anchor.x, ay = this.y - this.anchor.y;
+      if (ax*ax + ay*ay > 250*250) strayed = true;
     }
 
-    // Try attack
-    if (dist <= this.range) this.tryAttack(target);
+    const foe = strayed ? null : this.findNearestEnemyWithin(detect);
+    if (foe) this.engage(foe);
+    else this.moveToAnchor();
 
-    // Bounds
     this.x = Math.max(this.radius, Math.min(W - this.radius, this.x));
     this.y = Math.max(this.radius, Math.min(H - this.radius, this.y));
   }
 
-  // Used for player commander (auto-attack while you move)
-  aiAttack(dt) {
-    let target = null;
-    if (STATE.focusTarget && !STATE.focusTarget.dead) target = STATE.focusTarget;
-    else if (this.target && !this.target.dead) target = this.target;
-    else target = this.findNearestEnemy();
-    this.target = target;
-    if (!target) return;
-    const dist = Math.hypot(target.x - this.x, target.y - this.y);
-    if (dist <= this.range) this.tryAttack(target);
+  engage(foe) {
+    const dx = foe.x - this.x, dy = foe.y - this.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    if (this.ranged) {
+      if (dist > this.range) {            // close to firing range
+        this.x += (dx/dist) * this.speed; this.y += (dy/dist) * this.speed;
+      } else if (dist < this.range * 0.55) { // too close — kite backwards
+        this.x -= (dx/dist) * this.speed * 0.5; this.y -= (dy/dist) * this.speed * 0.5;
+      }
+      if (dist <= this.range) this.tryAttack(foe);
+    } else {
+      if (dist > this.range * 0.75) {     // charge in
+        this.x += (dx/dist) * this.speed; this.y += (dy/dist) * this.speed;
+        this.charging = true;
+      }
+      if (dist <= this.range) this.tryAttack(foe);
+    }
   }
 
-  tryAttack(target) {
+  moveToAnchor() {
+    if (!this.anchor) return;
+    const dx = this.anchor.x - this.x, dy = this.anchor.y - this.y;
+    const d = Math.hypot(dx, dy);
+    if (d > 6) { this.x += (dx/d) * this.speed; this.y += (dy/d) * this.speed; }
+  }
+
+  attackDamage() {
+    let dmg = this.dmg * leaderMult(this.side) * auraMult(this);
+    if (this.type === 'cavalry' && this.charging) dmg *= 1.5;  // cavalry charge bonus
+    return dmg;
+  }
+
+  tryAttack(foe) {
     if (this.attackCD > 0) return;
     this.attackCD = 1 / this.attackRate;
+    const dmg = this.attackDamage();
     if (this.ranged) {
-      // Fire projectile
-      const dx = target.x - this.x;
-      const dy = target.y - this.y;
-      const d = Math.hypot(dx, dy);
+      const dx = foe.x - this.x, dy = foe.y - this.y;
+      const d = Math.hypot(dx, dy) || 1;
       STATE.projectiles.push({
-        x: this.x, y: this.y,
-        vx: (dx / d) * this.projectileSpeed,
-        vy: (dy / d) * this.projectileSpeed,
-        dmg: this.dmg,
-        side: this.side,
-        color: this.faction.accent,
-        life: 1.2,
+        x:this.x, y:this.y,
+        vx:(dx/d) * this.projectileSpeed, vy:(dy/d) * this.projectileSpeed,
+        dmg, side:this.side, color:this.faction.accent, life:1.3,
       });
     } else {
-      // Instant melee hit
-      target.takeDamage(this.dmg);
-      // Small knockback feel: nudge target
-      const dx = target.x - this.x;
-      const dy = target.y - this.y;
+      foe.takeDamage(dmg);
+      const dx = foe.x - this.x, dy = foe.y - this.y;
       const d = Math.hypot(dx, dy) || 1;
-      target.x += (dx / d) * 1.2;
-      target.y += (dy / d) * 1.2;
+      foe.x += (dx/d) * (this.type === 'cavalry' ? 3 : 1.2);   // knockback
+      foe.y += (dy/d) * (this.type === 'cavalry' ? 3 : 1.2);
     }
   }
 }
 
-// ------------------------------------------------------------
-// Particles (death poof)
-// ------------------------------------------------------------
+// A commander alive & near a unit makes that unit hit harder. Lose him and the
+// whole army fights on, just weaker — no instant defeat.
+function leaderMult(side) {
+  const c = side === 'player' ? STATE.playerCommander : STATE.enemyCommander;
+  return (c && !c.dead) ? 1 : 0.8;
+}
+function auraMult(u) {
+  const c = u.side === 'player' ? STATE.playerCommander : STATE.enemyCommander;
+  if (!c || c.dead || c === u) return 1;
+  const dx = c.x - u.x, dy = c.y - u.y;
+  return (dx*dx + dy*dy < c.aura * c.aura) ? 1.2 : 1;
+}
+function onCommanderFall(side) {
+  const who = side === 'player' ? STATE.player.name : STATE.enemy.name;
+  const c = side === 'player' ? STATE.playerCommander : STATE.enemyCommander;
+  STATE.floaters.push({
+    x: c ? c.x : W/2, y: c ? c.y : H/2,
+    text: (side === 'player' ? 'Your commander has fallen!' : 'Enemy commander slain!'),
+    color: side === 'player' ? '#ff6b6b' : '#ffe08a', life: 2.4, max: 2.4,
+  });
+}
+
+// ============================================================
+// Particles / projectiles / markers / floaters
+// ============================================================
 function spawnParticles(x, y, color, count) {
   for (let i = 0; i < count; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const sp = 1 + Math.random() * 4;
-    STATE.particles.push({
-      x, y,
-      vx: Math.cos(a) * sp,
-      vy: Math.sin(a) * sp,
-      life: 0.7 + Math.random() * 0.4,
-      color,
-    });
+    const a = Math.random() * Math.PI * 2, sp = 1 + Math.random() * 4;
+    STATE.particles.push({ x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:0.7+Math.random()*0.4, color });
   }
 }
 function updateParticles(dt) {
   for (let i = STATE.particles.length - 1; i >= 0; i--) {
     const p = STATE.particles[i];
-    p.x += p.vx; p.y += p.vy;
-    p.vx *= 0.92; p.vy *= 0.92;
-    p.life -= dt;
+    p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92; p.life -= dt;
     if (p.life <= 0) STATE.particles.splice(i, 1);
   }
 }
-
-// ------------------------------------------------------------
-// Projectile updates
-// ------------------------------------------------------------
 function updateProjectiles(dt) {
   for (let i = STATE.projectiles.length - 1; i >= 0; i--) {
     const p = STATE.projectiles[i];
-    p.x += p.vx; p.y += p.vy;
-    p.life -= dt;
+    p.x += p.vx; p.y += p.vy; p.life -= dt;
     let hit = false;
     if (p.life > 0) {
       for (const u of STATE.units) {
-        if (u.dead || u.side === p.side) continue;
+        if (u.dead || u.side === p.side || u.routing) continue;
         const dx = u.x - p.x, dy = u.y - p.y;
-        if (dx * dx + dy * dy < (u.radius + 4) * (u.radius + 4)) {
-          u.takeDamage(p.dmg);
-          hit = true;
-          break;
-        }
+        if (dx*dx + dy*dy < (u.radius+4)*(u.radius+4)) { u.takeDamage(p.dmg); hit = true; break; }
       }
     }
-    if (hit || p.life <= 0 || p.x < 0 || p.x > W || p.y < 0 || p.y > H) {
-      STATE.projectiles.splice(i, 1);
-    }
+    if (hit || p.life <= 0 || p.x < -20 || p.x > W+20 || p.y < -20 || p.y > H+20) STATE.projectiles.splice(i, 1);
+  }
+}
+function updateMarkers(dt) {
+  for (let i = STATE.markers.length - 1; i >= 0; i--) {
+    STATE.markers[i].life -= dt;
+    if (STATE.markers[i].life <= 0) STATE.markers.splice(i, 1);
+  }
+}
+function updateFloaters(dt) {
+  for (let i = STATE.floaters.length - 1; i >= 0; i--) {
+    const f = STATE.floaters[i];
+    f.y -= dt * 18; f.life -= dt;
+    if (f.life <= 0) STATE.floaters.splice(i, 1);
   }
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // Battle setup
-// ------------------------------------------------------------
+// ============================================================
 function startBattle(playerFactionId) {
   STATE.player = FACTIONS[playerFactionId];
-  // Pick a different random enemy faction
   const others = Object.keys(FACTIONS).filter(k => k !== playerFactionId);
   STATE.enemy = FACTIONS[others[Math.floor(Math.random() * others.length)]];
 
-  STATE.units = [];
-  STATE.projectiles = [];
-  STATE.particles = [];
-  STATE.kills = 0;
-  STATE.focusTarget = null;
+  STATE.units = []; STATE.projectiles = []; STATE.particles = [];
+  STATE.markers = []; STATE.floaters = []; STATE.selected = [];
+  STATE.kills = 0; STATE.routSide = null; STATE.routTimer = 0;
 
-  // Place player army on left, enemy on right
-  const cx = 140;             // player commander x
-  const ex = W - 140;         // enemy commander x
-  const cy = H / 2;
+  deployArmy(STATE.player, 'player');
+  deployArmy(STATE.enemy,  'enemy');
 
-  const playerCommander = new Unit({ faction: STATE.player, isCommander: true, side: 'player', x: cx, y: cy });
-  STATE.units.push(playerCommander);
-  STATE.playerCommander = playerCommander;
+  STATE.pInit = STATE.units.filter(u => u.side==='player').length;
+  STATE.eInit = STATE.units.filter(u => u.side==='enemy').length;
 
-  const enemyCommander = new Unit({ faction: STATE.enemy, isCommander: true, side: 'enemy', x: ex, y: cy });
-  STATE.units.push(enemyCommander);
-  STATE.enemyCommander = enemyCommander;
+  buildDecor();
 
-  // Spawn clones in loose formations
-  function spawnClones(faction, side, baseX, count) {
-    const rows = Math.ceil(count / 5);
-    const spacing = 36;
-    let placed = 0;
-    for (let r = 0; r < rows && placed < count; r++) {
-      const inRow = Math.min(5, count - placed);
-      const startY = cy - ((inRow - 1) / 2) * spacing;
-      const xOffset = (r + 1) * (side === 'player' ? -42 : 42);
-      for (let c = 0; c < inRow && placed < count; c++) {
-        const x = baseX + xOffset + (Math.random() - 0.5) * 12;
-        const y = startY + c * spacing + (Math.random() - 0.5) * 12;
-        STATE.units.push(new Unit({ faction, isCommander: false, side, x, y }));
-        placed++;
-      }
-    }
-  }
-  spawnClones(STATE.player, 'player', cx, STATE.player.cloneCount);
-  spawnClones(STATE.enemy,  'enemy',  ex, STATE.enemy.cloneCount);
-
-  // UI
   document.getElementById('menu').classList.add('hidden');
   document.getElementById('endScreen').classList.add('hidden');
   document.getElementById('hud').classList.remove('hidden');
@@ -461,18 +530,62 @@ function startBattle(playerFactionId) {
   STATE.phase = 'battle';
 }
 
-// ------------------------------------------------------------
+// Lay an army out in blocks: infantry front and centre, archers behind them,
+// cavalry on the wing, commander at the back. The player can re-order any of it.
+function deployArmy(faction, side) {
+  const cy = H / 2;
+  const s = side === 'player' ? 1 : -1;               // +1: home is on the left
+  const homeX     = side === 'player' ? W * 0.15 : W * 0.85;
+  const infantryX = side === 'player' ? W * 0.34 : W * 0.66;
+  const archerX   = side === 'player' ? W * 0.25 : W * 0.75;
+  const cavalryX  = side === 'player' ? W * 0.30 : W * 0.70;
+
+  const make = (type, x, y) => {
+    const u = new Unit({ faction, type, side, x, y });
+    STATE.units.push(u); return u;
+  };
+
+  const block = (type, frontX, centreY, count) => {
+    const list = [];
+    for (let i = 0; i < count; i++) list.push(i);
+    const perRow = Math.min(6, Math.max(1, Math.round(Math.sqrt(count * 1.6))));
+    const sx = 30, sy = 27;
+    list.forEach(i => {
+      const col = i % perRow, row = Math.floor(i / perRow);
+      const x = frontX - s * row * sx + (Math.random()-0.5) * 6;
+      const y = centreY + (col - (perRow-1)/2) * sy + (Math.random()-0.5) * 6;
+      make(type, x, y);
+    });
+  };
+
+  block('infantry', infantryX, cy, faction.comp.infantry);
+  block('archer',   archerX,   cy, faction.comp.archer);
+  block('cavalry',  cavalryX,  cy - H * 0.27, faction.comp.cavalry);   // cavalry on the upper wing
+
+  const cmd = make('commander', homeX, cy);
+  if (side === 'player') STATE.playerCommander = cmd; else STATE.enemyCommander = cmd;
+}
+
+// Cosmetic battlefield features — trees and rocks, kept clear of the centre lane.
+function buildDecor() {
+  STATE.decor = [];
+  for (let i = 0; i < 16; i++) {
+    STATE.decor.push({ kind:'tree', x: 40 + Math.random()*(W-80), y: 40 + Math.random()*(H-80), r: 12 + Math.random()*10 });
+  }
+  for (let i = 0; i < 10; i++) {
+    STATE.decor.push({ kind:'rock', x: 40 + Math.random()*(W-80), y: 40 + Math.random()*(H-80), r: 5 + Math.random()*7 });
+  }
+}
+
+// ============================================================
 // Game loop
-// ------------------------------------------------------------
+// ============================================================
 let lastTime = performance.now();
 function loop(now) {
   const dt = Math.min((now - lastTime) / 1000, 0.05);
   lastTime = now;
   if (STATE.phase === 'battle') {
-    tick(dt);
-    render();
-    updateHUD();
-    checkEnd();
+    tick(dt); render(); updateHUD(); checkEnd(dt);
   } else if (STATE.phase === 'menu') {
     renderMenuBackground();
   }
@@ -480,194 +593,238 @@ function loop(now) {
 }
 
 function tick(dt) {
-  // Player commander movement
-  const pc = STATE.playerCommander;
-  if (pc && !pc.dead) {
-    let dx = 0, dy = 0;
-    if (keys['w'] || keys['arrowup'])    dy -= 1;
-    if (keys['s'] || keys['arrowdown'])  dy += 1;
-    if (keys['a'] || keys['arrowleft'])  dx -= 1;
-    if (keys['d'] || keys['arrowright']) dx += 1;
-    if (dx !== 0 || dy !== 0) {
-      const len = Math.hypot(dx, dy);
-      pc.x += (dx / len) * pc.speed * 1.4;
-      pc.y += (dy / len) * pc.speed * 1.4;
-    }
-    pc.x = Math.max(pc.radius, Math.min(W - pc.radius, pc.x));
-    pc.y = Math.max(pc.radius, Math.min(H - pc.radius, pc.y));
-  }
-
-  // Update units
   for (const u of STATE.units) u.update(dt);
-  // Remove fully faded dead units
   for (let i = STATE.units.length - 1; i >= 0; i--) {
-    if (STATE.units[i].dead && STATE.units[i].fade <= 0) STATE.units.splice(i, 1);
+    const u = STATE.units[i];
+    if (u.dead && u.fade <= 0) STATE.units.splice(i, 1);
+    else if (u.routing && (u.x < -50 || u.x > W + 50)) STATE.units.splice(i, 1);
   }
-
-  updateProjectiles(dt);
-  updateParticles(dt);
-
-  // Clear focus target if it died
-  if (STATE.focusTarget && STATE.focusTarget.dead) STATE.focusTarget = null;
+  updateProjectiles(dt); updateParticles(dt); updateMarkers(dt); updateFloaters(dt);
+  STATE.selected = STATE.selected.filter(u => !u.dead);
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // Rendering
-// ------------------------------------------------------------
+// ============================================================
 function drawGround() {
-  // Tiled green field
-  ctx.fillStyle = '#3c5a2e';
-  ctx.fillRect(0, 0, W, H);
-  // Subtle stripes
+  ctx.fillStyle = '#3c5a2e'; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = 'rgba(255,255,255,0.04)';
   for (let i = 0; i < W; i += 60) ctx.fillRect(i, 0, 30, H);
-  // Center divider
-  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([6, 10]);
-  ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke();
-  ctx.setLineDash([]);
+  // Deployment tints
+  const pg = ctx.createLinearGradient(0,0,W*0.4,0);
+  pg.addColorStop(0,'rgba(60,120,60,0.18)'); pg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = pg; ctx.fillRect(0,0,W*0.4,H);
+  const eg = ctx.createLinearGradient(W,0,W*0.6,0);
+  eg.addColorStop(0,'rgba(140,60,60,0.18)'); eg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = eg; ctx.fillRect(W*0.6,0,W*0.4,H);
+  // Centre line
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 2; ctx.setLineDash([6,10]);
+  ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke(); ctx.setLineDash([]);
+  // Terrain decor
+  for (const d of STATE.decor) {
+    ctx.beginPath();
+    ctx.ellipse(d.x, d.y + d.r*0.6, d.r*0.9, d.r*0.4, 0, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fill();
+    if (d.kind === 'tree') {
+      ctx.fillStyle = '#5a3a1e'; ctx.fillRect(d.x-2, d.y-2, 4, d.r*0.7);
+      ctx.beginPath(); ctx.arc(d.x, d.y-4, d.r, 0, Math.PI*2);
+      ctx.fillStyle = '#2f5423'; ctx.fill();
+      ctx.beginPath(); ctx.arc(d.x-d.r*0.4, d.y-2, d.r*0.7, 0, Math.PI*2);
+      ctx.fillStyle = '#376127'; ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+      ctx.fillStyle = '#6b6b63'; ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+  }
 }
 
 function drawUnit(u) {
   if (u.fade <= 0) return;
-  ctx.globalAlpha = Math.max(0, Math.min(1, u.fade));
+  ctx.globalAlpha = Math.max(0, Math.min(1, u.fade)) * (u.routing ? 0.7 : 1);
   const color = u.hitFlash > 0 ? '#fff' : u.faction.color;
   const accent = u.faction.accent;
 
+  // Selection ring
+  if (u.selected) {
+    ctx.beginPath(); ctx.arc(u.x, u.y, u.radius + 5, 0, Math.PI*2);
+    ctx.strokeStyle = '#8fe8ff'; ctx.lineWidth = 2; ctx.stroke();
+  }
+
   // Shadow
   ctx.beginPath();
-  ctx.ellipse(u.x, u.y + u.radius * 0.6, u.radius * 0.9, u.radius * 0.4, 0, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  ctx.fill();
+  ctx.ellipse(u.x, u.y + u.radius*0.6, u.radius*0.9, u.radius*0.4, 0, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fill();
 
-  // Body
-  ctx.beginPath();
-  ctx.arc(u.x, u.y, u.radius, 0, Math.PI * 2);
+  // Body — shape tells the unit type apart at a glance
   ctx.fillStyle = color;
-  ctx.fill();
-  ctx.lineWidth = 2;
   ctx.strokeStyle = u.isCommander ? '#fff' : 'rgba(0,0,0,0.45)';
-  ctx.stroke();
+  ctx.lineWidth = 2;
+  if (u.type === 'cavalry') {
+    // diamond
+    ctx.beginPath();
+    ctx.moveTo(u.x, u.y - u.radius); ctx.lineTo(u.x + u.radius, u.y);
+    ctx.lineTo(u.x, u.y + u.radius); ctx.lineTo(u.x - u.radius, u.y);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+  } else if (u.type === 'archer') {
+    // triangle
+    ctx.beginPath();
+    ctx.moveTo(u.x, u.y - u.radius); ctx.lineTo(u.x + u.radius, u.y + u.radius*0.8);
+    ctx.lineTo(u.x - u.radius, u.y + u.radius*0.8); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+  } else {
+    // square-ish infantry / round commander
+    if (u.isCommander) { ctx.beginPath(); ctx.arc(u.x, u.y, u.radius, 0, Math.PI*2); ctx.fill(); ctx.stroke(); }
+    else { ctx.fillRect(u.x-u.radius, u.y-u.radius, u.radius*2, u.radius*2); ctx.strokeRect(u.x-u.radius, u.y-u.radius, u.radius*2, u.radius*2); }
+  }
 
-  // Commander crown / marker
+  // Commander crown
   if (u.isCommander) {
     ctx.beginPath();
-    ctx.moveTo(u.x - 8, u.y - u.radius - 6);
-    ctx.lineTo(u.x - 4, u.y - u.radius - 14);
-    ctx.lineTo(u.x,     u.y - u.radius - 6);
-    ctx.lineTo(u.x + 4, u.y - u.radius - 14);
-    ctx.lineTo(u.x + 8, u.y - u.radius - 6);
-    ctx.closePath();
-    ctx.fillStyle = accent;
-    ctx.fill();
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.moveTo(u.x-8, u.y-u.radius-6); ctx.lineTo(u.x-4, u.y-u.radius-14);
+    ctx.lineTo(u.x,   u.y-u.radius-6); ctx.lineTo(u.x+4, u.y-u.radius-14);
+    ctx.lineTo(u.x+8, u.y-u.radius-6); ctx.closePath();
+    ctx.fillStyle = accent; ctx.fill(); ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
   }
 
-  // HP bar over unit
+  // HP bar
   if (!u.dead) {
-    const w = u.isCommander ? 38 : 22;
-    const h = u.isCommander ? 5 : 3;
+    const w = u.isCommander ? 40 : 22, h = u.isCommander ? 5 : 3;
     const y = u.y - u.radius - (u.isCommander ? 22 : 12);
-    ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillRect(u.x - w / 2, y, w, h);
-    const pct = Math.max(0, u.hp / u.maxHp);
-    const hc = pct > 0.5 ? '#7fe000' : pct > 0.25 ? '#f0c020' : '#e23030';
-    ctx.fillStyle = hc;
-    ctx.fillRect(u.x - w / 2, y, w * pct, h);
+    ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(u.x-w/2, y, w, h);
+    const pct = Math.max(0, u.hp/u.maxHp);
+    ctx.fillStyle = pct > 0.5 ? '#7fe000' : pct > 0.25 ? '#f0c020' : '#e23030';
+    ctx.fillRect(u.x-w/2, y, w*pct, h);
   }
-
-  // Focus target outline
-  if (u === STATE.focusTarget) {
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.arc(u.x, u.y, u.radius + 6, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
   ctx.globalAlpha = 1;
 }
 
-function drawProjectile(p) {
-  ctx.strokeStyle = p.color;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(p.x, p.y);
-  ctx.lineTo(p.x - p.vx * 1.6, p.y - p.vy * 1.6);
-  ctx.stroke();
-  ctx.fillStyle = p.color;
-  ctx.beginPath();
-  ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-  ctx.fill();
+function drawCommanderAura() {
+  const c = STATE.playerCommander;
+  if (!c || c.dead) return;
+  ctx.beginPath(); ctx.arc(c.x, c.y, c.aura, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,215,0,0.18)'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = 'rgba(255,215,0,0.05)'; ctx.fill();
 }
-
+function drawProjectile(p) {
+  ctx.strokeStyle = p.color; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx*1.6, p.y - p.vy*1.6); ctx.stroke();
+  ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2); ctx.fill();
+}
 function drawParticles() {
   for (const p of STATE.particles) {
-    ctx.globalAlpha = Math.max(0, p.life);
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
+}
+function drawMarkers() {
+  for (const m of STATE.markers) {
+    const t = 1 - m.life/m.max;
+    ctx.globalAlpha = m.life/m.max;
+    ctx.strokeStyle = '#8fe8ff'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(m.x, m.y, 6 + t*18, 0, Math.PI*2); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawFloaters() {
+  ctx.textAlign = 'center'; ctx.font = 'bold 18px Segoe UI, sans-serif';
+  for (const f of STATE.floaters) {
+    ctx.globalAlpha = Math.min(1, f.life/0.6);
+    ctx.fillStyle = '#000'; ctx.fillText(f.text, f.x+1, f.y+1);
+    ctx.fillStyle = f.color; ctx.fillText(f.text, f.x, f.y);
+  }
+  ctx.globalAlpha = 1; ctx.textAlign = 'start';
+}
+function drawSelectionBox() {
+  if (!STATE.drag) return;
+  const d = STATE.drag;
+  const x = Math.min(d.x0,d.x1), y = Math.min(d.y0,d.y1);
+  const w = Math.abs(d.x1-d.x0), h = Math.abs(d.y1-d.y0);
+  ctx.fillStyle = 'rgba(143,232,255,0.12)'; ctx.fillRect(x,y,w,h);
+  ctx.strokeStyle = 'rgba(143,232,255,0.7)'; ctx.lineWidth = 1.5; ctx.strokeRect(x,y,w,h);
 }
 
 function render() {
   drawGround();
-  // Sort by Y for crude depth
-  const sorted = STATE.units.slice().sort((a, b) => a.y - b.y);
+  drawCommanderAura();
+  drawMarkers();
+  const sorted = STATE.units.slice().sort((a,b) => a.y - b.y);
   for (const u of sorted) drawUnit(u);
   for (const p of STATE.projectiles) drawProjectile(p);
   drawParticles();
+  drawFloaters();
+  drawSelectionBox();
 }
 
-// Animated background for the menu
 let menuT = 0;
 function renderMenuBackground() {
   menuT += 0.01;
-  ctx.fillStyle = '#3c5a2e';
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#3c5a2e'; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = 'rgba(255,255,255,0.04)';
-  for (let i = 0; i < W; i += 60) ctx.fillRect(i + (menuT * 12) % 60 - 60, 0, 30, H);
+  for (let i = 0; i < W; i += 60) ctx.fillRect(i + (menuT*12)%60 - 60, 0, 30, H);
 }
 
-// ------------------------------------------------------------
-// HUD updates
-// ------------------------------------------------------------
+// ============================================================
+// HUD
+// ============================================================
+function aliveCounts(side) {
+  const c = { infantry:0, archer:0, cavalry:0, total:0 };
+  for (const u of STATE.units) {
+    if (u.side !== side || u.dead || u.isCommander) continue;
+    c[u.type]++; c.total++;
+  }
+  return c;
+}
 function updateHUD() {
-  const pAlive  = STATE.units.filter(u => u.side === 'player' && !u.dead).length;
-  const pTotal  = STATE.player.cloneCount + 1;
-  const eAlive  = STATE.units.filter(u => u.side === 'enemy' && !u.dead).length;
-  const eTotal  = STATE.enemy.cloneCount + 1;
-  document.getElementById('playerCounts').textContent = pAlive + ' / ' + pTotal;
-  document.getElementById('enemyCounts').textContent  = eAlive + ' / ' + eTotal;
+  const p = aliveCounts('player'), e = aliveCounts('enemy');
+  const pAll = STATE.units.filter(u => u.side==='player' && !u.dead).length;
+  const eAll = STATE.units.filter(u => u.side==='enemy'  && !u.dead).length;
+  document.getElementById('playerComp').innerHTML = `🛡️ ${p.infantry} &nbsp; 🏹 ${p.archer} &nbsp; 🐎 ${p.cavalry}`;
+  document.getElementById('enemyComp').innerHTML  = `🛡️ ${e.infantry} &nbsp; 🏹 ${e.archer} &nbsp; 🐎 ${e.cavalry}`;
   document.getElementById('kills').textContent = STATE.kills;
+  document.getElementById('playerStrFill').style.width = (pAll / STATE.pInit) * 100 + '%';
+  document.getElementById('enemyStrFill').style.width  = (eAll / STATE.eInit) * 100 + '%';
   const pc = STATE.playerCommander, ec = STATE.enemyCommander;
-  document.getElementById('playerHpFill').style.width = (pc && !pc.dead ? (pc.hp / pc.maxHp) * 100 : 0) + '%';
-  document.getElementById('enemyHpFill').style.width  = (ec && !ec.dead ? (ec.hp / ec.maxHp) * 100 : 0) + '%';
+  document.getElementById('playerCmdFill').style.width = (pc && !pc.dead ? (pc.hp/pc.maxHp)*100 : 0) + '%';
+  document.getElementById('enemyCmdFill').style.width  = (ec && !ec.dead ? (ec.hp/ec.maxHp)*100 : 0) + '%';
 }
 
-// ------------------------------------------------------------
-// Win / lose
-// ------------------------------------------------------------
-function checkEnd() {
+// ============================================================
+// Win / lose — an army breaks when it's ground down, then routs.
+// Losing your commander weakens your army but does NOT end the battle.
+// ============================================================
+function fightingStrength(side) {
+  // Units still willing to fight (not routing) as a fraction of the start count.
+  let alive = 0;
+  for (const u of STATE.units) if (u.side === side && !u.dead && !u.routing) alive++;
+  return alive / (side === 'player' ? STATE.pInit : STATE.eInit);
+}
+function beginRout(side) {
+  STATE.routSide = side;
+  STATE.routTimer = 1.6;
+  for (const u of STATE.units) if (u.side === side && !u.dead) u.routing = true;
+  const mid = { x: side==='player' ? W*0.3 : W*0.7, y: H*0.2 };
+  STATE.floaters.push({ x: mid.x, y: mid.y,
+    text: (side==='player' ? 'Your army breaks and routs!' : 'The enemy army breaks and routs!'),
+    color: side==='player' ? '#ff6b6b' : '#ffe08a', life: 2.2, max: 2.2 });
+}
+function checkEnd(dt) {
   if (STATE.phase !== 'battle') return;
-  const playerCommanderDead = STATE.playerCommander.dead;
-  const enemyCommanderDead  = STATE.enemyCommander.dead;
-  if (playerCommanderDead || enemyCommanderDead) {
-    endBattle(!playerCommanderDead && enemyCommanderDead);
+
+  if (STATE.routSide) {                       // a rout is already under way
+    STATE.routTimer -= dt;
+    const routed = STATE.units.filter(u => u.side === STATE.routSide && !u.dead).length === 0;
+    if (STATE.routTimer <= 0 || routed) endBattle(STATE.routSide === 'enemy');
     return;
   }
-  // Also win if all enemies are dead (defensive: commanders dying is the main case)
-  const aliveEnemy  = STATE.units.some(u => u.side === 'enemy'  && !u.dead);
-  const alivePlayer = STATE.units.some(u => u.side === 'player' && !u.dead);
-  if (!aliveEnemy)  endBattle(true);
-  else if (!alivePlayer) endBattle(false);
+
+  const pStr = fightingStrength('player'), eStr = fightingStrength('enemy');
+  const BREAK = 0.20;                          // an army breaks once ~1/5 is left
+  if (eStr <= BREAK && pStr > eStr)      beginRout('enemy');
+  else if (pStr <= BREAK)                beginRout('player');
+  else if (eStr <= 0)                    endBattle(true);
+  else if (pStr <= 0)                    endBattle(false);
 }
 
 function endBattle(won) {
@@ -677,15 +834,16 @@ function endBattle(won) {
   const end = document.getElementById('endScreen');
   end.classList.remove('hidden');
   document.getElementById('endTitle').textContent = won ? '🏆 VICTORY!' : '💀 DEFEATED';
+  const survivors = STATE.units.filter(u => u.side==='player' && !u.dead && !u.routing).length;
   document.getElementById('endSub').textContent =
-    (won ? 'Your ' + STATE.player.name + ' army crushed the ' + STATE.enemy.name + '.'
-         : 'The ' + STATE.enemy.name + ' broke your line. You fell on the battlefield.') +
-    ' Kills: ' + STATE.kills + '.';
+    (won ? `Your ${STATE.player.name} army broke the ${STATE.enemy.name} and holds the field with ${survivors} still standing.`
+         : `The ${STATE.enemy.name} shattered your line and your army routed.`) +
+    ` Kills: ${STATE.kills}.`;
 }
 
-// ------------------------------------------------------------
+// ============================================================
 // Menu wiring
-// ------------------------------------------------------------
+// ============================================================
 function renderFactionCards() {
   const list = document.getElementById('factionList');
   list.innerHTML = '';
@@ -694,25 +852,22 @@ function renderFactionCards() {
     const card = document.createElement('div');
     card.className = 'faction-card';
     card.innerHTML =
-      '<div class="faction-banner" style="background:' + f.color + '">' + f.short + '</div>' +
-      '<div class="faction-name">' + f.name + '</div>' +
-      '<div class="faction-desc">' + f.desc + '</div>' +
-      '<div class="faction-stats">' +
-        '<span>👥 Army: ' + f.cloneCount + '</span>' +
-        '<span>❤️ HP: ' + f.clone.hp + '</span>' +
-        '<span>⚔️ DMG: ' + f.clone.dmg + '</span>' +
-        '<span>🏃 SPD: ' + f.clone.speed.toFixed(1) + '</span>' +
-        '<span>🎯 ' + (f.clone.ranged ? 'Ranged' : 'Melee') + '</span>' +
-      '</div>';
+      `<div class="faction-banner" style="background:${f.color}">${f.short}</div>` +
+      `<div class="faction-name">${f.name}</div>` +
+      `<div class="faction-desc">${f.desc}</div>` +
+      `<div class="faction-comp">` +
+        `<span>🛡️ <b>${f.comp.infantry}</b></span>` +
+        `<span>🏹 <b>${f.comp.archer}</b></span>` +
+        `<span>🐎 <b>${f.comp.cavalry}</b></span>` +
+        `<span style="margin-left:auto;opacity:.7">${armySize(f)} troops</span>` +
+      `</div>`;
     card.addEventListener('click', () => startBattle(id));
     list.appendChild(card);
   }
 }
 renderFactionCards();
 
-document.getElementById('playAgain').addEventListener('click', () => {
-  startBattle(STATE.player.id);
-});
+document.getElementById('playAgain').addEventListener('click', () => startBattle(STATE.player.id));
 document.getElementById('backToMenu').addEventListener('click', () => {
   STATE.phase = 'menu';
   document.getElementById('endScreen').classList.add('hidden');
