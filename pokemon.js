@@ -33,12 +33,85 @@
     }
 
     /* ── API helpers ───────────────────────────────────── */
+    /* Known set name fragments → API set ids (populated on first search) */
+    let setsIndex = null;
+    async function loadSetsIndex() {
+        if (setsIndex) return setsIndex;
+        const res = await fetch(`${API}/sets?select=id,name&pageSize=250&orderBy=-releaseDate`);
+        if (!res.ok) return [];
+        const json = await res.json();
+        setsIndex = json.data || [];
+        return setsIndex;
+    }
+
+    /* Rarity shorthands collectors actually type */
+    const RARITY_ALIASES = {
+        'sir': 'Special Illustration Rare',
+        'sar': 'Special Art Rare',
+        'ar': 'Art Rare',
+        'ur': 'Ultra Rare',
+        'hr': 'Hyper Rare',
+        'ir': 'Illustration Rare',
+        'dr': 'Double Rare',
+        'rr': 'Double Rare',
+    };
+
+    /**
+     * Smart search: parses a free-text query like "Meowth SIR Perfect Order"
+     * into API filters for name, rarity and set.
+     */
     async function searchCards(query) {
-        const key = query.trim().toLowerCase();
-        if (!key) return [];
+        const raw = query.trim();
+        if (!raw) return [];
+        const key = raw.toLowerCase();
         if (searchCache[key]) return searchCache[key];
 
-        const url = `${API}/cards?q=name:"${encodeURIComponent(key)}"&pageSize=20&select=id,name,images,set,rarity,tcgplayer,cardmarket,number,supertype`;
+        await loadSetsIndex();
+
+        let words = raw.split(/\s+/);
+        let setFilter = '';
+        let rarityFilter = '';
+        let nameWords = [];
+
+        // 1) Pull out rarity aliases (e.g. SIR, UR)
+        const remaining = [];
+        for (const w of words) {
+            const alias = RARITY_ALIASES[w.toLowerCase()];
+            if (alias && !rarityFilter) {
+                rarityFilter = alias;
+            } else {
+                remaining.push(w);
+            }
+        }
+        words = remaining;
+
+        // 2) Greedily match set names from the end of the query
+        if (setsIndex && setsIndex.length) {
+            // Try longest substring match from end
+            for (let len = words.length; len >= 1; len--) {
+                const candidate = words.slice(words.length - len).join(' ').toLowerCase();
+                const match = setsIndex.find(s => s.name.toLowerCase() === candidate);
+                if (match) {
+                    setFilter = match.id;
+                    words = words.slice(0, words.length - len);
+                    break;
+                }
+            }
+        }
+
+        nameWords = words;
+        const nameQuery = nameWords.join(' ');
+
+        // Build API query parts
+        const parts = [];
+        if (nameQuery) parts.push(`name:"${nameQuery}*"`);
+        if (setFilter) parts.push(`set.id:${setFilter}`);
+        if (rarityFilter) parts.push(`rarity:"${rarityFilter}"`);
+
+        // If nothing useful parsed, fall back to wildcard name search
+        if (!parts.length) parts.push(`name:"${raw}*"`);
+
+        const url = `${API}/cards?q=${encodeURIComponent(parts.join(' '))}&pageSize=20&select=id,name,images,set,rarity,tcgplayer,cardmarket,number,supertype`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('API request failed');
         const json = await res.json();
