@@ -3337,6 +3337,30 @@ body {
     max-height: 420px;
     overflow-y: auto;
 }
+.pokemon-load-more-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px;
+}
+.pokemon-result-count {
+    font-size: 0.82rem;
+    color: var(--muted);
+}
+.pokemon-load-more-btn {
+    padding: 8px 18px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.pokemon-load-more-btn:hover { background: var(--primary-dark); }
+.pokemon-load-more-btn:disabled { opacity: 0.6; cursor: wait; }
 .pokemon-searching, .pokemon-no-results {
     text-align: center;
     color: var(--muted);

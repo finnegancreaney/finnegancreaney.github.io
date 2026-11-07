@@ -13,6 +13,9 @@
     let collection = loadCollection();
     // collection shape: { cardId: { card, qty, addedAt, priceHistory: [{ date, price }] } }
     let searchCache = {};
+    let lastSearchUrl = '';   // for "Load more"
+    let lastSearchPage = 1;
+    let lastSearchCards = []; // accumulated results across pages
 
     /* ── DOM refs ──────────────────────────────────────── */
     const $ = id => document.getElementById(id);
@@ -111,12 +114,28 @@
         // If nothing useful parsed, fall back to wildcard name search
         if (!parts.length) parts.push(`name:"${raw}*"`);
 
-        const url = `${API}/cards?q=${encodeURIComponent(parts.join(' '))}&pageSize=20&select=id,name,images,set,rarity,tcgplayer,cardmarket,number,supertype`;
-        const res = await fetch(url);
+        const baseUrl = `${API}/cards?q=${encodeURIComponent(parts.join(' '))}&pageSize=50&select=id,name,images,set,rarity,tcgplayer,cardmarket,number,supertype`;
+        lastSearchUrl = baseUrl;
+        lastSearchPage = 1;
+
+        const res = await fetch(baseUrl + '&page=1');
         if (!res.ok) throw new Error('API request failed');
         const json = await res.json();
-        searchCache[key] = json.data || [];
+        const cards = json.data || [];
+        lastSearchCards = cards;
+        searchCache[key] = { cards, totalCount: json.totalCount || cards.length };
         return searchCache[key];
+    }
+
+    async function loadMoreResults() {
+        if (!lastSearchUrl) return null;
+        lastSearchPage++;
+        const res = await fetch(lastSearchUrl + '&page=' + lastSearchPage);
+        if (!res.ok) return null;
+        const json = await res.json();
+        const more = json.data || [];
+        lastSearchCards = lastSearchCards.concat(more);
+        return { cards: lastSearchCards, totalCount: json.totalCount || lastSearchCards.length };
     }
 
     async function fetchCardById(id) {
@@ -198,13 +217,17 @@
     }
 
     /* ── render: search results ────────────────────────── */
-    function renderSearchResults(cards) {
+    function renderSearchResults(result) {
         const container = $('pokemon-search-results');
+        const cards = result.cards || result;  // support old array or new {cards, totalCount}
+        const totalCount = result.totalCount || cards.length;
+
         if (!cards.length) {
             container.innerHTML = '<p class="pokemon-no-results">No cards found. Try a different name.</p>';
             return;
         }
-        container.innerHTML = cards.map(card => {
+
+        let html = cards.map(card => {
             const price = getPrice(card);
             const inCollection = collection[card.id];
             return `
@@ -222,6 +245,19 @@
                 </div>`;
         }).join('');
 
+        // Show count + Load More if there are more results
+        const showing = cards.length;
+        if (totalCount > showing) {
+            html += `<div class="pokemon-load-more-row">
+                <span class="pokemon-result-count">Showing ${showing} of ${totalCount}</span>
+                <button class="pokemon-load-more-btn" id="pokemon-load-more">Load more</button>
+            </div>`;
+        } else if (showing > 5) {
+            html += `<div class="pokemon-load-more-row"><span class="pokemon-result-count">${showing} cards found</span></div>`;
+        }
+
+        container.innerHTML = html;
+
         container.querySelectorAll('.pokemon-add-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -230,6 +266,16 @@
                 if (card) addCard(card);
             });
         });
+
+        const loadMoreBtn = $('pokemon-load-more');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', async () => {
+                loadMoreBtn.textContent = 'Loading…';
+                loadMoreBtn.disabled = true;
+                const more = await loadMoreResults();
+                if (more) renderSearchResults(more);
+            });
+        }
     }
 
     /* ── render: collection list ───────────────────────── */
