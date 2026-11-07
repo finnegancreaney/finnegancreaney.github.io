@@ -147,16 +147,27 @@
 
     /* ── price helpers ─────────────────────────────────── */
     function getPrice(card) {
+        // TCGPlayer: try every variant, not just a few
         const tcg = card.tcgplayer?.prices;
         if (tcg) {
-            const variant = tcg.holofoil || tcg['1stEditionHolofoil'] || tcg.reverseHolofoil || tcg.normal || tcg['1stEditionNormal'];
-            if (variant?.market) return variant.market;
-            if (variant?.mid) return variant.mid;
+            for (const variant of Object.values(tcg)) {
+                if (variant?.market) return variant.market;
+            }
+            for (const variant of Object.values(tcg)) {
+                if (variant?.mid) return variant.mid;
+            }
+            for (const variant of Object.values(tcg)) {
+                if (variant?.low) return variant.low;
+            }
         }
+        // Cardmarket fallback
         const cm = card.cardmarket?.prices;
         if (cm) {
             if (cm.averageSellPrice) return cm.averageSellPrice;
             if (cm.trendPrice) return cm.trendPrice;
+            if (cm.avg1) return cm.avg1;
+            if (cm.avg7) return cm.avg7;
+            if (cm.avg30) return cm.avg30;
         }
         return null;
     }
