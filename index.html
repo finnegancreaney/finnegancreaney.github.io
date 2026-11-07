@@ -44,6 +44,11 @@
                         <h3>School</h3>
                         <p>Bus tracker and live train times</p>
                     </div>
+                    <div class="interest-card" onclick="switchTab('pokemon')">
+                        <span class="interest-icon">⚡</span>
+                        <h3>Pokémon Cards</h3>
+                        <p>Track your collection with live prices</p>
+                    </div>
                 </div>
             </div>
 
@@ -971,6 +976,98 @@
                 </div>
             </div>
 
+            <!-- Pokémon Card Inventory -->
+            <div id="pokemon" class="game-page">
+                <div class="game-header-inline">
+                    <h2>⚡ Pokémon Card Collection</h2>
+                    <button class="back-btn" onclick="switchTab('home')">← Back</button>
+                </div>
+                <div class="game-content pokemon-content">
+                    <!-- Collection Stats -->
+                    <div class="pokemon-stats-bar">
+                        <div class="pokemon-stat-chip">
+                            <span class="pokemon-stat-label">Cards</span>
+                            <span class="pokemon-stat-value" id="pokemon-total-cards">0</span>
+                        </div>
+                        <div class="pokemon-stat-chip">
+                            <span class="pokemon-stat-label">Unique</span>
+                            <span class="pokemon-stat-value" id="pokemon-unique-cards">0</span>
+                        </div>
+                        <div class="pokemon-stat-chip pokemon-stat-value-chip">
+                            <span class="pokemon-stat-label">Est. Value</span>
+                            <span class="pokemon-stat-value" id="pokemon-total-value">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Search & Scan -->
+                    <div class="pokemon-search-section">
+                        <div class="pokemon-search-row">
+                            <input type="text" id="pokemon-search" class="pokemon-search-input" placeholder="Search cards by name (e.g. Charizard, Pikachu)..." autocomplete="off">
+                            <button class="pokemon-search-btn" id="pokemon-search-btn">Search</button>
+                            <label class="pokemon-scan-btn" id="pokemon-scan-label" title="Scan a card with your camera">
+                                📷 Scan
+                                <input type="file" accept="image/*" capture="environment" id="pokemon-scan-input" style="display:none!important;width:0;height:0;position:absolute">
+                            </label>
+                        </div>
+                        <div class="pokemon-scan-status" id="pokemon-scan-status" hidden></div>
+                        <div class="pokemon-search-results" id="pokemon-search-results"></div>
+                    </div>
+
+                    <!-- Filters & Sort -->
+                    <div class="pokemon-toolbar">
+                        <select id="pokemon-filter-rarity" class="pokemon-select">
+                            <option value="">All Rarities</option>
+                        </select>
+                        <select id="pokemon-filter-set" class="pokemon-select">
+                            <option value="">All Sets</option>
+                        </select>
+                        <select id="pokemon-sort" class="pokemon-select">
+                            <option value="name-asc">Name A–Z</option>
+                            <option value="name-desc">Name Z–A</option>
+                            <option value="value-desc">Value High–Low</option>
+                            <option value="value-asc">Value Low–High</option>
+                            <option value="date-desc">Newest Added</option>
+                            <option value="date-asc">Oldest Added</option>
+                        </select>
+                        <button class="pokemon-refresh-btn" id="pokemon-refresh-btn" title="Refresh all prices">🔄 Refresh Prices</button>
+                        <button class="pokemon-export-btn" id="pokemon-export-btn" title="Export collection">📋 Export</button>
+                    </div>
+
+                    <!-- Collection List -->
+                    <div class="pokemon-list-wrap" id="pokemon-list-wrap">
+                        <table class="pokemon-list" id="pokemon-list">
+                            <thead>
+                                <tr>
+                                    <th class="pokemon-col-img"></th>
+                                    <th class="pokemon-col-name pokemon-sortable" data-sort="name">Name</th>
+                                    <th class="pokemon-col-set pokemon-sortable" data-sort="set">Set</th>
+                                    <th class="pokemon-col-num">#</th>
+                                    <th class="pokemon-col-rarity pokemon-sortable" data-sort="rarity">Rarity</th>
+                                    <th class="pokemon-col-qty">Qty</th>
+                                    <th class="pokemon-col-price pokemon-sortable" data-sort="value">Price</th>
+                                    <th class="pokemon-col-trend">Trend</th>
+                                    <th class="pokemon-col-actions"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="pokemon-list-body"></tbody>
+                        </table>
+                        <div class="pokemon-empty-state" id="pokemon-empty">
+                            <span class="pokemon-empty-icon">🎴</span>
+                            <h3>No cards yet</h3>
+                            <p>Search for Pokémon cards above or scan one with your camera!</p>
+                        </div>
+                    </div>
+
+                    <!-- Price History Modal -->
+                    <div class="pokemon-modal-backdrop" id="pokemon-modal" hidden>
+                        <div class="pokemon-modal">
+                            <button class="pokemon-modal-close" id="pokemon-modal-close">✕</button>
+                            <div class="pokemon-modal-body" id="pokemon-modal-body"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         <footer class="hub-footer">
             <p>&copy; 2026 Finnegan Creaney</p>
         </footer>
@@ -1021,6 +1118,8 @@
     <script src="solitaire.js"></script>
     <script src="blackjack.js"></script>
     <script src="chancellor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="pokemon.js"></script>
 
     <!-- Chess deps (MIT). chessboard.js needs jQuery. -->
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
